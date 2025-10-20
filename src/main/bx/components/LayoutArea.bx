@@ -1,0 +1,287 @@
+/**
+ * BoxLang Component Which Generates Layout Areas
+ * 
+ * This component implements the functionality of the ColdFusion cflayoutarea tag,
+ * providing content areas within Layout components.
+ */
+@BoxComponent( LayoutArea )
+@AllowsBody( true )
+@RequiresBody( false )
+class{
+
+	variables.layoutComponentName = "Layout";
+
+	/**
+	 * The LayoutArea UI component
+	 *
+	 * <pre>
+	 * <bx:layout type="tab">
+	 *     <bx:layoutarea title="Tab 1" align="center">Content for Tab 1</bx:layoutarea>
+	 *     <bx:layoutarea title="Tab 2" source="content.cfm">Content loaded from source</bx:layoutarea>
+	 * </bx:layout>
+	 * </pre>
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+		
+		// Find parent Layout component
+		var layoutParentState = context.findClosestComponent( layoutComponentName );
+		if( isNull( layoutParentState ) ){
+			throw(
+				type		= "boxlang.compat.ui.MissingParentException",
+				message		= "LayoutArea component must be used within a Layout component"
+			);
+		}
+
+		// Get layout context
+		var layoutType = layoutParentState.layoutType ?: "tab";
+		var layoutId = layoutParentState.layoutId ?: "";
+
+		// Set default values based on layout type
+		param attributes.title = "";
+		param attributes.align = "";
+		param attributes.collapsible = true;
+		param attributes.initcollapsed = false;
+		param attributes.source = "";
+		param attributes.position = "center"; // For border layout
+		param attributes.size = ""; // For border layout regions
+		param attributes.splitter = true; // For border layout
+		param attributes.minsize = ""; // For border layout
+		param attributes.maxsize = ""; // For border layout
+
+		// Validate border layout position
+		if( layoutType == "border" && !isNull( attributes.position ) ){
+			var validPositions = [ "north", "south", "east", "west", "center" ];
+			if( !validPositions.contains( lcase( attributes.position ) ) ){
+				throw(
+					type		= "boxlang.compat.ui.InvalidAttributeException",
+					message		= "For border layout, position must be one of: #validPositions.toList()#"
+				);
+			}
+			attributes.position = lcase( attributes.position );
+		}
+
+		// Generate unique ID if not provided
+		if( isNull( attributes.id ) ){
+			attributes.id = "layoutarea_" & listLast( lcase( createUUID() ), "-" );
+		}
+
+		// Process body content or load from source
+		var areaContent = "";
+		if( !isNull( attributes.source ) && len( attributes.source ) ){
+			// Load content from source URL/file
+			try {
+				// In a real implementation, this would make an HTTP request or include a file
+				// For now, we'll just note that source was specified
+				areaContent = "<!-- Content loaded from: #attributes.source# -->";
+			} catch( any e ){
+				// Log error and fall back to body content
+				BoxAnnounce(
+					"LogMessage",
+					{
+						"text" : "Failed to load content from source: #attributes.source#. Error: #e.message#",
+						"level" : "WARN"
+					}
+				);
+			}
+		}
+		
+		// If no source content or source failed, process body
+		if( !len( areaContent ) ){
+			var buffer = newBuffer();
+			var bodyResult = processBody( context, body, buffer );
+			areaContent = buffer.toString();
+		}
+
+		// Create area data structure to pass to parent Layout
+		var areaData = {
+			"id" : attributes.id,
+			"title" : attributes.title,
+			"content" : areaContent,
+			"align" : attributes.align,
+			"collapsible" : attributes.collapsible,
+			"initcollapsed" : attributes.initcollapsed,
+			"position" : attributes.position,
+			"size" : attributes.size,
+			"splitter" : attributes.splitter,
+			"minsize" : attributes.minsize,
+			"maxsize" : attributes.maxsize,
+			"attributes" : attributes
+		};
+
+		// Add this area to the parent layout's areas collection
+		if( isNull( layoutParentState.areas ) ){
+			layoutParentState.areas = [];
+		}
+		layoutParentState.areas.append( areaData );
+
+		// For immediate rendering layouts (like border), we might render directly
+		if( shouldRenderDirectly( layoutType ) ){
+			renderAreaDirectly( context, layoutType, areaData );
+		}
+
+		// Don't write any output here - the parent Layout component will handle rendering
+		// This allows the Layout component to have full control over the structure
+	}
+
+	/**
+	 * Determine if this layout type should render areas immediately
+	 */
+	private function shouldRenderDirectly( required layoutType ){
+		// Most layouts collect areas and render them in the parent
+		// Border layout might benefit from immediate rendering for positioning
+		return false; // For now, always let parent handle rendering
+	}
+
+	/**
+	 * Render area content directly for specific layout types
+	 */
+	private function renderAreaDirectly( required context, required layoutType, required areaData ){
+		switch( layoutType ){
+			case "border":
+				renderBorderAreaDirectly( context, areaData );
+				break;
+			default:
+				// Do nothing - parent will handle
+				break;
+		}
+	}
+
+	/**
+	 * Render border area directly
+	 */
+	private function renderBorderAreaDirectly( required context, required areaData ){
+		var cssClasses = [ "bx-border-area", "bx-border-" & areaData.position ];
+		
+		if( areaData.splitter ){
+			cssClasses.append( "bx-border-splitter" );
+		}
+		
+		var styleAttributes = [];
+		if( !isNull( areaData.size ) && len( areaData.size ) ){
+			if( [ "north", "south" ].contains( areaData.position ) ){
+				styleAttributes.append( "height: #areaData.size#" );
+			} else if( [ "east", "west" ].contains( areaData.position ) ){
+				styleAttributes.append( "width: #areaData.size#" );
+			}
+		}
+		
+		if( !isNull( areaData.minsize ) && len( areaData.minsize ) ){
+			if( [ "north", "south" ].contains( areaData.position ) ){
+				styleAttributes.append( "min-height: #areaData.minsize#" );
+			} else if( [ "east", "west" ].contains( areaData.position ) ){
+				styleAttributes.append( "min-width: #areaData.minsize#" );
+			}
+		}
+		
+		if( !isNull( areaData.maxsize ) && len( areaData.maxsize ) ){
+			if( [ "north", "south" ].contains( areaData.position ) ){
+				styleAttributes.append( "max-height: #areaData.maxsize#" );
+			} else if( [ "east", "west" ].contains( areaData.position ) ){
+				styleAttributes.append( "max-width: #areaData.maxsize#" );
+			}
+		}
+
+		var tagContent = "<div";
+		tagContent &= " id=""#encodeForHTMLAttribute( areaData.id )#""";
+		tagContent &= " class=""#cssClasses.toList( " " )#""";
+		
+		if( styleAttributes.len() ){
+			tagContent &= " style=""#styleAttributes.toList( "; " )#""";
+		}
+		
+		tagContent &= ">";
+		tagContent &= areaData.content;
+		tagContent &= "</div>";
+		
+		context.writeToBuffer( tagContent );
+	}
+
+	/**
+	 * Validate attributes for specific layout types
+	 */
+	private function validateAttributes( required layoutType, required attributes ){
+		switch( layoutType ){
+			case "border":
+				validateBorderAttributes( attributes );
+				break;
+			case "accordion":
+				validateAccordionAttributes( attributes );
+				break;
+			case "tab":
+				validateTabAttributes( attributes );
+				break;
+			case "hbox":
+			case "vbox":
+				validateBoxAttributes( attributes );
+				break;
+		}
+	}
+
+	/**
+	 * Validate border layout specific attributes
+	 */
+	private function validateBorderAttributes( required attributes ){
+		var validPositions = [ "north", "south", "east", "west", "center" ];
+		if( !isNull( attributes.position ) && !validPositions.contains( lcase( attributes.position ) ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "Border layout position must be one of: #validPositions.toList()#"
+			);
+		}
+	}
+
+	/**
+	 * Validate accordion layout specific attributes
+	 */
+	private function validateAccordionAttributes( required attributes ){
+		// Accordion areas should have titles
+		if( isNull( attributes.title ) || !len( attributes.title ) ){
+			BoxAnnounce(
+				"LogMessage",
+				{
+					"text" : "Accordion layout areas should have a title attribute for best user experience.",
+					"level" : "WARN"
+				}
+			);
+		}
+	}
+
+	/**
+	 * Validate tab layout specific attributes
+	 */
+	private function validateTabAttributes( required attributes ){
+		// Tab areas should have titles
+		if( isNull( attributes.title ) || !len( attributes.title ) ){
+			BoxAnnounce(
+				"LogMessage",
+				{
+					"text" : "Tab layout areas should have a title attribute for best user experience.",
+					"level" : "WARN"
+				}
+			);
+		}
+	}
+
+	/**
+	 * Validate box layout specific attributes
+	 */
+	private function validateBoxAttributes( required attributes ){
+		// Box layouts don't typically use titles
+		if( !isNull( attributes.title ) && len( attributes.title ) ){
+			BoxAnnounce(
+				"LogMessage",
+				{
+					"text" : "Title attribute is not typically used with hbox/vbox layouts.",
+					"level" : "INFO"
+				}
+			);
+		}
+	}
+}

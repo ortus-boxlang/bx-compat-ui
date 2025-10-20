@@ -1,0 +1,373 @@
+/**
+ * BoxLang Component Which Generates the Layout Container
+ * 
+ * This component implements the functionality of the ColdFusion cflayout tag,
+ * providing various layout types including accordion, border, hbox, tab, and vbox.
+ */
+@BoxComponent( Layout )
+@AllowsBody( true )
+@RequiresBody( false )
+class{
+
+	/**
+	 * The Layout UI component
+	 *
+	 * <pre>
+	 * <bx:layout type="tab" align="center" fillHeight="true">
+	 *     <bx:layoutarea title="Tab 1">Content for Tab 1</bx:layoutarea>
+	 *     <bx:layoutarea title="Tab 2">Content for Tab 2</bx:layoutarea>
+	 * </bx:layout>
+	 * </pre>
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+		
+		// Validate required type attribute
+		if( isNull( attributes.type ) ){
+			throw(
+				type		= "boxlang.compat.ui.MissingAttributeException",
+				message		= "The type attribute is required for the Layout component"
+			);
+		}
+
+		// Validate type attribute values
+		var validTypes = [ "accordion", "border", "hbox", "tab", "vbox" ];
+		if( !validTypes.contains( lcase( attributes.type ) ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The type attribute must be one of: #validTypes.toList()#"
+			);
+		}
+
+		// Set default values
+		param attributes.align = "";
+		param attributes.fillHeight = false;
+		param attributes.fitToWindow = false;
+		param attributes.height = "";
+		param attributes.width = "";
+		param attributes.style = "";
+		param attributes.name = "";
+
+		// Non-HTML attributes that should not be passed through
+		var nonHTMLAttributes = [ "type", "fillHeight", "fitToWindow" ];
+
+		// Generate unique ID if not provided
+		if( isNull( attributes.id ) ){
+			attributes.id = "layout_" & listLast( lcase( createUUID() ), "-" );
+		}
+
+		// Store layout context for child layoutarea components
+		executionState.layoutType = lcase( attributes.type );
+		executionState.layoutId = attributes.id;
+		executionState.fillHeight = attributes.fillHeight;
+		executionState.fitToWindow = attributes.fitToWindow;
+		executionState.areas = [];
+
+		// Generate CSS classes based on layout type and attributes
+		var cssClasses = [ "bx-layout", "bx-layout-" & lcase( attributes.type ) ];
+		
+		if( attributes.fillHeight ){
+			cssClasses.append( "bx-layout-fill-height" );
+		}
+		
+		if( attributes.fitToWindow ){
+			cssClasses.append( "bx-layout-fit-window" );
+		}
+		
+		if( !isNull( attributes.align ) && len( attributes.align ) ){
+			cssClasses.append( "bx-layout-align-" & lcase( attributes.align ) );
+		}
+
+		// Start building the HTML output
+		var tagContent = "<div";
+		
+		// Add ID
+		tagContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+		
+		// Add CSS classes
+		var classAttribute = "class=""#cssClasses.toList( " " )#""";
+		if( !isNull( attributes.class ) && len( attributes.class ) ){
+			classAttribute = "class=""#cssClasses.toList( " " )# #encodeForHTMLAttribute( attributes.class )#""";
+		}
+		tagContent &= " " & classAttribute;
+
+		// Add HTML attributes (excluding non-HTML ones)
+		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.contains( key ) && key != "id" && key != "class" ).each( ( key, value ) => {
+			if( key == "style" && len( value ) ){
+				var styleValue = value;
+				// Add layout-specific styles
+				if( !isNull( attributes.height ) && len( attributes.height ) ){
+					styleValue &= "; height: #attributes.height#";
+				}
+				if( !isNull( attributes.width ) && len( attributes.width ) ){
+					styleValue &= "; width: #attributes.width#";
+				}
+				tagContent &= " style=""#encodeForHTMLAttribute( styleValue )#""";
+			} else if( key != "height" && key != "width" && key != "style" ){
+				tagContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+			}
+		} );
+
+		// Handle inline styles for dimensions
+		if( ( !isNull( attributes.height ) && len( attributes.height ) ) || ( !isNull( attributes.width ) && len( attributes.width ) ) ){
+			if( isNull( attributes.style ) || !len( attributes.style ) ){
+				var inlineStyle = "";
+				if( !isNull( attributes.height ) && len( attributes.height ) ){
+					inlineStyle &= "height: #attributes.height#;";
+				}
+				if( !isNull( attributes.width ) && len( attributes.width ) ){
+					inlineStyle &= " width: #attributes.width#;";
+				}
+				tagContent &= " style=""#encodeForHTMLAttribute( inlineStyle )#""";
+			}
+		}
+
+		tagContent &= ">";
+
+		// Write opening tag
+		context.writeToBuffer( tagContent );
+
+		// Generate layout-specific structure based on type
+		switch( lcase( attributes.type ) ){
+			case "tab":
+				context.writeToBuffer( generateTabStructure( executionState ) );
+				break;
+			case "accordion":
+				context.writeToBuffer( generateAccordionStructure( executionState ) );
+				break;
+			case "border":
+				context.writeToBuffer( generateBorderStructure( executionState ) );
+				break;
+			case "hbox":
+			case "vbox":
+				context.writeToBuffer( generateBoxStructure( executionState, lcase( attributes.type ) ) );
+				break;
+		}
+
+		// Process the body to capture layoutarea components
+		var buffer = newBuffer();
+		var bodyResult = processBody( context, body, buffer );
+		
+		// The layoutarea components will have populated executionState.areas
+		// Now we need to render them in the appropriate structure
+		renderLayoutAreas( context, executionState );
+
+		// Close layout structure
+		switch( lcase( attributes.type ) ){
+			case "tab":
+				context.writeToBuffer( "</div>" ); // Close tab content container
+				break;
+			case "accordion":
+				// Accordion areas are rendered inline
+				break;
+			case "border":
+				context.writeToBuffer( "</div>" ); // Close border center if exists
+				break;
+			case "hbox":
+			case "vbox":
+				// Box areas are rendered inline
+				break;
+		}
+
+		// Write closing tag
+		context.writeToBuffer( "</div>" );
+
+		// Generate JavaScript initialization if needed
+		generateLayoutScript( context, attributes, executionState );
+	}
+
+	/**
+	 * Generate tab layout structure
+	 */
+	private function generateTabStructure( required executionState ){
+		return "<div class=""bx-tab-headers""></div><div class=""bx-tab-content"">";
+	}
+
+	/**
+	 * Generate accordion layout structure
+	 */
+	private function generateAccordionStructure( required executionState ){
+		return ""; // Accordion panels are generated inline
+	}
+
+	/**
+	 * Generate border layout structure
+	 */
+	private function generateBorderStructure( required executionState ){
+		return ""; // Border regions are positioned absolutely
+	}
+
+	/**
+	 * Generate box layout structure (hbox/vbox)
+	 */
+	private function generateBoxStructure( required executionState, required type ){
+		return ""; // Box items are rendered inline with flexbox
+	}
+
+	/**
+	 * Render layout areas based on collected data
+	 */
+	private function renderLayoutAreas( required context, required executionState ){
+		var layoutType = executionState.layoutType;
+		
+		switch( layoutType ){
+			case "tab":
+				renderTabAreas( context, executionState );
+				break;
+			case "accordion":
+				renderAccordionAreas( context, executionState );
+				break;
+			case "border":
+				renderBorderAreas( context, executionState );
+				break;
+			case "hbox":
+			case "vbox":
+				renderBoxAreas( context, executionState );
+				break;
+		}
+	}
+
+	/**
+	 * Render tab areas
+	 */
+	private function renderTabAreas( required context, required executionState ){
+		var areas = executionState.areas ?: [];
+		var layoutId = executionState.layoutId;
+		
+		// Render tab headers
+		var tabHeaders = "<div class=""bx-tab-headers"">";
+		for( var i = 1; i <= areas.len(); i++ ){
+			var area = areas[i];
+			var activeClass = i == 1 ? " active" : "";
+			tabHeaders &= "<button class=""bx-tab-header#activeClass#"" data-tab=""#layoutId#_tab_#i#"">#encodeForHTML( area.title ?: 'Tab #i#' )#</button>";
+		}
+		tabHeaders &= "</div>";
+		
+		// Insert tab headers before content
+		context.writeToBuffer( tabHeaders );
+		
+		// Render tab content panels
+		for( var i = 1; i <= areas.len(); i++ ){
+			var area = areas[i];
+			var activeClass = i == 1 ? " active" : "";
+			context.writeToBuffer( "<div id=""#layoutId#_tab_#i#"" class=""bx-tab-panel#activeClass#"">" );
+			context.writeToBuffer( area.content );
+			context.writeToBuffer( "</div>" );
+		}
+	}
+
+	/**
+	 * Render accordion areas
+	 */
+	private function renderAccordionAreas( required context, required executionState ){
+		var areas = executionState.areas ?: [];
+		
+		for( var i = 1; i <= areas.len(); i++ ){
+			var area = areas[i];
+			var collapsedClass = area.initcollapsed ? " collapsed" : "";
+			
+			context.writeToBuffer( "<div class=""bx-accordion-panel#collapsedClass#"">" );
+			context.writeToBuffer( "<div class=""bx-accordion-header"">#encodeForHTML( area.title ?: 'Panel #i#' )#</div>" );
+			context.writeToBuffer( "<div class=""bx-accordion-content"">" );
+			context.writeToBuffer( area.content );
+			context.writeToBuffer( "</div></div>" );
+		}
+	}
+
+	/**
+	 * Render border areas
+	 */
+	private function renderBorderAreas( required context, required executionState ){
+		var areas = executionState.areas ?: [];
+		
+		for( var area in areas ){
+			var position = area.position ?: "center";
+			context.writeToBuffer( "<div class=""bx-border-#position#"">" );
+			context.writeToBuffer( area.content );
+			context.writeToBuffer( "</div>" );
+		}
+	}
+
+	/**
+	 * Render box areas (hbox/vbox)
+	 */
+	private function renderBoxAreas( required context, required executionState ){
+		var areas = executionState.areas ?: [];
+		
+		for( var area in areas ){
+			context.writeToBuffer( "<div class=""bx-box-item"">" );
+			context.writeToBuffer( area.content );
+			context.writeToBuffer( "</div>" );
+		}
+	}
+
+	/**
+	 * Generate JavaScript for layout functionality
+	 */
+	private function generateLayoutScript( required context, required attributes, required executionState ){
+		var layoutType = lcase( attributes.type );
+		var layoutId = attributes.id;
+		
+		// Only generate script for interactive layouts
+		if( [ "tab", "accordion" ].contains( layoutType ) ){
+			var script = "<script type=""text/javascript"">";
+			script &= "(function(){";
+			script &= "var layout = document.getElementById('#layoutId#');";
+			
+			if( layoutType == "tab" ){
+				script &= generateTabScript( layoutId );
+			} else if( layoutType == "accordion" ){
+				script &= generateAccordionScript( layoutId );
+			}
+			
+			script &= "})();";
+			script &= "</script>";
+			
+			context.writeToBuffer( script );
+		}
+	}
+
+	/**
+	 * Generate tab functionality script
+	 */
+	private function generateTabScript( required layoutId ){
+		return "
+			layout.addEventListener('click', function(e) {
+				if (e.target.classList.contains('bx-tab-header')) {
+					var tabId = e.target.getAttribute('data-tab');
+					// Hide all panels
+					layout.querySelectorAll('.bx-tab-panel').forEach(function(panel) {
+						panel.classList.remove('active');
+					});
+					// Remove active from all headers
+					layout.querySelectorAll('.bx-tab-header').forEach(function(header) {
+						header.classList.remove('active');
+					});
+					// Show target panel and activate header
+					document.getElementById(tabId).classList.add('active');
+					e.target.classList.add('active');
+				}
+			});
+		";
+	}
+
+	/**
+	 * Generate accordion functionality script
+	 */
+	private function generateAccordionScript( required layoutId ){
+		return "
+			layout.addEventListener('click', function(e) {
+				if (e.target.classList.contains('bx-accordion-header')) {
+					var panel = e.target.parentNode;
+					panel.classList.toggle('collapsed');
+				}
+			});
+		";
+	}
+}

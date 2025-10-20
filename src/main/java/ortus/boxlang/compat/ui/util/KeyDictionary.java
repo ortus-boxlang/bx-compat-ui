@@ -23,4 +23,22 @@ public class KeyDictionary {
 
 	public static final Key moduleName = new Key( "bx-compat-ui" );
 
+	// Layout component keys
+	public static final Key type = new Key( "type" );
+	public static final Key align = new Key( "align" );
+	public static final Key fillHeight = new Key( "fillHeight" );
+	public static final Key fitToWindow = new Key( "fitToWindow" );
+	public static final Key height = new Key( "height" );
+	public static final Key width = new Key( "width" );
+	public static final Key style = new Key( "style" );
+	public static final Key title = new Key( "title" );
+	public static final Key collapsible = new Key( "collapsible" );
+	public static final Key initcollapsed = new Key( "initcollapsed" );
+	public static final Key source = new Key( "source" );
+	public static final Key position = new Key( "position" );
+	public static final Key size = new Key( "size" );
+	public static final Key splitter = new Key( "splitter" );
+	public static final Key minsize = new Key( "minsize" );
+	public static final Key maxsize = new Key( "maxsize" );
+
 }
