@@ -419,7 +419,7 @@ class{
 							})
 							.catch(function(error) {
 								console.warn('Failed to load content from ' + sourceUrl + ':', error);
-								element.innerHTML = '<div class=\"\"bx-source-error\"\">' +
+								element.innerHTML = '<div class=""bx-source-error"">' +
 									'<p>Error loading content from: ' + sourceUrl + '</p>' +
 									'<p>Error: ' + error.message + '</p>' +
 									'</div>';
