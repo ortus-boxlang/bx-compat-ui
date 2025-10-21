@@ -18,7 +18,6 @@ This is a BoxLang module for Excel spreadsheet manipulation built on Apache POI.
 - `src/main/bx/` - Root directory for Boxlang components and BIFs
   - `bifs/` - Individual BIF function implementations (`@BoxBIF` annotated)
   - `components/` - Component tag implementations (`@BoxComponent` annotated)
-  - `util/KeyDictionary.java` - Centralized Key constants
 
 
 ## Development Workflows
@@ -57,7 +56,7 @@ public class MyTest extends BaseIntegrationTest {
 
 ### Module Loading
 
-Module uses `KeyDictionary.moduleName = "bx-spreadsheet"` for registration. The `BaseIntegrationTest.loadModule()` handles module lifecycle during testing.
+Module uses the module name `bx-compat-ui` for registration. The `BaseIntegrationTest.loadModule()` handles module lifecycle during testing.
 
 ## BoxLang Type Helpers and Casters
 
