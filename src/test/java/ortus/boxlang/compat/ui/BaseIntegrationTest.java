@@ -12,7 +12,7 @@
  * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-package ortus.boxlang.moduleslug;
+package ortus.boxlang.compat.ui;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,7 +40,7 @@ public abstract class BaseIntegrationTest {
 	protected static ModuleService			moduleService;
 	protected static ModuleRecord			moduleRecord;
 	protected static Key					result		= new Key( "result" );
-	protected static Key					moduleName	= KeyDictionary.moduleName;
+	protected static Key					moduleName	= new Key( KeyDictionary.moduleName );
 	protected ScriptingRequestBoxContext	context;
 	protected IScope						variables;
 
