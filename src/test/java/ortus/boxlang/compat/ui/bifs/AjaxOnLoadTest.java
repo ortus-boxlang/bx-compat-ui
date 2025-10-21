@@ -132,25 +132,25 @@ public class AjaxOnLoadTest extends BaseIntegrationTest {
 		    ajaxOnLoad("validFunction");
 		    result1 = getBoxContext().getBuffer().toString();
 		    getBoxContext().getBuffer().reset();
-		    
+
 		    ajaxOnLoad("_privateFunction");
 		    result2 = getBoxContext().getBuffer().toString();
 		    getBoxContext().getBuffer().reset();
-		    
+
 		    ajaxOnLoad("$jquery");
 		    result3 = getBoxContext().getBuffer().toString();
 		    getBoxContext().getBuffer().reset();
-		    
+
 		    ajaxOnLoad("func123");
 		    result4 = getBoxContext().getBuffer().toString();
 		    """,
 		    context
 		);
 
-		String result1 = variables.getAsString( Key.of( "result1" ) );
-		String result2 = variables.getAsString( Key.of( "result2" ) );
-		String result3 = variables.getAsString( Key.of( "result3" ) );
-		String result4 = variables.getAsString( Key.of( "result4" ) );
+		String	result1	= variables.getAsString( Key.of( "result1" ) );
+		String	result2	= variables.getAsString( Key.of( "result2" ) );
+		String	result3	= variables.getAsString( Key.of( "result3" ) );
+		String	result4	= variables.getAsString( Key.of( "result4" ) );
 
 		assertThat( result1 ).contains( "validFunction()" );
 		assertThat( result2 ).contains( "_privateFunction()" );

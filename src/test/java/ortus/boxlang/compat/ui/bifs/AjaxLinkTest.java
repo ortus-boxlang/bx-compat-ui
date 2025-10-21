@@ -17,7 +17,7 @@ package ortus.boxlang.compat.ui.bifs;
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.Test;
+import org.junit.jupiter.api.Test;
 
 import ortus.boxlang.compat.ui.BaseIntegrationTest;
 import ortus.boxlang.runtime.scopes.Key;
@@ -147,7 +147,7 @@ public class AjaxLinkTest extends BaseIntegrationTest {
 		// Should not contain unescaped quotes that would break JavaScript
 		assertThat( result ).doesNotContain( "'Hello \"World\"'" );
 		// Should contain properly escaped content
-		assertThat( result ).contains( "\\'Hello \\\"World\\\"\\'");
+		assertThat( result ).contains( "\\'Hello \\\"World\\\"\\'" );
 	}
 
 	@DisplayName( "It includes fallback error handling" )

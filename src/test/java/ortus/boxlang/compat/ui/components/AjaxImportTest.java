@@ -37,7 +37,7 @@ public class AjaxImportTest extends BaseIntegrationTest {
 		);
 
 		String output = variables.getAsString( Key.of( "result" ) );
-		
+
 		// Check CSS imports
 		assertThat( output ).contains( "<link rel=\"stylesheet\" type=\"text/css\" href=\"/bx-compat-ui/css/boxlang-ajax-core.css\"" );
 		assertThat( output ).contains( "boxlang-layout.css" );
@@ -45,7 +45,7 @@ public class AjaxImportTest extends BaseIntegrationTest {
 		assertThat( output ).contains( "boxlang-grid.css" );
 		assertThat( output ).contains( "boxlang-tooltip.css" );
 		assertThat( output ).contains( "boxlang-pod.css" );
-		
+
 		// Check JavaScript imports
 		assertThat( output ).contains( "<script type=\"text/javascript\" src=\"/bx-compat-ui/js/boxlang-ajax-core.js\"></script>" );
 		assertThat( output ).contains( "boxlang-layout.js" );
@@ -69,17 +69,17 @@ public class AjaxImportTest extends BaseIntegrationTest {
 		);
 
 		String output = variables.getAsString( Key.of( "result" ) );
-		
+
 		// Should contain core files
 		assertThat( output ).contains( "boxlang-ajax-core.css" );
 		assertThat( output ).contains( "boxlang-ajax-core.js" );
-		
+
 		// Should contain specific tag files
 		assertThat( output ).contains( "boxlang-layout.css" );
 		assertThat( output ).contains( "boxlang-grid.css" );
 		assertThat( output ).contains( "boxlang-layout.js" );
 		assertThat( output ).contains( "boxlang-grid.js" );
-		
+
 		// Should not contain other tag files
 		assertThat( output ).doesNotContain( "boxlang-div.css" );
 		assertThat( output ).doesNotContain( "boxlang-tooltip.css" );
