@@ -28,7 +28,6 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testBasicTabLayout() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout type="tab" id="myTabLayout" {
 		        bx:layoutarea title="Tab 1" {
 		            writeOutput("Content for Tab 1");
@@ -37,11 +36,12 @@ public class LayoutTest extends BaseIntegrationTest {
 		            writeOutput("Content for Tab 2");
 		        }
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-layout" );
 		assertThat( output ).contains( "bx-layout-tab" );
 		assertThat( output ).contains( "id=\"myTabLayout\"" );
@@ -58,7 +58,6 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testAccordionLayout() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout type="accordion" fillHeight="true" {
 		        bx:layoutarea title="Section 1" {
 		            writeOutput("Content for Section 1");
@@ -67,11 +66,12 @@ public class LayoutTest extends BaseIntegrationTest {
 		            writeOutput("Content for Section 2");
 		        }
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-layout" );
 		assertThat( output ).contains( "bx-layout-accordion" );
 		assertThat( output ).contains( "bx-layout-fill-height" );
@@ -88,7 +88,6 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testBorderLayout() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout type="border" height="500px" {
 		        bx:layoutarea position="top" title="Header" {
 		            writeOutput("Header content");
@@ -106,11 +105,12 @@ public class LayoutTest extends BaseIntegrationTest {
 		            writeOutput("Footer content");
 		        }
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-layout" );
 		assertThat( output ).contains( "bx-layout-border" );
 		assertThat( output ).contains( "height: 500px" );
@@ -131,7 +131,6 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testHBoxLayout() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout type="hbox" align="center" {
 		        bx:layoutarea {
 		            writeOutput("Box 1");
@@ -143,11 +142,12 @@ public class LayoutTest extends BaseIntegrationTest {
 		            writeOutput("Box 3");
 		        }
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-layout" );
 		assertThat( output ).contains( "bx-layout-hbox" );
 		assertThat( output ).contains( "bx-layout-align-center" );
@@ -162,7 +162,6 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testVBoxLayout() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout type="vbox" width="300px" {
 		        bx:layoutarea {
 		            writeOutput("Vertical Box 1");
@@ -171,11 +170,12 @@ public class LayoutTest extends BaseIntegrationTest {
 		            writeOutput("Vertical Box 2");
 		        }
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-layout" );
 		assertThat( output ).contains( "bx-layout-vbox" );
 		assertThat( output ).contains( "width: 300px" );
@@ -227,17 +227,17 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testJavaScriptGeneration() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout type="tab" id="jsTabTest" {
 		        bx:layoutarea title="Interactive Tab" {
 		            writeOutput("Interactive content");
 		        }
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "<script type=\"text/javascript\">" );
 		assertThat( output ).contains( "getElementById('jsTabTest')" );
 		assertThat( output ).contains( "bx-tab-header" );
@@ -249,7 +249,6 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testCustomCSSAndStyles() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout
 		        type="tab"
 		        class="my-custom-class"
@@ -260,11 +259,12 @@ public class LayoutTest extends BaseIntegrationTest {
 		            writeOutput("Styled content");
 		        }
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-layout bx-layout-tab bx-layout-fill-height bx-layout-fit-window my-custom-class" );
 		assertThat( output ).contains( "background-color: red;" );
 		assertThat( output ).contains( "Styled content" );
@@ -275,15 +275,15 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testEmptyLayout() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout type="tab" id="emptyLayout" {
 		        // No layout areas
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-layout" );
 		assertThat( output ).contains( "bx-layout-tab" );
 		assertThat( output ).contains( "id=\"emptyLayout\"" );
@@ -295,17 +295,17 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testAutoGeneratedID() {
 		runtime.executeSource(
 		    """
-		    result = writeOutput("");
 		    bx:layout type="tab" {
 		        bx:layoutarea title="Auto ID Test" {
 		            writeOutput("Test content");
 		        }
 		    }
+		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
 		);
 
-		String output = context.getBuffer().toString();
+		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "id=\"layout_" );
 		assertThat( output ).contains( "bx-layout" );
 	}
