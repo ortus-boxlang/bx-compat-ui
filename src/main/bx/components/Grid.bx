@@ -36,6 +36,52 @@ class{
 	 * @attribute.id - string, optional - HTML element ID (auto-generated if not provided)
 	 * @attribute.class - string, optional - Additional CSS classes
 	 * @attribute.style - string, optional - Additional CSS styles
+	 * 
+	 * Additional Adobe ColdFusion cfgrid compatible attributes:
+	 * @attribute.appendKey - boolean, optional - Append key field to form data (default: false)
+	 * @attribute.bgColor - string, optional - Background color for grid
+	 * @attribute.bind - string, optional - Data binding expression for AJAX
+	 * @attribute.bindOnLoad - boolean, optional - Whether to bind data on initial load (default: true)
+	 * @attribute.bold - boolean, optional - Bold text formatting (default: false)
+	 * @attribute.colHeaderBold - boolean, optional - Bold column headers (default: false)
+	 * @attribute.colHeaderFont - string, optional - Column header font family
+	 * @attribute.colHeaderFontSize - number, optional - Column header font size
+	 * @attribute.colHeaderItalic - boolean, optional - Italic column headers (default: false)
+	 * @attribute.colHeaderTextColor - string, optional - Column header text color
+	 * @attribute.collapsible - boolean, optional - Whether grid is collapsible (default: false)
+	 * @attribute.delete - boolean, optional - Allow delete operations (default: false)
+	 * @attribute.deleteButton - boolean, optional - Show delete button (default: false)
+	 * @attribute.enabled - boolean, optional - Enable/disable grid (default: true)
+	 * @attribute.font - string, optional - Text font family
+	 * @attribute.fontSize - number, optional - Text font size
+	 * @attribute.format - string, optional - Data format: html, xml, flash (default: html)
+	 * @attribute.gridDataAlign - string, optional - Data alignment: left, center, right (default: left)
+	 * @attribute.groupfield - string, optional - Field to group by
+	 * @attribute.href - string, optional - URL for links in grid
+	 * @attribute.hrefKey - string, optional - Key field for href links
+	 * @attribute.hSpace - number, optional - Horizontal spacing (default: 0)
+	 * @attribute.insert - boolean, optional - Allow insert operations (default: false)
+	 * @attribute.insertButton - boolean, optional - Show insert button (default: false)
+	 * @attribute.italic - boolean, optional - Italic text formatting (default: false)
+	 * @attribute.maxRows - number, optional - Maximum rows to display (default: 0 = no limit)
+	 * @attribute.multirowselect - boolean, optional - Multiple row selection (default: false)
+	 * @attribute.notSupported - string, optional - Message when grid format not supported
+	 * @attribute.onBlur - string, optional - Blur event handler
+	 * @attribute.onChange - string, optional - Change event handler
+	 * @attribute.onError - string, optional - Error event handler
+	 * @attribute.onFocus - string, optional - Focus event handler
+	 * @attribute.onValidate - string, optional - Validation event handler
+	 * @attribute.preservePageOnSort - boolean, optional - Preserve page when sorting (default: false)
+	 * @attribute.resetHead - boolean, optional - Reset column headers (default: false)
+	 * @attribute.rowHeight - number, optional - Height of rows in pixels
+	 * @attribute.selectColor - string, optional - Selection highlight color
+	 * @attribute.selectOnLoad - boolean, optional - Select first row on load (default: false)
+	 * @attribute.stripeRowColor - string, optional - Alternate row color
+	 * @attribute.target - string, optional - Target for href links
+	 * @attribute.textColor - string, optional - Text color
+	 * @attribute.title - string, optional - Grid title
+	 * @attribute.tooltip - string, optional - Tooltip text
+	 * @attribute.visible - boolean, optional - Grid visibility (default: true)
 	 *
 	 * @param context The context of the execution (IBoxContext)
 	 * @param attributes The attributes of the component that were passed in
