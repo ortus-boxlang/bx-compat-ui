@@ -52,7 +52,7 @@ class{
 	 * @attribute.enabled - boolean, optional - Enable/disable grid (default: true)
 	 * @attribute.font - string, optional - Text font family
 	 * @attribute.fontSize - number, optional - Text font size
-	 * @attribute.format - string, optional - Data format: html, xml, flash (default: html)
+	 * @attribute.format - Only HTML format is supported ( default )
 	 * @attribute.gridDataAlign - string, optional - Data alignment: left, center, right (default: left)
 	 * @attribute.groupfield - string, optional - Field to group by
 	 * @attribute.href - string, optional - URL for links in grid
@@ -114,8 +114,6 @@ class{
 		param attributes.onSort = "";
 		param attributes.class = "";
 		param attributes.style = "";
-		
-		// Additional cfgrid attributes
 		param attributes.appendKey = false;
 		param attributes.bgColor = "";
 		param attributes.bind = "";
@@ -171,7 +169,7 @@ class{
 		}
 
 		// Validate format attribute
-		var validFormats = [ "html", "xml", "flash" ];
+		var validFormats = [ "html" ];
 		if( !validFormats.containsNoCase( attributes.format ) ){
 			throw(
 				type		= "boxlang.compat.ui.InvalidAttributeException",
@@ -199,13 +197,13 @@ class{
 		}
 
 		// Non-HTML attributes that should not be passed through
-		var nonHTMLAttributes = [ 
-			"name", "query", "pageSize", "sortable", "editable", "autoWidth", "stripeRows", "showHeaders", "selectMode", 
-			"onLoad", "onEdit", "onSort", "appendKey", "bind", "bindOnLoad", "bold", "colHeaderBold", "colHeaderFont", 
-			"colHeaderFontSize", "colHeaderItalic", "colHeaderTextColor", "collapsible", "delete", "deleteButton", 
-			"enabled", "font", "fontSize", "format", "gridDataAlign", "groupfield", "href", "hrefKey", "hSpace", 
-			"insert", "insertButton", "italic", "maxRows", "multirowselect", "notSupported", "onBlur", "onChange", 
-			"onError", "onFocus", "onValidate", "preservePageOnSort", "resetHead", "rowHeight", "selectColor", 
+		var nonHTMLAttributes = [
+			"name", "query", "pageSize", "sortable", "editable", "autoWidth", "stripeRows", "showHeaders", "selectMode",
+			"onLoad", "onEdit", "onSort", "appendKey", "bind", "bindOnLoad", "bold", "colHeaderBold", "colHeaderFont",
+			"colHeaderFontSize", "colHeaderItalic", "colHeaderTextColor", "collapsible", "delete", "deleteButton",
+			"enabled", "font", "fontSize", "format", "gridDataAlign", "groupfield", "href", "hrefKey", "hSpace",
+			"insert", "insertButton", "italic", "maxRows", "multirowselect", "notSupported", "onBlur", "onChange",
+			"onError", "onFocus", "onValidate", "preservePageOnSort", "resetHead", "rowHeight", "selectColor",
 			"selectOnLoad", "stripeRowColor", "target", "textColor", "title", "tooltip", "visible"
 		];
 
@@ -277,7 +275,6 @@ class{
 		gridContent &= " data-sortable=""#attributes.sortable#""";
 		gridContent &= " data-editable=""#attributes.editable#""";
 		gridContent &= " data-select-mode=""#attributes.selectMode#""";
-		gridContent &= " data-format=""#attributes.format#""";
 		gridContent &= " data-enabled=""#attributes.enabled#""";
 		gridContent &= " data-append-key=""#attributes.appendKey#""";
 		gridContent &= " data-delete=""#attributes.delete#""";
@@ -462,7 +459,7 @@ class{
 			if( attributes.colHeaderItalic ){
 				headerStyles.append( "font-style: italic" );
 			}
-			
+
 			if( headerStyles.len() ){
 				headContent &= " style=""#headerStyles.toList( "; " )#""";
 			}
