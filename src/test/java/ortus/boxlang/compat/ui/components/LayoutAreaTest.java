@@ -29,7 +29,7 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			        bx:layoutarea( title="Orphan Area" ) {
+			        bx:layoutarea title="Orphan Area" {
 			            writeOutput("This should fail");
 			        }
 			        """,
@@ -46,8 +46,8 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			        bx:layout( type="border" ) {
-			            bx:layoutarea( position="invalid" ) {
+			        bx:layout type="border" {
+			            bx:layoutarea position="invalid" {
 			                writeOutput("Invalid position");
 			            }
 			        }
@@ -65,20 +65,20 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="border" ) {
-		            bx:layoutarea( position="top", size="50px", title="Header" ) {
+		        bx:layout type="border" {
+		            bx:layoutarea position="top" size="50px" title="Header" {
 		                writeOutput("Top content");
 		            }
-		            bx:layoutarea( position="bottom", size="30px" ) {
+		            bx:layoutarea position="bottom" size="30px" {
 		                writeOutput("Bottom content");
 		            }
-		            bx:layoutarea( position="left", size="200px", minsize="100px", maxsize="300px" ) {
+		            bx:layoutarea position="left" size="200px" minsize="100px" maxsize="300px" {
 		                writeOutput("Left content");
 		            }
-		            bx:layoutarea( position="right", size="150px", splitter="false" ) {
+		            bx:layoutarea position="right" size="150px" splitter="false" {
 		                writeOutput("Right content");
 		            }
-		            bx:layoutarea( position="center" ) {
+		            bx:layoutarea position="center" {
 		                writeOutput("Center content");
 		            }
 		        }
@@ -105,14 +105,14 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="accordion" ) {
-		            bx:layoutarea( title="First Panel", collapsible="true" ) {
+		        bx:layout type="accordion" {
+		            bx:layoutarea title="First Panel" collapsible="true" {
 		                writeOutput("First panel content");
 		            }
-		            bx:layoutarea( title="Second Panel", initcollapsed="true" ) {
+		            bx:layoutarea title="Second Panel" initcollapsed="true" {
 		                writeOutput("Second panel content");
 		            }
-		            bx:layoutarea( title="Third Panel", collapsible="false" ) {
+		            bx:layoutarea title="Third Panel" collapsible="false" {
 		                writeOutput("Third panel content");
 		            }
 		        }
@@ -139,14 +139,14 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab" ) {
-		            bx:layoutarea( title="Home Tab" ) {
+		        bx:layout type="tab" {
+		            bx:layoutarea title="Home Tab" {
 		                writeOutput("Home tab content");
 		            }
-		            bx:layoutarea( title="About Tab" ) {
+		            bx:layoutarea title="About Tab" {
 		                writeOutput("About tab content");
 		            }
-		            bx:layoutarea( title="Contact Tab" ) {
+		            bx:layoutarea title="Contact Tab" {
 		                writeOutput("Contact tab content");
 		            }
 		        }
@@ -172,14 +172,14 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="hbox" ) {
-		            bx:layoutarea() {
+		        bx:layout type="hbox" {
+		            bx:layoutarea {
 		                writeOutput("First box");
 		            }
-		            bx:layoutarea() {
+		            bx:layoutarea {
 		                writeOutput("Second box");
 		            }
-		            bx:layoutarea() {
+		            bx:layoutarea {
 		                writeOutput("Third box");
 		            }
 		        }
@@ -200,8 +200,8 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab" ) {
-		            bx:layoutarea( title="Test Tab" ) {
+		        bx:layout type="tab" {
+		            bx:layoutarea title="Test Tab" {
 		                writeOutput("Test content");
 		            }
 		        }
@@ -219,8 +219,8 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab" ) {
-		            bx:layoutarea( id="customTabArea", title="Custom Tab" ) {
+		        bx:layout type="tab" {
+		            bx:layoutarea id="customTabArea" title="Custom Tab" {
 		                writeOutput("Custom content");
 		            }
 		        }
@@ -240,8 +240,8 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab" ) {
-		            bx:layoutarea( title="External Content", source="external.cfm" ) {
+		        bx:layout type="tab" {
+		            bx:layoutarea title="External Content" source="external.cfm" {
 		                writeOutput("Fallback content");
 		            }
 		        }
@@ -261,14 +261,14 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="hbox" ) {
-		            bx:layoutarea( align="left" ) {
+		        bx:layout type="hbox" {
+		            bx:layoutarea align="left" {
 		                writeOutput("Left aligned");
 		            }
-		            bx:layoutarea( align="center" ) {
+		            bx:layoutarea align="center" {
 		                writeOutput("Center aligned");
 		            }
-		            bx:layoutarea( align="right" ) {
+		            bx:layoutarea align="right" {
 		                writeOutput("Right aligned");
 		            }
 		        }
@@ -288,8 +288,8 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab" ) {
-		            bx:layoutarea( title="Complex Tab" ) {
+		        bx:layout type="tab" {
+		            bx:layoutarea title="Complex Tab" {
 		                writeOutput("<div class='nested-content'>");
 		                writeOutput("<h2>Nested Heading</h2>");
 		                writeOutput("<p>Paragraph with <strong>bold</strong> text.</p>");
@@ -315,11 +315,11 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab" ) {
-		            bx:layoutarea( title="Empty Tab" ) {
+		        bx:layout type="tab" {
+		            bx:layoutarea title="Empty Tab" {
 		                // No content
 		            }
-		            bx:layoutarea( title="Another Empty Tab" ) {
+		            bx:layoutarea title="Another Empty Tab" {
 		                writeOutput("");
 		            }
 		        }

@@ -29,11 +29,11 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab", id="myTabLayout" ) {
-		            bx:layoutarea( title="Tab 1" ) {
+		        bx:layout type="tab" id="myTabLayout" {
+		            bx:layoutarea title="Tab 1" {
 		                writeOutput("Content for Tab 1");
 		            }
-		            bx:layoutarea( title="Tab 2" ) {
+		            bx:layoutarea title="Tab 2" {
 		                writeOutput("Content for Tab 2");
 		            }
 		        }
@@ -59,11 +59,11 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="accordion", fillHeight="true" ) {
-		            bx:layoutarea( title="Section 1" ) {
+		        bx:layout type="accordion" fillHeight="true" {
+		            bx:layoutarea title="Section 1" {
 		                writeOutput("Content for Section 1");
 		            }
-		            bx:layoutarea( title="Section 2", initcollapsed="true" ) {
+		            bx:layoutarea title="Section 2" initcollapsed="true" {
 		                writeOutput("Content for Section 2");
 		            }
 		        }
@@ -89,20 +89,20 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="border", height="500px" ) {
-		            bx:layoutarea( position="top", title="Header" ) {
+		        bx:layout type="border" height="500px" {
+		            bx:layoutarea position="top" title="Header" {
 		                writeOutput("Header content");
 		            }
-		            bx:layoutarea( position="left", size="200px" ) {
+		            bx:layoutarea position="left" size="200px" {
 		                writeOutput("Left sidebar");
 		            }
-		            bx:layoutarea( position="center" ) {
+		            bx:layoutarea position="center" {
 		                writeOutput("Main content");
 		            }
-		            bx:layoutarea( position="right", size="150px" ) {
+		            bx:layoutarea position="right" size="150px" {
 		                writeOutput("Right sidebar");
 		            }
-		            bx:layoutarea( position="bottom" ) {
+		            bx:layoutarea position="bottom" {
 		                writeOutput("Footer content");
 		            }
 		        }
@@ -132,14 +132,14 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="hbox", align="center" ) {
-		            bx:layoutarea() {
+		        bx:layout type="hbox" align="center" {
+		            bx:layoutarea {
 		                writeOutput("Box 1");
 		            }
-		            bx:layoutarea() {
+		            bx:layoutarea {
 		                writeOutput("Box 2");
 		            }
-		            bx:layoutarea() {
+		            bx:layoutarea {
 		                writeOutput("Box 3");
 		            }
 		        }
@@ -163,11 +163,11 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="vbox", width="300px" ) {
-		            bx:layoutarea() {
+		        bx:layout type="vbox" width="300px" {
+		            bx:layoutarea {
 		                writeOutput("Vertical Box 1");
 		            }
-		            bx:layoutarea() {
+		            bx:layoutarea {
 		                writeOutput("Vertical Box 2");
 		            }
 		        }
@@ -190,8 +190,8 @@ public class LayoutTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			        bx:layout() {
-			            bx:layoutarea( title="Test" ) {
+			        bx:layout {
+			            bx:layoutarea title="Test" {
 			                writeOutput("Test content");
 			            }
 			        }
@@ -209,8 +209,8 @@ public class LayoutTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			        bx:layout( type="invalid" ) {
-			            bx:layoutarea( title="Test" ) {
+			        bx:layout type="invalid" {
+			            bx:layoutarea title="Test" {
 			                writeOutput("Test content");
 			            }
 			        }
@@ -228,8 +228,8 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab", id="jsTabTest" ) {
-		            bx:layoutarea( title="Interactive Tab" ) {
+		        bx:layout type="tab" id="jsTabTest" {
+		            bx:layoutarea title="Interactive Tab" {
 		                writeOutput("Interactive content");
 		            }
 		        }
@@ -250,14 +250,13 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( 
-		            type="tab", 
-		            class="my-custom-class",
-		            style="background-color: red;",
-		            fillHeight="true",
-		            fitToWindow="true"
-		        ) {
-		            bx:layoutarea( title="Styled Tab" ) {
+		        bx:layout 
+		            type="tab" 
+		            class="my-custom-class"
+		            style="background-color: red;"
+		            fillHeight="true"
+		            fitToWindow="true" {
+		            bx:layoutarea title="Styled Tab" {
 		                writeOutput("Styled content");
 		            }
 		        }
@@ -277,7 +276,7 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab", id="emptyLayout" ) {
+		        bx:layout type="tab" id="emptyLayout" {
 		            // No layout areas
 		        }
 		        """,
@@ -297,8 +296,8 @@ public class LayoutTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		        result = writeOutput("");
-		        bx:layout( type="tab" ) {
-		            bx:layoutarea( title="Auto ID Test" ) {
+		        bx:layout type="tab" {
+		            bx:layoutarea title="Auto ID Test" {
 		                writeOutput("Test content");
 		            }
 		        }
