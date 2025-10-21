@@ -28,16 +28,16 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testBasicTabLayout() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout type="tab" id="myTabLayout" {
-		            bx:layoutarea title="Tab 1" {
-		                writeOutput("Content for Tab 1");
-		            }
-		            bx:layoutarea title="Tab 2" {
-		                writeOutput("Content for Tab 2");
-		            }
+		    result = writeOutput("");
+		    bx:layout type="tab" id="myTabLayout" {
+		        bx:layoutarea title="Tab 1" {
+		            writeOutput("Content for Tab 1");
 		        }
-		        """,
+		        bx:layoutarea title="Tab 2" {
+		            writeOutput("Content for Tab 2");
+		        }
+		    }
+		    """,
 		    context
 		);
 
@@ -58,16 +58,16 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testAccordionLayout() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout type="accordion" fillHeight="true" {
-		            bx:layoutarea title="Section 1" {
-		                writeOutput("Content for Section 1");
-		            }
-		            bx:layoutarea title="Section 2" initcollapsed="true" {
-		                writeOutput("Content for Section 2");
-		            }
+		    result = writeOutput("");
+		    bx:layout type="accordion" fillHeight="true" {
+		        bx:layoutarea title="Section 1" {
+		            writeOutput("Content for Section 1");
 		        }
-		        """,
+		        bx:layoutarea title="Section 2" initcollapsed="true" {
+		            writeOutput("Content for Section 2");
+		        }
+		    }
+		    """,
 		    context
 		);
 
@@ -88,25 +88,25 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testBorderLayout() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout type="border" height="500px" {
-		            bx:layoutarea position="top" title="Header" {
-		                writeOutput("Header content");
-		            }
-		            bx:layoutarea position="left" size="200px" {
-		                writeOutput("Left sidebar");
-		            }
-		            bx:layoutarea position="center" {
-		                writeOutput("Main content");
-		            }
-		            bx:layoutarea position="right" size="150px" {
-		                writeOutput("Right sidebar");
-		            }
-		            bx:layoutarea position="bottom" {
-		                writeOutput("Footer content");
-		            }
+		    result = writeOutput("");
+		    bx:layout type="border" height="500px" {
+		        bx:layoutarea position="top" title="Header" {
+		            writeOutput("Header content");
 		        }
-		        """,
+		        bx:layoutarea position="left" size="200px" {
+		            writeOutput("Left sidebar");
+		        }
+		        bx:layoutarea position="center" {
+		            writeOutput("Main content");
+		        }
+		        bx:layoutarea position="right" size="150px" {
+		            writeOutput("Right sidebar");
+		        }
+		        bx:layoutarea position="bottom" {
+		            writeOutput("Footer content");
+		        }
+		    }
+		    """,
 		    context
 		);
 
@@ -131,19 +131,19 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testHBoxLayout() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout type="hbox" align="center" {
-		            bx:layoutarea {
-		                writeOutput("Box 1");
-		            }
-		            bx:layoutarea {
-		                writeOutput("Box 2");
-		            }
-		            bx:layoutarea {
-		                writeOutput("Box 3");
-		            }
+		    result = writeOutput("");
+		    bx:layout type="hbox" align="center" {
+		        bx:layoutarea {
+		            writeOutput("Box 1");
 		        }
-		        """,
+		        bx:layoutarea {
+		            writeOutput("Box 2");
+		        }
+		        bx:layoutarea {
+		            writeOutput("Box 3");
+		        }
+		    }
+		    """,
 		    context
 		);
 
@@ -162,16 +162,16 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testVBoxLayout() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout type="vbox" width="300px" {
-		            bx:layoutarea {
-		                writeOutput("Vertical Box 1");
-		            }
-		            bx:layoutarea {
-		                writeOutput("Vertical Box 2");
-		            }
+		    result = writeOutput("");
+		    bx:layout type="vbox" width="300px" {
+		        bx:layoutarea {
+		            writeOutput("Vertical Box 1");
 		        }
-		        """,
+		        bx:layoutarea {
+		            writeOutput("Vertical Box 2");
+		        }
+		    }
+		    """,
 		    context
 		);
 
@@ -190,12 +190,12 @@ public class LayoutTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			        bx:layout {
-			            bx:layoutarea title="Test" {
-			                writeOutput("Test content");
-			            }
+			    bx:layout {
+			        bx:layoutarea title="Test" {
+			            writeOutput("Test content");
 			        }
-			        """,
+			    }
+			    """,
 			    context
 			);
 		} catch ( Exception e ) {
@@ -209,12 +209,12 @@ public class LayoutTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			        bx:layout type="invalid" {
-			            bx:layoutarea title="Test" {
-			                writeOutput("Test content");
-			            }
+			    bx:layout type="invalid" {
+			        bx:layoutarea title="Test" {
+			            writeOutput("Test content");
 			        }
-			        """,
+			    }
+			    """,
 			    context
 			);
 		} catch ( Exception e ) {
@@ -227,13 +227,13 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testJavaScriptGeneration() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout type="tab" id="jsTabTest" {
-		            bx:layoutarea title="Interactive Tab" {
-		                writeOutput("Interactive content");
-		            }
+		    result = writeOutput("");
+		    bx:layout type="tab" id="jsTabTest" {
+		        bx:layoutarea title="Interactive Tab" {
+		            writeOutput("Interactive content");
 		        }
-		        """,
+		    }
+		    """,
 		    context
 		);
 
@@ -249,18 +249,18 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testCustomCSSAndStyles() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout 
-		            type="tab" 
-		            class="my-custom-class"
-		            style="background-color: red;"
-		            fillHeight="true"
-		            fitToWindow="true" {
-		            bx:layoutarea title="Styled Tab" {
-		                writeOutput("Styled content");
-		            }
+		    result = writeOutput("");
+		    bx:layout
+		        type="tab"
+		        class="my-custom-class"
+		        style="background-color: red;"
+		        fillHeight="true"
+		        fitToWindow="true" {
+		        bx:layoutarea title="Styled Tab" {
+		            writeOutput("Styled content");
 		        }
-		        """,
+		    }
+		    """,
 		    context
 		);
 
@@ -275,11 +275,11 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testEmptyLayout() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout type="tab" id="emptyLayout" {
-		            // No layout areas
-		        }
-		        """,
+		    result = writeOutput("");
+		    bx:layout type="tab" id="emptyLayout" {
+		        // No layout areas
+		    }
+		    """,
 		    context
 		);
 
@@ -295,13 +295,13 @@ public class LayoutTest extends BaseIntegrationTest {
 	public void testAutoGeneratedID() {
 		runtime.executeSource(
 		    """
-		        result = writeOutput("");
-		        bx:layout type="tab" {
-		            bx:layoutarea title="Auto ID Test" {
-		                writeOutput("Test content");
-		            }
+		    result = writeOutput("");
+		    bx:layout type="tab" {
+		        bx:layoutarea title="Auto ID Test" {
+		            writeOutput("Test content");
 		        }
-		        """,
+		    }
+		    """,
 		    context
 		);
 

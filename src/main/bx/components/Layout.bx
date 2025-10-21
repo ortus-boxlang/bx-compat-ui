@@ -99,12 +99,12 @@ class{
 		var tagContent = "<div";
 
 		// Add ID
-		tagContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+		tagContent &= " id=""#encodeForHTML( attributes.id )#""";
 
 		// Add CSS classes
 		var classAttribute = "class=""#cssClasses.toList( " " )#""";
 		if( !isNull( attributes.class ) && len( attributes.class ) ){
-			classAttribute = "class=""#cssClasses.toList( " " )# #encodeForHTMLAttribute( attributes.class )#""";
+			classAttribute = "class=""#cssClasses.toList( " " )# #encodeForHTML( attributes.class )#""";
 		}
 		tagContent &= " " & classAttribute;
 
@@ -119,9 +119,9 @@ class{
 				if( !isNull( attributes.width ) && len( attributes.width ) ){
 					styleValue &= "; width: #attributes.width#";
 				}
-				tagContent &= " style=""#encodeForHTMLAttribute( styleValue )#""";
+				tagContent &= " style=""#encodeForHTML( styleValue )#""";
 			} else if( key != "height" && key != "width" && key != "style" ){
-				tagContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+				tagContent &= " #key#=""#encodeForHTML( value )#""";
 			}
 		} );
 
@@ -135,7 +135,7 @@ class{
 				if( !isNull( attributes.width ) && len( attributes.width ) ){
 					inlineStyle &= " width: #attributes.width#;";
 				}
-				tagContent &= " style=""#encodeForHTMLAttribute( inlineStyle )#""";
+				tagContent &= " style=""#encodeForHTML( inlineStyle )#""";
 			}
 		}
 
