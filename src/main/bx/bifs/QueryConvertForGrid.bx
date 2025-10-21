@@ -2,7 +2,6 @@
  * BoxLang BIF: QueryConvertForGrid
  *
  * Converts a query object to a format suitable for grid display.
- * This BIF provides compatibility with Adobe ColdFusion's QueryConvertForGrid function.
  */
 @BoxBIF( "QueryConvertForGrid" )
 class {
@@ -66,7 +65,6 @@ class {
             }
         }
 
-        // Build the result structure matching ColdFusion's format
         var result = {
             "TOTALROWCOUNT" = totalRows,
             "QUERY" = pageQuery,
