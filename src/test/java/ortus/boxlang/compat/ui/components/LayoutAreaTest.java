@@ -20,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import ortus.boxlang.compat.ui.BaseIntegrationTest;
+import ortus.boxlang.runtime.scopes.Key;
 
 public class LayoutAreaTest extends BaseIntegrationTest {
 
