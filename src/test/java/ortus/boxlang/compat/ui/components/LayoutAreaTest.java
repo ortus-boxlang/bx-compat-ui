@@ -66,17 +66,17 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		    """
 		        result = writeOutput("");
 		        bx:layout( type="border" ) {
-		            bx:layoutarea( position="north", size="50px", title="Header" ) {
-		                writeOutput("North content");
+		            bx:layoutarea( position="top", size="50px", title="Header" ) {
+		                writeOutput("Top content");
 		            }
-		            bx:layoutarea( position="south", size="30px" ) {
-		                writeOutput("South content");
+		            bx:layoutarea( position="bottom", size="30px" ) {
+		                writeOutput("Bottom content");
 		            }
-		            bx:layoutarea( position="west", size="200px", minsize="100px", maxsize="300px" ) {
-		                writeOutput("West content");
+		            bx:layoutarea( position="left", size="200px", minsize="100px", maxsize="300px" ) {
+		                writeOutput("Left content");
 		            }
-		            bx:layoutarea( position="east", size="150px", splitter="false" ) {
-		                writeOutput("East content");
+		            bx:layoutarea( position="right", size="150px", splitter="false" ) {
+		                writeOutput("Right content");
 		            }
 		            bx:layoutarea( position="center" ) {
 		                writeOutput("Center content");
@@ -87,15 +87,15 @@ public class LayoutAreaTest extends BaseIntegrationTest {
 		);
 
 		String output = context.getBuffer().toString();
-		assertThat( output ).contains( "bx-border-north" );
-		assertThat( output ).contains( "bx-border-south" );
-		assertThat( output ).contains( "bx-border-west" );
-		assertThat( output ).contains( "bx-border-east" );
+		assertThat( output ).contains( "bx-border-top" );
+		assertThat( output ).contains( "bx-border-bottom" );
+		assertThat( output ).contains( "bx-border-left" );
+		assertThat( output ).contains( "bx-border-right" );
 		assertThat( output ).contains( "bx-border-center" );
-		assertThat( output ).contains( "North content" );
-		assertThat( output ).contains( "South content" );
-		assertThat( output ).contains( "West content" );
-		assertThat( output ).contains( "East content" );
+		assertThat( output ).contains( "Top content" );
+		assertThat( output ).contains( "Bottom content" );
+		assertThat( output ).contains( "Left content" );
+		assertThat( output ).contains( "Right content" );
 		assertThat( output ).contains( "Center content" );
 	}
 

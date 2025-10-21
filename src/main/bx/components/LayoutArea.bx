@@ -1,7 +1,7 @@
 /**
  * BoxLang Component Which Generates Layout Areas
  * 
- * This component implements the functionality of the ColdFusion cflayoutarea tag,
+ * This component implements the functionality of the BoxLang layoutarea component,
  * providing content areas within Layout components.
  */
 @BoxComponent( LayoutArea )
@@ -20,6 +20,18 @@ class{
 	 *     <bx:layoutarea title="Tab 2" source="content.cfm">Content loaded from source</bx:layoutarea>
 	 * </bx:layout>
 	 * </pre>
+	 *
+	 * @attribute.title - string, optional - Area title (used for tabs/accordion headers)
+	 * @attribute.align - string, optional - Content alignment within the area
+	 * @attribute.collapsible - boolean, optional - Whether area can be collapsed (accordion)
+	 * @attribute.initcollapsed - boolean, optional - Start in collapsed state
+	 * @attribute.source - string, optional - URL to load content from
+	 * @attribute.position - string, optional - Position for border layout: bottom, center, left, right, top
+	 * @attribute.size - string, optional - CSS size for border layout regions
+	 * @attribute.splitter - boolean, optional - Show splitter for border layout
+	 * @attribute.minsize - string, optional - Minimum size constraint
+	 * @attribute.maxsize - string, optional - Maximum size constraint
+	 * @attribute.id - string, optional - HTML element ID (auto-generated if not provided)
 	 *
 	 * @param context The context of the execution (IBoxContext)
 	 * @param attributes The attributes of the component that were passed in
@@ -57,8 +69,8 @@ class{
 
 		// Validate border layout position
 		if( layoutType == "border" && !isNull( attributes.position ) ){
-			var validPositions = [ "north", "south", "east", "west", "center" ];
-			if( !validPositions.contains( lcase( attributes.position ) ) ){
+			var validPositions = [ "bottom", "center", "left", "right", "top" ];
+			if( !validPositions.containsNoCase( attributes.position ) ){
 				throw(
 					type		= "boxlang.compat.ui.InvalidAttributeException",
 					message		= "For border layout, position must be one of: #validPositions.toList()#"
@@ -74,26 +86,13 @@ class{
 
 		// Process body content or load from source
 		var areaContent = "";
-		if( !isNull( attributes.source ) && len( attributes.source ) ){
-			// Load content from source URL/file
-			try {
-				// In a real implementation, this would make an HTTP request or include a file
-				// For now, we'll just note that source was specified
-				areaContent = "<!-- Content loaded from: #attributes.source# -->";
-			} catch( any e ){
-				// Log error and fall back to body content
-				BoxAnnounce(
-					"LogMessage",
-					{
-						"text" : "Failed to load content from source: #attributes.source#. Error: #e.message#",
-						"level" : "WARN"
-					}
-				);
-			}
-		}
+		var hasSource = !isNull( attributes.source ) && len( attributes.source );
 		
-		// If no source content or source failed, process body
-		if( !len( areaContent ) ){
+		if( hasSource ){
+			// Create placeholder for AJAX content with loading indicator
+			areaContent = "<div class=""bx-source-loading"" data-source=""#encodeForHTMLAttribute( attributes.source )#"">Loading content...</div>";
+		} else {
+			// Process body content normally
 			var buffer = newBuffer();
 			var bodyResult = processBody( context, body, buffer );
 			areaContent = buffer.toString();
@@ -165,25 +164,25 @@ class{
 		
 		var styleAttributes = [];
 		if( !isNull( areaData.size ) && len( areaData.size ) ){
-			if( [ "north", "south" ].contains( areaData.position ) ){
+			if( [ "top", "bottom" ].containsNoCase( areaData.position ) ){
 				styleAttributes.append( "height: #areaData.size#" );
-			} else if( [ "east", "west" ].contains( areaData.position ) ){
+			} else if( [ "left", "right" ].containsNoCase( areaData.position ) ){
 				styleAttributes.append( "width: #areaData.size#" );
 			}
 		}
 		
 		if( !isNull( areaData.minsize ) && len( areaData.minsize ) ){
-			if( [ "north", "south" ].contains( areaData.position ) ){
+			if( [ "top", "bottom" ].containsNoCase( areaData.position ) ){
 				styleAttributes.append( "min-height: #areaData.minsize#" );
-			} else if( [ "east", "west" ].contains( areaData.position ) ){
+			} else if( [ "left", "right" ].containsNoCase( areaData.position ) ){
 				styleAttributes.append( "min-width: #areaData.minsize#" );
 			}
 		}
 		
 		if( !isNull( areaData.maxsize ) && len( areaData.maxsize ) ){
-			if( [ "north", "south" ].contains( areaData.position ) ){
+			if( [ "top", "bottom" ].containsNoCase( areaData.position ) ){
 				styleAttributes.append( "max-height: #areaData.maxsize#" );
-			} else if( [ "east", "west" ].contains( areaData.position ) ){
+			} else if( [ "left", "right" ].containsNoCase( areaData.position ) ){
 				styleAttributes.append( "max-width: #areaData.maxsize#" );
 			}
 		}
@@ -228,8 +227,8 @@ class{
 	 * Validate border layout specific attributes
 	 */
 	private function validateBorderAttributes( required attributes ){
-		var validPositions = [ "north", "south", "east", "west", "center" ];
-		if( !isNull( attributes.position ) && !validPositions.contains( lcase( attributes.position ) ) ){
+		var validPositions = [ "bottom", "center", "left", "right", "top" ];
+		if( !isNull( attributes.position ) && !validPositions.containsNoCase( attributes.position ) ){
 			throw(
 				type		= "boxlang.compat.ui.InvalidAttributeException",
 				message		= "Border layout position must be one of: #validPositions.toList()#"

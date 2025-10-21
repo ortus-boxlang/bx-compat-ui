@@ -1,6 +1,6 @@
 # BoxLang Layout Components
 
-This module provides BoxLang implementations of the ColdFusion `cflayout` and `cflayoutarea` tags, offering modern UI layout capabilities compatible with CFML syntax.
+This module provides BoxLang implementations of the layout and layoutarea components, offering modern UI layout capabilities compatible with CFML syntax.
 
 ## Components
 
@@ -10,7 +10,7 @@ The Layout component creates structured layouts for organizing content areas. It
 
 - **tab** - Tabbed interface with clickable headers
 - **accordion** - Collapsible panels with headers
-- **border** - Five-region layout (north, south, east, west, center)
+- **border** - Five-region layout (top, bottom, left, right, center)
 - **hbox** - Horizontal box layout (flex row)
 - **vbox** - Vertical box layout (flex column)
 
@@ -47,19 +47,19 @@ The Layout component creates structured layouts for organizing content areas. It
 **Border Layout:**
 ```cfml
 <bx:layout type="border" height="500px">
-    <bx:layoutarea position="north">
+    <bx:layoutarea position="top">
         <header>Site Header</header>
     </bx:layoutarea>
-    <bx:layoutarea position="west" size="200px">
+    <bx:layoutarea position="left" size="200px">
         <nav>Navigation Menu</nav>
     </bx:layoutarea>
     <bx:layoutarea position="center">
         <main>Main Content Area</main>
     </bx:layoutarea>
-    <bx:layoutarea position="east" size="150px">
+    <bx:layoutarea position="right" size="150px">
         <aside>Sidebar</aside>
     </bx:layoutarea>
-    <bx:layoutarea position="south">
+    <bx:layoutarea position="bottom">
         <footer>Site Footer</footer>
     </bx:layoutarea>
 </bx:layout>
@@ -90,7 +90,7 @@ The LayoutArea component defines content areas within a Layout. Must be used ins
 | `collapsible` | boolean | No | true | Whether area can be collapsed (accordion) |
 | `initcollapsed` | boolean | No | false | Start in collapsed state |
 | `source` | string | No | "" | URL to load content from |
-| `position` | string | No | "center" | Position for border layout: north, south, east, west, center |
+| `position` | string | No | "center" | Position for border layout: bottom, center, left, right, top |
 | `size` | string | No | "" | CSS size for border layout regions |
 | `splitter` | boolean | No | true | Show splitter for border layout |
 | `minsize` | string | No | "" | Minimum size constraint |
@@ -99,10 +99,10 @@ The LayoutArea component defines content areas within a Layout. Must be used ins
 
 #### Border Layout Positions
 
-- **north** - Top region (full width)
-- **south** - Bottom region (full width)
-- **east** - Right region (between north/south)
-- **west** - Left region (between north/south)
+- **top** - Top region (full width)
+- **bottom** - Bottom region (full width)
+- **left** - Left region (between top/bottom)
+- **right** - Right region (between top/bottom)
 - **center** - Middle region (fills remaining space)
 
 ## CSS Classes
@@ -131,7 +131,7 @@ The components generate semantic CSS classes for styling:
 - `.bx-accordion-content` - Accordion content area
 
 ### Border Layout Classes
-- `.bx-border-{position}` - Border region (north, south, east, west, center)
+- `.bx-border-{position}` - Border region (top, bottom, left, right, center)
 - `.bx-border-area` - Border area base class
 - `.bx-border-splitter` - Splitter enabled area
 
@@ -181,13 +181,13 @@ Or customize with your own CSS targeting the generated classes.
 </head>
 <body>
     <bx:layout type="border" fitToWindow="true">
-        <bx:layoutarea position="north" size="60px">
+        <bx:layoutarea position="top" size="60px">
             <header style="padding: 10px; background: #333; color: white;">
                 <h1>My Application</h1>
             </header>
         </bx:layoutarea>
         
-        <bx:layoutarea position="west" size="250px">
+        <bx:layoutarea position="left" size="250px">
             <bx:layout type="accordion">
                 <bx:layoutarea title="Navigation">
                     <ul>
@@ -220,7 +220,7 @@ Or customize with your own CSS targeting the generated classes.
             </bx:layout>
         </bx:layoutarea>
         
-        <bx:layoutarea position="south" size="40px">
+        <bx:layoutarea position="bottom" size="40px">
             <footer style="padding: 10px; background: #f5f5f5; text-align: center;">
                 © 2024 My Application
             </footer>

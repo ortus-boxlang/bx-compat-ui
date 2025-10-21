@@ -1,7 +1,7 @@
 /**
  * BoxLang Component Which Generates the Layout Container
  * 
- * This component implements the functionality of the ColdFusion cflayout tag,
+ * This component implements the functionality of the BoxLang layout component,
  * providing various layout types including accordion, border, hbox, tab, and vbox.
  */
 @BoxComponent( Layout )
@@ -18,6 +18,17 @@ class{
 	 *     <bx:layoutarea title="Tab 2">Content for Tab 2</bx:layoutarea>
 	 * </bx:layout>
 	 * </pre>
+	 *
+	 * @attribute.type - string, required - Layout type: tab, accordion, border, hbox, vbox
+	 * @attribute.align - string, optional - Content alignment: left, center, right, justify
+	 * @attribute.fillHeight - boolean, optional - Fill available height
+	 * @attribute.fitToWindow - boolean, optional - Fill entire window viewport
+	 * @attribute.height - string, optional - CSS height value
+	 * @attribute.width - string, optional - CSS width value
+	 * @attribute.style - string, optional - Additional CSS styles
+	 * @attribute.id - string, optional - HTML element ID (auto-generated if not provided)
+	 * @attribute.class - string, optional - Additional CSS classes
+	 * @attribute.name - string, optional - Component name identifier
 	 *
 	 * @param context The context of the execution (IBoxContext)
 	 * @param attributes The attributes of the component that were passed in
@@ -38,7 +49,7 @@ class{
 
 		// Validate type attribute values
 		var validTypes = [ "accordion", "border", "hbox", "tab", "vbox" ];
-		if( !validTypes.contains( lcase( attributes.type ) ) ){
+		if( !validTypes.containsNoCase( attributes.type ) ){
 			throw(
 				type		= "boxlang.compat.ui.InvalidAttributeException",
 				message		= "The type attribute must be one of: #validTypes.toList()#"
@@ -98,7 +109,7 @@ class{
 		tagContent &= " " & classAttribute;
 
 		// Add HTML attributes (excluding non-HTML ones)
-		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.contains( key ) && key != "id" && key != "class" ).each( ( key, value ) => {
+		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" ).each( ( key, value ) => {
 			if( key == "style" && len( value ) ){
 				var styleValue = value;
 				// Add layout-specific styles
@@ -313,9 +324,15 @@ class{
 	private function generateLayoutScript( required context, required attributes, required executionState ){
 		var layoutType = lcase( attributes.type );
 		var layoutId = attributes.id;
+		var areas = executionState.areas ?: [];
 		
-		// Only generate script for interactive layouts
-		if( [ "tab", "accordion" ].contains( layoutType ) ){
+		// Check if any areas have source attributes
+		var hasSourceAreas = areas.some( function( area ) {
+			return !isNull( area.attributes.source ) && len( area.attributes.source );
+		} );
+		
+		// Generate script for interactive layouts or AJAX sources
+		if( [ "tab", "accordion" ].containsNoCase( layoutType ) || hasSourceAreas ){
 			var script = "<script type=""text/javascript"">";
 			script &= "(function(){";
 			script &= "var layout = document.getElementById('#layoutId#');";
@@ -324,6 +341,11 @@ class{
 				script &= generateTabScript( layoutId );
 			} else if( layoutType == "accordion" ){
 				script &= generateAccordionScript( layoutId );
+			}
+			
+			// Add AJAX functionality for source attributes
+			if( hasSourceAreas ){
+				script &= generateSourceScript( areas );
 			}
 			
 			script &= "})();";
@@ -367,6 +389,43 @@ class{
 					var panel = e.target.parentNode;
 					panel.classList.toggle('collapsed');
 				}
+			});
+		";
+	}
+
+	/**
+	 * Generate AJAX functionality for source attributes
+	 */
+	private function generateSourceScript( required areas ){
+		return "
+			// Load content from source URLs using Fetch API
+			document.addEventListener('DOMContentLoaded', function() {
+				layout.querySelectorAll('.bx-source-loading').forEach(function(element) {
+					var sourceUrl = element.getAttribute('data-source');
+					if (sourceUrl) {
+						fetch(sourceUrl)
+							.then(function(response) {
+								if (!response.ok) {
+									throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+								}
+								return response.text();
+							})
+							.then(function(content) {
+								element.innerHTML = content;
+								element.classList.remove('bx-source-loading');
+								element.classList.add('bx-source-loaded');
+							})
+							.catch(function(error) {
+								console.warn('Failed to load content from ' + sourceUrl + ':', error);
+								element.innerHTML = '<div class=\"\"bx-source-error\"\">' +
+									'<p>Error loading content from: ' + sourceUrl + '</p>' +
+									'<p>Error: ' + error.message + '</p>' +
+									'</div>';
+								element.classList.remove('bx-source-loading');
+								element.classList.add('bx-source-error');
+							});
+					}
+				});
 			});
 		";
 	}

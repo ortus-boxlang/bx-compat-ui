@@ -90,19 +90,19 @@ public class LayoutTest extends BaseIntegrationTest {
 		    """
 		        result = writeOutput("");
 		        bx:layout( type="border", height="500px" ) {
-		            bx:layoutarea( position="north", title="Header" ) {
+		            bx:layoutarea( position="top", title="Header" ) {
 		                writeOutput("Header content");
 		            }
-		            bx:layoutarea( position="west", size="200px" ) {
+		            bx:layoutarea( position="left", size="200px" ) {
 		                writeOutput("Left sidebar");
 		            }
 		            bx:layoutarea( position="center" ) {
 		                writeOutput("Main content");
 		            }
-		            bx:layoutarea( position="east", size="150px" ) {
+		            bx:layoutarea( position="right", size="150px" ) {
 		                writeOutput("Right sidebar");
 		            }
-		            bx:layoutarea( position="south" ) {
+		            bx:layoutarea( position="bottom" ) {
 		                writeOutput("Footer content");
 		            }
 		        }
@@ -114,11 +114,11 @@ public class LayoutTest extends BaseIntegrationTest {
 		assertThat( output ).contains( "bx-layout" );
 		assertThat( output ).contains( "bx-layout-border" );
 		assertThat( output ).contains( "height: 500px" );
-		assertThat( output ).contains( "bx-border-north" );
-		assertThat( output ).contains( "bx-border-west" );
+		assertThat( output ).contains( "bx-border-top" );
+		assertThat( output ).contains( "bx-border-left" );
 		assertThat( output ).contains( "bx-border-center" );
-		assertThat( output ).contains( "bx-border-east" );
-		assertThat( output ).contains( "bx-border-south" );
+		assertThat( output ).contains( "bx-border-right" );
+		assertThat( output ).contains( "bx-border-bottom" );
 		assertThat( output ).contains( "Header content" );
 		assertThat( output ).contains( "Left sidebar" );
 		assertThat( output ).contains( "Main content" );

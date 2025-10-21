@@ -131,31 +131,31 @@
 .bx-layout-border {
     display: grid;
     grid-template-areas: 
-        "north north north"
-        "west center east"
-        "south south south";
+        "top top top"
+        "left center right"
+        "bottom bottom bottom";
     grid-template-columns: auto 1fr auto;
     grid-template-rows: auto 1fr auto;
     height: 100%;
 }
 
-.bx-border-north {
-    grid-area: north;
+.bx-border-top {
+    grid-area: top;
     border-bottom: 1px solid #ddd;
 }
 
-.bx-border-south {
-    grid-area: south;
+.bx-border-bottom {
+    grid-area: bottom;
     border-top: 1px solid #ddd;
 }
 
-.bx-border-west {
-    grid-area: west;
+.bx-border-left {
+    grid-area: left;
     border-right: 1px solid #ddd;
 }
 
-.bx-border-east {
-    grid-area: east;
+.bx-border-right {
+    grid-area: right;
     border-left: 1px solid #ddd;
 }
 
@@ -191,15 +191,50 @@
     padding: 10px;
 }
 
+/* Source Loading Styles */
+.bx-source-loading {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.bx-source-loading::before {
+    content: "⟳ ";
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.bx-source-error {
+    padding: 15px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.bx-source-error p {
+    margin: 5px 0;
+}
+
+.bx-source-loaded {
+    /* Styles applied after successful AJAX load */
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .bx-layout-border {
         grid-template-areas: 
-            "north"
-            "west"
+            "top"
+            "left"
             "center"
-            "east"
-            "south";
+            "right"
+            "bottom";
         grid-template-columns: 1fr;
         grid-template-rows: auto auto 1fr auto auto;
     }
