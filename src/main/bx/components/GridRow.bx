@@ -1,0 +1,265 @@
+/**
+ * BoxLang Component Which Defines a Grid Row
+ *
+ * This component implements the functionality of the BoxLang GridRow component,
+ * defining individual rows within Grid components when not using query data.
+ */
+@BoxComponent( "GridRow" )
+@AllowsBody( true )
+@RequiresBody( false )
+class{
+
+	variables.gridComponentName = "Grid";
+
+	/**
+	 * The GridRow UI component
+	 *
+	 * <pre>
+	 * <bx:grid name="myGrid">
+	 *     <bx:gridcolumn name="id" header="ID" />
+	 *     <bx:gridcolumn name="name" header="Name" />
+	 *     <bx:gridrow data="#{ id: 1, name: 'John Doe' }#" />
+	 *     <bx:gridrow data="#{ id: 2, name: 'Jane Smith' }#" />
+	 * </bx:grid>
+	 * </pre>
+	 *
+	 * @attribute.data - struct, optional - Struct containing row data with column names as keys
+	 * @attribute.bgcolor - string, optional - Background color for the row
+	 * @attribute.textColor - string, optional - Text color for the row
+	 * @attribute.selected - boolean, optional - Whether this row is initially selected (default: false)
+	 * @attribute.id - string, optional - HTML element ID for the row
+	 * @attribute.class - string, optional - Additional CSS classes for the row
+	 * @attribute.style - string, optional - Additional CSS styles for the row
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Find parent Grid component
+		var gridParentState = context.findClosestComponent( gridComponentName );
+		if( isNull( gridParentState ) ){
+			throw(
+				type		= "boxlang.compat.ui.MissingParentException",
+				message		= "GridRow component must be used within a Grid component"
+			);
+		}
+
+		// Set default values
+		param attributes.data = {};
+		param attributes.bgcolor = "";
+		param attributes.textColor = "";
+		param attributes.selected = false;
+		param attributes.id = "";
+		param attributes.class = "";
+		param attributes.style = "";
+
+		// Generate unique ID if not provided
+		if( isNull( attributes.id ) || !len( attributes.id ) ){
+			attributes.id = "gridrow_" & listLast( lcase( createUUID() ), "-" );
+		}
+
+		// Process body content to extract cell data if no data attribute provided
+		var rowData = attributes.data;
+		var hasBodyContent = !isNull( body );
+		
+		if( hasBodyContent && ( isNull( attributes.data ) || !structCount( attributes.data ) ) ){
+			// Process body to extract data - this could contain custom content or data
+			var buffer = newBuffer();
+			var bodyResult = processBody( context, body, buffer );
+			var bodyContent = buffer.toString();
+			
+			// Store body content for custom rendering
+			rowData[ "_bodyContent" ] = bodyContent;
+		}
+
+		// Build style attributes
+		var inlineStyles = [];
+		
+		if( !isNull( attributes.bgcolor ) && len( attributes.bgcolor ) ){
+			inlineStyles.append( "background-color: #attributes.bgcolor#" );
+		}
+		if( !isNull( attributes.textColor ) && len( attributes.textColor ) ){
+			inlineStyles.append( "color: #attributes.textColor#" );
+		}
+		if( !isNull( attributes.style ) && len( attributes.style ) ){
+			inlineStyles.append( attributes.style );
+		}
+
+		// Build CSS classes
+		var cssClasses = [];
+		if( attributes.selected ){
+			cssClasses.append( "bx-grid-row-selected" );
+		}
+		if( !isNull( attributes.class ) && len( attributes.class ) ){
+			cssClasses.append( attributes.class );
+		}
+
+		// Create row data structure to pass to parent Grid
+		var rowDataStruct = {
+			"id" : attributes.id,
+			"data" : rowData,
+			"selected" : attributes.selected,
+			"cssClasses" : cssClasses,
+			"inlineStyles" : inlineStyles,
+			"attributes" : attributes
+		};
+
+		// Add column-specific data from rowData
+		var gridColumns = gridParentState.columns ?: [];
+		for( var column in gridColumns ){
+			if( structKeyExists( rowData, column.name ) ){
+				rowDataStruct[ column.name ] = rowData[ column.name ];
+			}
+		}
+
+		// Add this row to the parent grid's rows collection
+		if( isNull( gridParentState.rows ) ){
+			gridParentState.rows = [];
+		}
+		gridParentState.rows.append( rowDataStruct );
+
+		// Don't write any output here - the parent Grid component will handle rendering
+	}
+
+	/**
+	 * Generate row HTML from row data structure
+	 */
+	public static function generateRowHTML( required rowData, required columns, gridState = {} ){
+		var rowHTML = "<tr";
+		
+		// Add ID if provided
+		if( !isNull( rowData.id ) && len( rowData.id ) ){
+			rowHTML &= " id=""#encodeForHTML( rowData.id )#""";
+		}
+		
+		// Add CSS classes
+		var cssClasses = [ "bx-grid-row" ];
+		if( !isNull( rowData.cssClasses ) && isArray( rowData.cssClasses ) ){
+			cssClasses.addAll( rowData.cssClasses );
+		}
+		
+		if( cssClasses.len() > 0 ){
+			rowHTML &= " class=""#cssClasses.toList( " " )#""";
+		}
+		
+		// Add inline styles
+		if( !isNull( rowData.inlineStyles ) && isArray( rowData.inlineStyles ) && rowData.inlineStyles.len() > 0 ){
+			rowHTML &= " style=""#rowData.inlineStyles.toList( "; " )#""";
+		}
+		
+		// Add data attributes
+		if( rowData.selected ){
+			rowHTML &= " data-selected=""true""";
+		}
+		
+		rowHTML &= ">";
+		
+		// Add selection cell if grid supports selection
+		var selectMode = gridState.selectMode ?: "single";
+		if( selectMode != "none" ){
+			var selectType = selectMode == "multi" ? "checkbox" : "radio";
+			var gridName = gridState.gridName ?: "grid";
+			var checkedAttr = rowData.selected ? " checked" : "";
+			
+			rowHTML &= "<td class=""bx-grid-select-cell"">";
+			rowHTML &= "<input type=""#selectType#"" name=""#gridName#_select"" value=""#encodeForHTML( rowData.id )#""#checkedAttr# />";
+			rowHTML &= "</td>";
+		}
+		
+		// Generate cells for each column
+		for( var column in columns ){
+			var cellValue = "";
+			var cellData = rowData.data ?: {};
+			
+			// Check if row has data for this column
+			if( structKeyExists( cellData, column.name ) ){
+				cellValue = cellData[ column.name ];
+			} else if( structKeyExists( rowData, column.name ) ){
+				cellValue = rowData[ column.name ];
+			}
+			
+			// Check for custom body content
+			var hasBodyContent = structKeyExists( cellData, "_bodyContent" ) && len( cellData[ "_bodyContent" ] );
+			
+			rowHTML &= generateCellHTML( cellValue, column, rowData, hasBodyContent ? cellData[ "_bodyContent" ] : "" );
+		}
+		
+		rowHTML &= "</tr>";
+		
+		return rowHTML;
+	}
+
+	/**
+	 * Generate individual cell HTML
+	 */
+	private static function generateCellHTML( required value, required column, required rowData, bodyContent = "" ){
+		var cellHTML = "<td class=""bx-grid-cell""";
+		cellHTML &= " data-column=""#encodeForHTML( column.name )#""";
+		
+		// Add column-specific styling
+		if( !isNull( column.dataAlign ) && column.dataAlign != "left" ){
+			cellHTML &= " style=""text-align: #column.dataAlign#""";
+		}
+		
+		// Add editable attribute if column is editable
+		if( column.editable ){
+			cellHTML &= " contenteditable=""true"" class=""bx-grid-cell bx-grid-editable-cell""";
+		}
+		
+		cellHTML &= ">";
+		
+		// Use body content if available, otherwise format the value
+		if( len( bodyContent ) ){
+			cellHTML &= bodyContent;
+		} else {
+			// Use GridColumn's formatting functionality
+			cellHTML &= invokeStatic( "bx:components.GridColumn", "generateCellHTML", [ value, column, rowData.data ?: {} ] );
+		}
+		
+		cellHTML &= "</td>";
+		
+		return cellHTML;
+	}
+
+	/**
+	 * Create row data from simple struct
+	 */
+	public static function createRowDataFromStruct( required data, id = "" ){
+		var autoId = len( id ) ? id : "gridrow_" & listLast( lcase( createUUID() ), "-" );
+		
+		return {
+			"id" : autoId,
+			"data" : data,
+			"selected" : false,
+			"cssClasses" : [],
+			"inlineStyles" : [],
+			"attributes" : {}
+		};
+	}
+
+	/**
+	 * Update row data with new values
+	 */
+	public static function updateRowData( required rowData, required updates ){
+		if( isNull( rowData.data ) ){
+			rowData.data = {};
+		}
+		
+		// Merge updates into existing data
+		for( var key in updates ){
+			rowData.data[ key ] = updates[ key ];
+			
+			// Also update top-level if column exists
+			if( structKeyExists( rowData, key ) ){
+				rowData[ key ] = updates[ key ];
+			}
+		}
+		
+		return rowData;
+	}
+}

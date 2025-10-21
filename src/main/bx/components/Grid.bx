@@ -1,0 +1,483 @@
+/**
+ * BoxLang Component Which Generates a Data Grid
+ *
+ * This component implements the functionality of the BoxLang Grid component,
+ * providing a data grid with sorting, editing, and pagination capabilities.
+ */
+@BoxComponent( "Grid" )
+@AllowsBody( true )
+@RequiresBody( false )
+class{
+
+	/**
+	 * The Grid UI component
+	 *
+	 * <pre>
+	 * <bx:grid name="myGrid" query="#myQuery#" pageSize="10" sortable="true">
+	 *     <bx:gridcolumn name="id" header="ID" width="80" />
+	 *     <bx:gridcolumn name="name" header="Name" width="200" />
+	 * </bx:grid>
+	 * </pre>
+	 *
+	 * @attribute.name - string, required - Grid control name
+	 * @attribute.query - any, optional - Query object to populate the grid
+	 * @attribute.pageSize - number, optional - Number of rows per page (default: 25)
+	 * @attribute.sortable - boolean, optional - Enable column sorting (default: true)
+	 * @attribute.editable - boolean, optional - Enable cell editing (default: false)
+	 * @attribute.autoWidth - boolean, optional - Auto-size columns to fit content (default: false)
+	 * @attribute.height - string, optional - Grid height (CSS value)
+	 * @attribute.width - string, optional - Grid width (CSS value)
+	 * @attribute.stripeRows - boolean, optional - Alternate row colors (default: true)
+	 * @attribute.showHeaders - boolean, optional - Show column headers (default: true)
+	 * @attribute.selectMode - string, optional - Row selection mode: none, single, multi (default: single)
+	 * @attribute.onLoad - string, optional - JavaScript function called when grid loads
+	 * @attribute.onEdit - string, optional - JavaScript function called when cell is edited
+	 * @attribute.onSort - string, optional - JavaScript function called when column is sorted
+	 * @attribute.id - string, optional - HTML element ID (auto-generated if not provided)
+	 * @attribute.class - string, optional - Additional CSS classes
+	 * @attribute.style - string, optional - Additional CSS styles
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Validate required name attribute
+		if( isNull( attributes.name ) ){
+			throw(
+				type		= "boxlang.compat.ui.MissingAttributeException",
+				message		= "The name attribute is required for the Grid component"
+			);
+		}
+
+		// Set default values
+		param attributes.query = "";
+		param attributes.pageSize = 25;
+		param attributes.sortable = true;
+		param attributes.editable = false;
+		param attributes.autoWidth = false;
+		param attributes.height = "";
+		param attributes.width = "";
+		param attributes.stripeRows = true;
+		param attributes.showHeaders = true;
+		param attributes.selectMode = "single";
+		param attributes.onLoad = "";
+		param attributes.onEdit = "";
+		param attributes.onSort = "";
+		param attributes.class = "";
+		param attributes.style = "";
+
+		// Validate selectMode attribute
+		var validSelectModes = [ "none", "single", "multi" ];
+		if( !validSelectModes.containsNoCase( attributes.selectMode ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The selectMode attribute must be one of: #validSelectModes.toList()#"
+			);
+		}
+
+		// Generate unique ID if not provided
+		if( isNull( attributes.id ) ){
+			attributes.id = "grid_" & listLast( lcase( createUUID() ), "-" );
+		}
+
+		// Non-HTML attributes that should not be passed through
+		var nonHTMLAttributes = [ "name", "query", "pageSize", "sortable", "editable", "autoWidth", "stripeRows", "showHeaders", "selectMode", "onLoad", "onEdit", "onSort" ];
+
+		// Initialize grid state
+		executionState.gridName = attributes.name;
+		executionState.gridId = attributes.id;
+		executionState.columns = [];
+		executionState.rows = [];
+		executionState.query = attributes.query;
+		executionState.pageSize = attributes.pageSize;
+		executionState.currentPage = 1;
+		executionState.sortColumn = "";
+		executionState.sortDirection = "ASC";
+
+		// Generate CSS classes
+		var cssClasses = [ "bx-grid" ];
+		
+		if( attributes.stripeRows ){
+			cssClasses.append( "bx-grid-striped" );
+		}
+		
+		if( attributes.sortable ){
+			cssClasses.append( "bx-grid-sortable" );
+		}
+		
+		if( attributes.editable ){
+			cssClasses.append( "bx-grid-editable" );
+		}
+		
+		// Add custom classes if provided
+		if( !isNull( attributes.class ) && len( attributes.class ) ){
+			cssClasses.append( attributes.class );
+		}
+
+		// Start building the grid container
+		var gridContent = "<div";
+		
+		// Add ID
+		gridContent &= " id=""#encodeForHTML( attributes.id )#""";
+		
+		// Add CSS classes
+		gridContent &= " class=""#cssClasses.toList( " " )#""";
+		
+		// Add data attributes
+		gridContent &= " data-name=""#encodeForHTML( attributes.name )#""";
+		gridContent &= " data-page-size=""#attributes.pageSize#""";
+		gridContent &= " data-sortable=""#attributes.sortable#""";
+		gridContent &= " data-editable=""#attributes.editable#""";
+		gridContent &= " data-select-mode=""#attributes.selectMode#""";
+
+		// Build inline styles
+		var inlineStyles = [];
+		
+		if( !isNull( attributes.height ) && len( attributes.height ) ){
+			inlineStyles.append( "height: #attributes.height#" );
+		}
+		if( !isNull( attributes.width ) && len( attributes.width ) ){
+			inlineStyles.append( "width: #attributes.width#" );
+		}
+		if( !isNull( attributes.style ) && len( attributes.style ) ){
+			inlineStyles.append( attributes.style );
+		}
+		
+		if( inlineStyles.len() ){
+			gridContent &= " style=""#inlineStyles.toList( "; " )#""";
+		}
+
+		// Add HTML attributes (excluding non-HTML ones)
+		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" && key != "style" ).each( ( key, value ) => {
+			gridContent &= " #key#=""#encodeForHTML( value )#""";
+		} );
+
+		gridContent &= ">";
+
+		// Write opening container
+		context.writeToBuffer( gridContent );
+
+		// Process body to capture GridColumn and GridRow components
+		var buffer = newBuffer();
+		var bodyResult = processBody( context, body, buffer );
+
+		// Generate grid table structure
+		generateGridStructure( context, attributes, executionState );
+
+		// Close container
+		context.writeToBuffer( "</div>" );
+
+		// Generate JavaScript for grid functionality
+		generateGridScript( context, attributes, executionState );
+	}
+
+	/**
+	 * Generate grid table structure
+	 */
+	private function generateGridStructure( required context, required attributes, required executionState ){
+		var tableContent = "<table class=""bx-grid-table"">";
+		
+		// Generate headers if enabled
+		if( attributes.showHeaders ){
+			tableContent &= generateGridHeaders( executionState );
+		}
+		
+		// Generate body
+		tableContent &= "<tbody class=""bx-grid-body"">";
+		tableContent &= generateGridRows( executionState );
+		tableContent &= "</tbody>";
+		
+		tableContent &= "</table>";
+		
+		// Add pagination if needed
+		if( executionState.pageSize > 0 ){
+			tableContent &= generateGridPagination( executionState );
+		}
+		
+		context.writeToBuffer( tableContent );
+	}
+
+	/**
+	 * Generate grid headers
+	 */
+	private function generateGridHeaders( required executionState ){
+		var headContent = "<thead class=""bx-grid-header""><tr>";
+		
+		// Add selection column if needed
+		if( executionState.gridSelectMode != "none" ){
+			var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
+			headContent &= "<th class=""bx-grid-select-header"">";
+			if( executionState.gridSelectMode == "multi" ){
+				headContent &= "<input type=""checkbox"" class=""bx-grid-select-all"" />";
+			}
+			headContent &= "</th>";
+		}
+		
+		// Generate column headers
+		var columns = executionState.columns ?: [];
+		for( var column in columns ){
+			var sortClass = "";
+			if( executionState.sortColumn == column.name ){
+				sortClass = " bx-grid-sorted bx-grid-sort-" & lcase( executionState.sortDirection );
+			}
+			
+			headContent &= "<th class=""bx-grid-column-header#sortClass#""";
+			headContent &= " data-column=""#encodeForHTML( column.name )#""";
+			
+			if( !isNull( column.width ) && len( column.width ) ){
+				headContent &= " style=""width: #column.width#""";
+			}
+			
+			headContent &= ">";
+			headContent &= encodeForHTML( column.header ?: column.name );
+			
+			// Add sort indicator if sortable
+			if( column.sortable ){
+				headContent &= "<span class=""bx-grid-sort-indicator""></span>";
+			}
+			
+			headContent &= "</th>";
+		}
+		
+		headContent &= "</tr></thead>";
+		return headContent;
+	}
+
+	/**
+	 * Generate grid rows
+	 */
+	private function generateGridRows( required executionState ){
+		var rowsContent = "";
+		var query = executionState.query;
+		var rows = executionState.rows ?: [];
+		var columns = executionState.columns ?: [];
+		
+		// Handle query data
+		if( !isNull( query ) && isQuery( query ) ){
+			var startRow = ( executionState.currentPage - 1 ) * executionState.pageSize + 1;
+			var endRow = min( startRow + executionState.pageSize - 1, query.recordCount );
+			
+			for( var i = startRow; i <= endRow; i++ ){
+				rowsContent &= "<tr class=""bx-grid-row"" data-row=""#i#"">";
+				
+				// Add selection column if needed
+				if( executionState.gridSelectMode != "none" ){
+					var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
+					rowsContent &= "<td class=""bx-grid-select-cell"">";
+					rowsContent &= "<input type=""#selectType#"" name=""#executionState.gridName#_select"" value=""#i#"" />";
+					rowsContent &= "</td>";
+				}
+				
+				// Generate data cells
+				for( var column in columns ){
+					var cellValue = "";
+					if( query.columnExists( column.name ) ){
+						cellValue = query.getCell( column.name, i );
+					}
+					
+					rowsContent &= "<td class=""bx-grid-cell""";
+					rowsContent &= " data-column=""#encodeForHTML( column.name )#""";
+					
+					if( column.editable ){
+						rowsContent &= " contenteditable=""true""";
+						rowsContent &= " class=""bx-grid-cell bx-grid-editable-cell""";
+					}
+					
+					rowsContent &= ">";
+					rowsContent &= encodeForHTML( cellValue );
+					rowsContent &= "</td>";
+				}
+				
+				rowsContent &= "</tr>";
+			}
+		}
+		
+		// Handle manual rows
+		for( var row in rows ){
+			rowsContent &= "<tr class=""bx-grid-row"">";
+			
+			// Add selection column if needed
+			if( executionState.gridSelectMode != "none" ){
+				var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
+				rowsContent &= "<td class=""bx-grid-select-cell"">";
+				rowsContent &= "<input type=""#selectType#"" name=""#executionState.gridName#_select"" />";
+				rowsContent &= "</td>";
+			}
+			
+			// Generate data cells from row data
+			for( var column in columns ){
+				var cellValue = row[ column.name ] ?: "";
+				
+				rowsContent &= "<td class=""bx-grid-cell""";
+				rowsContent &= " data-column=""#encodeForHTML( column.name )#""";
+				
+				if( column.editable ){
+					rowsContent &= " contenteditable=""true""";
+					rowsContent &= " class=""bx-grid-cell bx-grid-editable-cell""";
+				}
+				
+				rowsContent &= ">";
+				rowsContent &= encodeForHTML( cellValue );
+				rowsContent &= "</td>";
+			}
+			
+			rowsContent &= "</tr>";
+		}
+		
+		return rowsContent;
+	}
+
+	/**
+	 * Generate grid pagination
+	 */
+	private function generateGridPagination( required executionState ){
+		var totalRows = 0;
+		if( !isNull( executionState.query ) && isQuery( executionState.query ) ){
+			totalRows = executionState.query.recordCount;
+		} else {
+			totalRows = executionState.rows.len();
+		}
+		
+		var totalPages = ceiling( totalRows / executionState.pageSize );
+		var currentPage = executionState.currentPage;
+		
+		if( totalPages <= 1 ){
+			return "";
+		}
+		
+		var paginationContent = "<div class=""bx-grid-pagination"">";
+		
+		// Previous button
+		if( currentPage > 1 ){
+			paginationContent &= "<button class=""bx-grid-page-btn"" data-page=""#currentPage - 1#"">&laquo; Previous</button>";
+		}
+		
+		// Page numbers
+		var startPage = max( 1, currentPage - 2 );
+		var endPage = min( totalPages, currentPage + 2 );
+		
+		for( var i = startPage; i <= endPage; i++ ){
+			var activeClass = i == currentPage ? " active" : "";
+			paginationContent &= "<button class=""bx-grid-page-btn#activeClass#"" data-page=""#i#"">#i#</button>";
+		}
+		
+		// Next button
+		if( currentPage < totalPages ){
+			paginationContent &= "<button class=""bx-grid-page-btn"" data-page=""#currentPage + 1#"">Next &raquo;</button>";
+		}
+		
+		paginationContent &= "</div>";
+		
+		return paginationContent;
+	}
+
+	/**
+	 * Generate JavaScript for grid functionality
+	 */
+	private function generateGridScript( required context, required attributes, required executionState ){
+		var gridId = attributes.id;
+		var script = "<script type=""text/javascript"">";
+		script &= "(function(){";
+		script &= "var grid = document.getElementById('#gridId#');";
+		script &= generateGridBehaviorScript( attributes, executionState );
+		script &= "})();";
+		script &= "</script>";
+
+		context.writeToBuffer( script );
+	}
+
+	/**
+	 * Generate grid behavior script
+	 */
+	private function generateGridBehaviorScript( required attributes, required executionState ){
+		return "
+			// Grid event handlers
+			grid.addEventListener('click', function(e) {
+				// Handle column sorting
+				if (e.target.closest('.bx-grid-column-header') && grid.dataset.sortable === 'true') {
+					var header = e.target.closest('.bx-grid-column-header');
+					var column = header.dataset.column;
+					sortColumn(column);
+				}
+				
+				// Handle pagination
+				if (e.target.classList.contains('bx-grid-page-btn')) {
+					var page = parseInt(e.target.dataset.page);
+					goToPage(page);
+				}
+				
+				// Handle select all
+				if (e.target.classList.contains('bx-grid-select-all')) {
+					toggleSelectAll(e.target.checked);
+				}
+			});
+			
+			// Handle cell editing
+			if (grid.dataset.editable === 'true') {
+				grid.addEventListener('blur', function(e) {
+					if (e.target.classList.contains('bx-grid-editable-cell')) {
+						var column = e.target.dataset.column;
+						var row = e.target.closest('.bx-grid-row').dataset.row;
+						var value = e.target.textContent;
+						
+						// Fire edit event
+						#len( attributes.onEdit ) ? attributes.onEdit & '(column, row, value);' : ''#
+						
+						// Fire custom event
+						var event = new CustomEvent('gridCellEdit', { 
+							detail: { column: column, row: row, value: value } 
+						});
+						grid.dispatchEvent(event);
+					}
+				}, true);
+			}
+			
+			function sortColumn(column) {
+				var header = grid.querySelector('.bx-grid-column-header[data-column=\"' + column + '\"]');
+				var currentSort = header.classList.contains('bx-grid-sort-asc') ? 'asc' : 
+								  header.classList.contains('bx-grid-sort-desc') ? 'desc' : 'none';
+				var newSort = currentSort === 'asc' ? 'desc' : 'asc';
+				
+				// Remove all sort classes
+				grid.querySelectorAll('.bx-grid-column-header').forEach(function(h) {
+					h.classList.remove('bx-grid-sorted', 'bx-grid-sort-asc', 'bx-grid-sort-desc');
+				});
+				
+				// Add new sort class
+				header.classList.add('bx-grid-sorted', 'bx-grid-sort-' + newSort);
+				
+				// Fire sort event
+				#len( attributes.onSort ) ? attributes.onSort & '(column, newSort);' : ''#
+				
+				// Fire custom event
+				var event = new CustomEvent('gridSort', { 
+					detail: { column: column, direction: newSort } 
+				});
+				grid.dispatchEvent(event);
+			}
+			
+			function goToPage(page) {
+				// This would typically reload grid data for the specified page
+				// Fire custom event for now
+				var event = new CustomEvent('gridPageChange', { 
+					detail: { page: page } 
+				});
+				grid.dispatchEvent(event);
+			}
+			
+			function toggleSelectAll(checked) {
+				grid.querySelectorAll('input[name=\"#executionState.gridName#_select\"]').forEach(function(cb) {
+					cb.checked = checked;
+				});
+			}
+			
+			// Fire load event
+			#len( attributes.onLoad ) ? 'setTimeout(function() { ' & attributes.onLoad & '(); }, 0);' : ''#
+		";
+	}
+}

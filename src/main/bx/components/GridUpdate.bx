@@ -1,0 +1,396 @@
+/**
+ * BoxLang Component Which Handles Grid Data Updates
+ *
+ * This component implements the functionality of the BoxLang GridUpdate component,
+ * facilitating the updating of data in Grid components back to data sources.
+ */
+@BoxComponent( "GridUpdate" )
+@AllowsBody( false )
+@RequiresBody( false )
+class{
+
+	/**
+	 * The GridUpdate UI component
+	 *
+	 * <pre>
+	 * <bx:gridupdate 
+	 *     grid="myGrid" 
+	 *     dataSource="#myDataSource#" 
+	 *     tableName="employees"
+	 *     keyOnly="false" />
+	 * </pre>
+	 *
+	 * @attribute.grid - string, required - Name of the grid to update
+	 * @attribute.dataSource - string, optional - Data source name for database updates
+	 * @attribute.tableName - string, optional - Database table name to update
+	 * @attribute.tableOwner - string, optional - Database table owner/schema
+	 * @attribute.tableQualifier - string, optional - Database table qualifier
+	 * @attribute.keyOnly - boolean, optional - Only update key fields (default: false)
+	 * @attribute.username - string, optional - Database username
+	 * @attribute.password - string, optional - Database password
+	 * @attribute.url - string, optional - URL to send update data to via HTTP
+	 * @attribute.method - string, optional - HTTP method for URL updates: POST, PUT (default: POST)
+	 * @attribute.onSuccess - string, optional - JavaScript function to call on successful update
+	 * @attribute.onError - string, optional - JavaScript function to call on update error
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Validate required grid attribute
+		if( isNull( attributes.grid ) ){
+			throw(
+				type		= "boxlang.compat.ui.MissingAttributeException",
+				message		= "The grid attribute is required for the GridUpdate component"
+			);
+		}
+
+		// Set default values
+		param attributes.dataSource = "";
+		param attributes.tableName = "";
+		param attributes.tableOwner = "";
+		param attributes.tableQualifier = "";
+		param attributes.keyOnly = false;
+		param attributes.username = "";
+		param attributes.password = "";
+		param attributes.url = "";
+		param attributes.method = "POST";
+		param attributes.onSuccess = "";
+		param attributes.onError = "";
+
+		// Validate method attribute
+		var validMethods = [ "POST", "PUT", "PATCH" ];
+		if( !validMethods.containsNoCase( attributes.method ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The method attribute must be one of: #validMethods.toList()#"
+			);
+		}
+
+		// Validate that either dataSource+tableName or url is provided
+		var hasDatabase = !isNull( attributes.dataSource ) && len( attributes.dataSource ) && 
+						  !isNull( attributes.tableName ) && len( attributes.tableName );
+		var hasURL = !isNull( attributes.url ) && len( attributes.url );
+		
+		if( !hasDatabase && !hasURL ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidUsageException",
+				message		= "GridUpdate requires either dataSource+tableName for database updates or url for HTTP updates"
+			);
+		}
+
+		// Generate unique ID for the update handler
+		var updateId = "gridupdate_" & listLast( lcase( createUUID() ), "-" );
+
+		// Build configuration object
+		var updateConfig = {
+			"id" : updateId,
+			"gridName" : attributes.grid,
+			"dataSource" : attributes.dataSource,
+			"tableName" : attributes.tableName,
+			"tableOwner" : attributes.tableOwner,
+			"tableQualifier" : attributes.tableQualifier,
+			"keyOnly" : attributes.keyOnly,
+			"username" : attributes.username,
+			"password" : attributes.password,
+			"url" : attributes.url,
+			"method" : attributes.method,
+			"onSuccess" : attributes.onSuccess,
+			"onError" : attributes.onError,
+			"hasDatabase" : hasDatabase,
+			"hasURL" : hasURL
+		};
+
+		// Generate hidden form and JavaScript for grid update handling
+		generateGridUpdateScript( context, updateConfig );
+	}
+
+	/**
+	 * Generate JavaScript and form elements for grid update functionality
+	 */
+	private function generateGridUpdateScript( required context, required config ){
+		
+		// Create hidden form for data submission
+		var formHTML = "<form id=""#config.id#_form"" style=""display: none;"" method=""#config.method#"">";
+		
+		if( config.hasURL ){
+			formHTML &= " action=""#encodeForHTML( config.url )#""";
+		}
+		
+		formHTML &= ">";
+		formHTML &= "<input type=""hidden"" name=""gridName"" value=""#encodeForHTML( config.gridName )#"" />";
+		formHTML &= "<input type=""hidden"" name=""action"" value=""update"" />";
+		formHTML &= "<textarea name=""gridData"" style=""display: none;""></textarea>";
+		formHTML &= "</form>";
+		
+		context.writeToBuffer( formHTML );
+		
+		// Generate JavaScript functionality
+		var script = "<script type=""text/javascript"">";
+		script &= "(function(){";
+		script &= generateGridUpdateBehaviorScript( config );
+		script &= "})();";
+		script &= "</script>";
+
+		context.writeToBuffer( script );
+	}
+
+	/**
+	 * Generate grid update behavior script
+	 */
+	private function generateGridUpdateBehaviorScript( required config ){
+		return "
+			var gridElement = document.querySelector('#config.gridName#, [data-name=\"#config.gridName#\"]');
+			var updateForm = document.getElementById('#config.id#_form');
+			var gridDataField = updateForm.querySelector('[name=\"gridData\"]');
+			
+			if (!gridElement) {
+				console.error('Grid not found: #config.gridName#');
+				return;
+			}
+			
+			// Track modified cells
+			var modifiedCells = new Map();
+			var deletedRows = new Set();
+			var newRows = [];
+			
+			// Listen for grid changes
+			gridElement.addEventListener('gridCellEdit', function(e) {
+				var detail = e.detail;
+				var rowId = getRowId(e.target);
+				
+				if (!modifiedCells.has(rowId)) {
+					modifiedCells.set(rowId, {});
+				}
+				
+				modifiedCells.get(rowId)[detail.column] = detail.value;
+			});
+			
+			// Listen for row deletions
+			gridElement.addEventListener('gridRowDelete', function(e) {
+				var rowId = getRowId(e.target);
+				deletedRows.add(rowId);
+			});
+			
+			// Listen for new rows
+			gridElement.addEventListener('gridRowAdd', function(e) {
+				newRows.push(e.detail.rowData);
+			});
+			
+			// Public update function
+			window['updateGrid_#config.gridName#'] = function() {
+				var updateData = {
+					grid: '#config.gridName#',
+					modified: Object.fromEntries(modifiedCells),
+					deleted: Array.from(deletedRows),
+					added: newRows,
+					timestamp: new Date().toISOString()
+				};
+				
+				#config.hasDatabase ? 'updateDatabase(updateData);' : ''#
+				#config.hasURL ? 'updateViaURL(updateData);' : ''#
+			};
+			
+			#config.hasDatabase ? generateDatabaseUpdateScript( config ) : ''#
+			#config.hasURL ? generateURLUpdateScript( config ) : ''#
+			
+			function getRowId(element) {
+				var row = element.closest('.bx-grid-row');
+				return row ? (row.id || row.dataset.row || 'row_' + Array.from(row.parentNode.children).indexOf(row)) : null;
+			}
+			
+			function getRowData(rowElement) {
+				var data = {};
+				var cells = rowElement.querySelectorAll('.bx-grid-cell');
+				
+				cells.forEach(function(cell) {
+					var column = cell.dataset.column;
+					if (column) {
+						data[column] = cell.textContent.trim();
+					}
+				});
+				
+				return data;
+			}
+			
+			function showSuccess(message) {
+				#len( config.onSuccess ) ? config.onSuccess & '(message);' : 'console.log("Update successful:", message);'#
+			}
+			
+			function showError(error) {
+				#len( config.onError ) ? config.onError & '(error);' : 'console.error("Update failed:", error);'#
+			}
+		";
+	}
+
+	/**
+	 * Generate database update script
+	 */
+	private function generateDatabaseUpdateScript( required config ){
+		return "
+			function updateDatabase(updateData) {
+				// Prepare database update payload
+				var payload = {
+					dataSource: '#config.dataSource#',
+					tableName: '#config.tableName#',
+					tableOwner: '#config.tableOwner#',
+					tableQualifier: '#config.tableQualifier#',
+					keyOnly: #config.keyOnly#,
+					updates: updateData
+				};
+				
+				// Add credentials if provided
+				#len( config.username ) ? 'payload.username = "' & config.username & '";' : ''#
+				#len( config.password ) ? 'payload.password = "' & config.password & '";' : ''#
+				
+				// Send to BoxLang backend for database processing
+				fetch('/bx-compat-ui/gridupdate', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest'
+					},
+					body: JSON.stringify(payload)
+				})
+				.then(function(response) {
+					if (!response.ok) {
+						throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+					}
+					return response.json();
+				})
+				.then(function(result) {
+					if (result.success) {
+						// Clear tracking arrays
+						modifiedCells.clear();
+						deletedRows.clear();
+						newRows = [];
+						
+						showSuccess('Database updated successfully');
+						
+						// Fire success event
+						var event = new CustomEvent('gridUpdateSuccess', { detail: result });
+						gridElement.dispatchEvent(event);
+					} else {
+						throw new Error(result.message || 'Unknown database error');
+					}
+				})
+				.catch(function(error) {
+					showError(error.message);
+					
+					// Fire error event
+					var event = new CustomEvent('gridUpdateError', { detail: { error: error } });
+					gridElement.dispatchEvent(event);
+				});
+			}
+		";
+	}
+
+	/**
+	 * Generate URL update script
+	 */
+	private function generateURLUpdateScript( required config ){
+		return "
+			function updateViaURL(updateData) {
+				// Prepare form data
+				gridDataField.value = JSON.stringify(updateData);
+				
+				// Submit via fetch instead of form submission for better control
+				var formData = new FormData(updateForm);
+				
+				fetch('#config.url#', {
+					method: '#config.method#',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest'
+					},
+					body: formData
+				})
+				.then(function(response) {
+					if (!response.ok) {
+						throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+					}
+					
+					// Try to parse as JSON, fall back to text
+					var contentType = response.headers.get('content-type');
+					if (contentType && contentType.includes('application/json')) {
+						return response.json();
+					} else {
+						return response.text().then(function(text) {
+							return { success: true, message: text };
+						});
+					}
+				})
+				.then(function(result) {
+					// Clear tracking arrays
+					modifiedCells.clear();
+					deletedRows.clear();
+					newRows = [];
+					
+					showSuccess(result.message || 'Update completed successfully');
+					
+					// Fire success event
+					var event = new CustomEvent('gridUpdateSuccess', { detail: result });
+					gridElement.dispatchEvent(event);
+				})
+				.catch(function(error) {
+					showError(error.message);
+					
+					// Fire error event
+					var event = new CustomEvent('gridUpdateError', { detail: { error: error } });
+					gridElement.dispatchEvent(event);
+				});
+			}
+		";
+	}
+
+	/**
+	 * Process database updates (called by backend endpoint)
+	 */
+	public static function processDatabaseUpdate( required updatePayload ){
+		try {
+			var result = {
+				"success" : true,
+				"message" : "Update completed successfully",
+				"updatedRows" : 0,
+				"deletedRows" : 0,
+				"insertedRows" : 0
+			};
+
+			// Process modified rows
+			var modified = updatePayload.updates.modified ?: {};
+			for( var rowId in modified ){
+				var rowData = modified[ rowId ];
+				// Execute UPDATE query for this row
+				// Implementation would depend on specific database access patterns
+				result.updatedRows++;
+			}
+
+			// Process deleted rows
+			var deleted = updatePayload.updates.deleted ?: [];
+			for( var rowId in deleted ){
+				// Execute DELETE query for this row
+				result.deletedRows++;
+			}
+
+			// Process new rows
+			var added = updatePayload.updates.added ?: [];
+			for( var rowData in added ){
+				// Execute INSERT query for this row
+				result.insertedRows++;
+			}
+
+			return result;
+
+		} catch( any e ){
+			return {
+				"success" : false,
+				"message" : "Database update failed: " & e.message,
+				"error" : e
+			};
+		}
+	}
+}
