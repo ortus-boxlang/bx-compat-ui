@@ -30,8 +30,8 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="myGrid" {
-		        bx:gridcolumn name="id" header="ID";
-		        bx:gridcolumn name="name" header="Name";
+		        bx:gridcolumn name="id" header="ID" /
+		        bx:gridcolumn name="name" header="Name" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -53,7 +53,7 @@ public class GridTest extends BaseIntegrationTest {
 			runtime.executeSource(
 			    """
 			    bx:grid {
-			        bx:gridcolumn name="test";
+			        bx:gridcolumn name="test" /
 			    }
 			    """,
 			    context
@@ -74,7 +74,7 @@ public class GridTest extends BaseIntegrationTest {
 		        width="600px"
 		        class="my-grid-class"
 		        style="border: 1px solid gray;" {
-		        bx:gridcolumn name="col1";
+		        bx:gridcolumn name="col1" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -100,7 +100,7 @@ public class GridTest extends BaseIntegrationTest {
 		        selectMode="multi"
 		        pageSize="50"
 		        stripeRows="false" {
-		        bx:gridcolumn name="id";
+		        bx:gridcolumn name="id" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -124,7 +124,7 @@ public class GridTest extends BaseIntegrationTest {
 			runtime.executeSource(
 			    """
 			    bx:grid name="testGrid" selectMode="invalid" {
-			        bx:gridcolumn name="test";
+			        bx:gridcolumn name="test" /
 			    }
 			    """,
 			    context
@@ -140,9 +140,9 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="headerGrid" showHeaders="true" {
-		        bx:gridcolumn name="id" header="ID Column" width="80px";
-		        bx:gridcolumn name="name" header="Name Column" width="200px";
-		        bx:gridcolumn name="email" header="Email Address";
+		        bx:gridcolumn name="id" header="ID Column" width="80px" /
+		        bx:gridcolumn name="name" header="Name Column" width="200px" /
+		        bx:gridcolumn name="email" header="Email Address" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -165,7 +165,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="noHeaderGrid" showHeaders="false" {
-		        bx:gridcolumn name="col1" header="Hidden Header";
+		        bx:gridcolumn name="col1" header="Hidden Header" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -191,7 +191,7 @@ public class GridTest extends BaseIntegrationTest {
 		        onLoad="gridLoaded"
 		        onEdit="cellEdited"
 		        onSort="columnSorted" {
-		        bx:gridcolumn name="test";
+		        bx:gridcolumn name="test" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -204,9 +204,9 @@ public class GridTest extends BaseIntegrationTest {
 		assertThat( output ).contains( "sortColumn" );
 		assertThat( output ).contains( "goToPage" );
 		assertThat( output ).contains( "toggleSelectAll" );
-		assertThat( output ).contains( "gridLoaded" );
-		assertThat( output ).contains( "cellEdited" );
-		assertThat( output ).contains( "columnSorted" );
+		assertThat( output ).contains( "gridLoaded();" );
+		assertThat( output ).contains( "cellEdited(column, row, value);" );
+		assertThat( output ).contains( "columnSorted(column, newSort);" );
 	}
 
 	@DisplayName( "It auto-generates ID when not provided" )
@@ -215,7 +215,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="autoIdGrid" {
-		        bx:gridcolumn name="test";
+		        bx:gridcolumn name="test" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -232,10 +232,10 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="manualRowGrid" {
-		        bx:gridcolumn name="id" header="ID";
-		        bx:gridcolumn name="name" header="Name";
-		        bx:gridrow data="#{ id: 1, name: 'John' }#";
-		        bx:gridrow data="#{ id: 2, name: 'Jane' }#";
+		        bx:gridcolumn name="id" header="ID" /
+		        bx:gridcolumn name="name" header="Name" /
+		        bx:gridrow data="#{ id: 1, name: 'John' }#" /
+		        bx:gridrow data="#{ id: 2, name: 'Jane' }#" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -255,7 +255,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="multiSelectGrid" selectMode="multi" {
-		        bx:gridcolumn name="name" header="Name";
+		        bx:gridcolumn name="name" header="Name" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -264,7 +264,8 @@ public class GridTest extends BaseIntegrationTest {
 
 		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-grid-select-header" );
-		assertThat( output ).contains( "bx-grid-select-all" );
+		// In multi select mode, should have select-all checkbox in header
+		assertThat( output ).contains( "<input type=\"checkbox\" class=\"bx-grid-select-all\"" );
 		assertThat( output ).contains( "type=\"checkbox\"" );
 	}
 
@@ -274,7 +275,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="singleSelectGrid" selectMode="single" {
-		        bx:gridcolumn name="name" header="Name";
+		        bx:gridcolumn name="name" header="Name" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -283,8 +284,10 @@ public class GridTest extends BaseIntegrationTest {
 
 		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-grid-select-header" );
-		assertThat( output ).doesNotContain( "bx-grid-select-all" );
-		assertThat( output ).doesNotContain( "type=\"checkbox\"" );
+		// In single select mode, should use radio buttons, not checkboxes
+		assertThat( output ).contains( "type=\"radio\"" );
+		// Should not contain select-all checkbox in the header HTML
+		assertThat( output ).doesNotContain( "<input type=\"checkbox\" class=\"bx-grid-select-all\"" );
 	}
 
 	@DisplayName( "It does not generate selection columns for none mode" )
@@ -293,7 +296,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="noSelectGrid" selectMode="none" {
-		        bx:gridcolumn name="name" header="Name";
+		        bx:gridcolumn name="name" header="Name" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -301,8 +304,9 @@ public class GridTest extends BaseIntegrationTest {
 		);
 
 		String output = variables.getAsString( Key.of( "result" ) );
-		assertThat( output ).doesNotContain( "bx-grid-select-header" );
-		assertThat( output ).doesNotContain( "bx-grid-select-all" );
+		// Should not generate any selection headers or controls in none mode
+		assertThat( output ).doesNotContain( "<th class=\"bx-grid-select-header\"" );
+		assertThat( output ).doesNotContain( "<td class=\"bx-grid-select-cell\"" );
 	}
 
 	@DisplayName( "It generates pagination when pageSize is set" )
@@ -317,8 +321,8 @@ public class GridTest extends BaseIntegrationTest {
 		    ]);
 
 		    bx:grid name="paginatedGrid" query="#myQuery#" pageSize="3" {
-		        bx:gridcolumn name="id" header="ID";
-		        bx:gridcolumn name="name" header="Name";
+		        bx:gridcolumn name="id" header="ID" /
+		        bx:gridcolumn name="name" header="Name" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -337,7 +341,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="eventGrid" sortable="true" editable="true" {
-		        bx:gridcolumn name="test";
+		        bx:gridcolumn name="test" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,

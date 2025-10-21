@@ -96,7 +96,7 @@ public class GridUpdateTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			    bx:gridupdate grid="testGrid";
+			    bx:gridupdate grid="testGrid" /
 			    """,
 			    context
 			);

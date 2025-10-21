@@ -30,8 +30,8 @@ public class GridColumnTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="columnTest" {
-		        bx:gridcolumn name="id" header="ID Column" width="80px" sortable="true";
-		        bx:gridcolumn name="name" header="Name Column" width="200px" editable="true";
+		        bx:gridcolumn name="id" header="ID Column" width="80px" sortable="true" /
+		        bx:gridcolumn name="name" header="Name Column" width="200px" editable="true" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -53,7 +53,7 @@ public class GridColumnTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			    bx:gridcolumn name="orphan" header="Orphaned Column";
+			    bx:gridcolumn name="orphan" header="Orphaned Column" /
 			    """,
 			    context
 			);
@@ -69,7 +69,7 @@ public class GridColumnTest extends BaseIntegrationTest {
 			runtime.executeSource(
 			    """
 			    bx:grid name="testGrid" {
-			        bx:gridcolumn header="No Name Column";
+			        bx:gridcolumn header="No Name Column" /
 			    }
 			    """,
 			    context
@@ -85,7 +85,7 @@ public class GridColumnTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="defaultHeaderGrid" {
-		        bx:gridcolumn name="username";
+		        bx:gridcolumn name="username" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -103,9 +103,9 @@ public class GridColumnTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="alignmentGrid" {
-		        bx:gridcolumn name="left" dataAlign="left" headerAlign="left";
-		        bx:gridcolumn name="center" dataAlign="center" headerAlign="center";
-		        bx:gridcolumn name="right" dataAlign="right" headerAlign="right";
+		        bx:gridcolumn name="left" dataAlign="left" headerAlign="left" /
+		        bx:gridcolumn name="center" dataAlign="center" headerAlign="center" /
+		        bx:gridcolumn name="right" dataAlign="right" headerAlign="right" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -125,7 +125,7 @@ public class GridColumnTest extends BaseIntegrationTest {
 			runtime.executeSource(
 			    """
 			    bx:grid name="testGrid" {
-			        bx:gridcolumn name="test" dataAlign="invalid";
+			        bx:gridcolumn name="test" dataAlign="invalid" /
 			    }
 			    """,
 			    context
@@ -141,10 +141,10 @@ public class GridColumnTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="typeGrid" {
-		        bx:gridcolumn name="id" type="numeric";
-		        bx:gridcolumn name="name" type="string";
-		        bx:gridcolumn name="birthdate" type="date";
-		        bx:gridcolumn name="active" type="boolean";
+		        bx:gridcolumn name="id" type="numeric" /
+		        bx:gridcolumn name="name" type="string" /
+		        bx:gridcolumn name="birthdate" type="date" /
+		        bx:gridcolumn name="active" type="boolean" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -165,7 +165,7 @@ public class GridColumnTest extends BaseIntegrationTest {
 			runtime.executeSource(
 			    """
 			    bx:grid name="testGrid" {
-			        bx:gridcolumn name="test" type="invalidtype";
+			        bx:gridcolumn name="test" type="invalidtype" /
 			    }
 			    """,
 			    context
@@ -251,8 +251,8 @@ public class GridColumnTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="visibilityGrid" {
-		        bx:gridcolumn name="visible" display="true";
-		        bx:gridcolumn name="hidden" display="false";
+		        bx:gridcolumn name="visible" display="true" /
+		        bx:gridcolumn name="hidden" display="false" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -271,8 +271,8 @@ public class GridColumnTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="sortableGrid" sortable="true" {
-		        bx:gridcolumn name="sortable" sortable="true";
-		        bx:gridcolumn name="nonsortable" sortable="false";
+		        bx:gridcolumn name="sortable" sortable="true" /
+		        bx:gridcolumn name="nonsortable" sortable="false" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -291,8 +291,8 @@ public class GridColumnTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="editableGrid" editable="true" {
-		        bx:gridcolumn name="readonly" editable="false";
-		        bx:gridcolumn name="editable" editable="true";
+		        bx:gridcolumn name="readonly" editable="false" /
+		        bx:gridcolumn name="editable" editable="true" /
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,

@@ -98,6 +98,7 @@ class{
 		executionState.currentPage = 1;
 		executionState.sortColumn = "";
 		executionState.sortDirection = "ASC";
+		executionState.selectMode = lcase( attributes.selectMode );
 
 		// Generate CSS classes
 		var cssClasses = [ "bx-grid" ];
@@ -208,13 +209,11 @@ class{
 	private function generateGridHeaders( required executionState ){
 		var headContent = "<thead class=""bx-grid-header""><tr>";
 
-		param executionState.gridSelectMode = "none";
-
 		// Add selection column if needed
-		if( executionState.gridSelectMode != "none" ){
-			var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
+		if( executionState.selectMode != "none" ){
+			var selectType = executionState.selectMode == "multi" ? "checkbox" : "radio";
 			headContent &= "<th class=""bx-grid-select-header"">";
-			if( executionState.gridSelectMode == "multi" ){
+			if( executionState.selectMode == "multi" ){
 				headContent &= "<input type=""checkbox"" class=""bx-grid-select-all"" />";
 			}
 			headContent &= "</th>";
@@ -268,8 +267,8 @@ class{
 				rowsContent &= "<tr class=""bx-grid-row"" data-row=""#i#"">";
 
 				// Add selection column if needed
-				if( executionState.gridSelectMode != "none" ){
-					var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
+				if( executionState.selectMode != "none" ){
+					var selectType = executionState.selectMode == "multi" ? "checkbox" : "radio";
 					rowsContent &= "<td class=""bx-grid-select-cell"">";
 					rowsContent &= "<input type=""#selectType#"" name=""#executionState.gridName#_select"" value=""#i#"" />";
 					rowsContent &= "</td>";
@@ -304,8 +303,8 @@ class{
 			rowsContent &= "<tr class=""bx-grid-row"">";
 
 			// Add selection column if needed
-			if( executionState.gridSelectMode != "none" ){
-				var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
+			if( executionState.selectMode != "none" ){
+				var selectType = executionState.selectMode == "multi" ? "checkbox" : "radio";
 				rowsContent &= "<td class=""bx-grid-select-cell"">";
 				rowsContent &= "<input type=""#selectType#"" name=""#executionState.gridName#_select"" />";
 				rowsContent &= "</td>";
