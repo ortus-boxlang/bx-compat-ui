@@ -9,6 +9,8 @@
 @RequiresBody( false )
 class{
 
+	import GridColumn;
+
 	variables.gridComponentName = "Grid";
 
 	/**
@@ -226,7 +228,7 @@ class{
 			cellHTML &= bodyContent;
 		} else {
 			// Use GridColumn's formatting functionality
-			cellHTML &= invokeStatic( "bx:components.GridColumn", "generateCellHTML", [ value, column, rowData.data ?: {} ] );
+			cellHTML &= GridColumn.generateCellHTML( value, column, rowData.data ?: {} );
 		}
 
 		cellHTML &= "</td>";

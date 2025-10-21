@@ -64,7 +64,7 @@ class{
 		param attributes.width = "";
 		param attributes.stripeRows = true;
 		param attributes.showHeaders = true;
-		param attributes.selectMode = "single";
+		param attributes.selectMode = "none";
 		param attributes.onLoad = "";
 		param attributes.onEdit = "";
 		param attributes.onSort = "";
@@ -213,9 +213,7 @@ class{
 		if( executionState.selectMode != "none" ){
 			var selectType = executionState.selectMode == "multi" ? "checkbox" : "radio";
 			headContent &= "<th class=""bx-grid-select-header"">";
-			if( executionState.selectMode == "multi" ){
-				headContent &= "<input type=""checkbox"" class=""bx-grid-select-all"" />";
-			}
+			headContent &= "<input type=""#selectType#"" class=""bx-grid-select-all"" />";
 			headContent &= "</th>";
 		}
 
@@ -445,7 +443,7 @@ class{
 			}
 
 			function sortColumn(column) {
-				var header = grid.querySelector('.bx-grid-column-header[data-column=\"' + column + '\"]');
+				var header = grid.querySelector('.bx-grid-column-header[data-column=""' + column + '""]');
 				var currentSort = header.classList.contains('bx-grid-sort-asc') ? 'asc' :
 								  header.classList.contains('bx-grid-sort-desc') ? 'desc' : 'none';
 				var newSort = currentSort === 'asc' ? 'desc' : 'asc';
@@ -478,7 +476,7 @@ class{
 			}
 
 			function toggleSelectAll(checked) {
-				grid.querySelectorAll('input[name=\"#executionState.gridName#_select\"]').forEach(function(cb) {
+				grid.querySelectorAll('input[name=""#executionState.gridName#_select""]').forEach(function(cb) {
 					cb.checked = checked;
 				});
 			}
