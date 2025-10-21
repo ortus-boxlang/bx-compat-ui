@@ -1,10 +1,10 @@
 /**
  * BoxLang Component Which Generates the Layout Container
- * 
+ *
  * This component implements the functionality of the BoxLang layout component,
  * providing various layout types including accordion, border, hbox, tab, and vbox.
  */
-@BoxComponent( Layout )
+@BoxComponent( "Layout" )
 @AllowsBody( true )
 @RequiresBody( false )
 class{
@@ -38,7 +38,7 @@ class{
 	 * @return A BodyResult instance or null for a default result return.
 	 */
 	function invoke( required context, Struct attributes, any body, Struct executionState ){
-		
+
 		// Validate required type attribute
 		if( isNull( attributes.type ) ){
 			throw(
@@ -82,25 +82,25 @@ class{
 
 		// Generate CSS classes based on layout type and attributes
 		var cssClasses = [ "bx-layout", "bx-layout-" & lcase( attributes.type ) ];
-		
+
 		if( attributes.fillHeight ){
 			cssClasses.append( "bx-layout-fill-height" );
 		}
-		
+
 		if( attributes.fitToWindow ){
 			cssClasses.append( "bx-layout-fit-window" );
 		}
-		
+
 		if( !isNull( attributes.align ) && len( attributes.align ) ){
 			cssClasses.append( "bx-layout-align-" & lcase( attributes.align ) );
 		}
 
 		// Start building the HTML output
 		var tagContent = "<div";
-		
+
 		// Add ID
 		tagContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
-		
+
 		// Add CSS classes
 		var classAttribute = "class=""#cssClasses.toList( " " )#""";
 		if( !isNull( attributes.class ) && len( attributes.class ) ){
@@ -164,7 +164,7 @@ class{
 		// Process the body to capture layoutarea components
 		var buffer = newBuffer();
 		var bodyResult = processBody( context, body, buffer );
-		
+
 		// The layoutarea components will have populated executionState.areas
 		// Now we need to render them in the appropriate structure
 		renderLayoutAreas( context, executionState );
@@ -226,7 +226,7 @@ class{
 	 */
 	private function renderLayoutAreas( required context, required executionState ){
 		var layoutType = executionState.layoutType;
-		
+
 		switch( layoutType ){
 			case "tab":
 				renderTabAreas( context, executionState );
@@ -250,7 +250,7 @@ class{
 	private function renderTabAreas( required context, required executionState ){
 		var areas = executionState.areas ?: [];
 		var layoutId = executionState.layoutId;
-		
+
 		// Render tab headers
 		var tabHeaders = "<div class=""bx-tab-headers"">";
 		for( var i = 1; i <= areas.len(); i++ ){
@@ -259,10 +259,10 @@ class{
 			tabHeaders &= "<button class=""bx-tab-header#activeClass#"" data-tab=""#layoutId#_tab_#i#"">#encodeForHTML( area.title ?: 'Tab #i#' )#</button>";
 		}
 		tabHeaders &= "</div>";
-		
+
 		// Insert tab headers before content
 		context.writeToBuffer( tabHeaders );
-		
+
 		// Render tab content panels
 		for( var i = 1; i <= areas.len(); i++ ){
 			var area = areas[i];
@@ -278,11 +278,11 @@ class{
 	 */
 	private function renderAccordionAreas( required context, required executionState ){
 		var areas = executionState.areas ?: [];
-		
+
 		for( var i = 1; i <= areas.len(); i++ ){
 			var area = areas[i];
 			var collapsedClass = area.initcollapsed ? " collapsed" : "";
-			
+
 			context.writeToBuffer( "<div class=""bx-accordion-panel#collapsedClass#"">" );
 			context.writeToBuffer( "<div class=""bx-accordion-header"">#encodeForHTML( area.title ?: 'Panel #i#' )#</div>" );
 			context.writeToBuffer( "<div class=""bx-accordion-content"">" );
@@ -296,7 +296,7 @@ class{
 	 */
 	private function renderBorderAreas( required context, required executionState ){
 		var areas = executionState.areas ?: [];
-		
+
 		for( var area in areas ){
 			var position = area.position ?: "center";
 			context.writeToBuffer( "<div class=""bx-border-#position#"">" );
@@ -310,7 +310,7 @@ class{
 	 */
 	private function renderBoxAreas( required context, required executionState ){
 		var areas = executionState.areas ?: [];
-		
+
 		for( var area in areas ){
 			context.writeToBuffer( "<div class=""bx-box-item"">" );
 			context.writeToBuffer( area.content );
@@ -325,32 +325,32 @@ class{
 		var layoutType = lcase( attributes.type );
 		var layoutId = attributes.id;
 		var areas = executionState.areas ?: [];
-		
+
 		// Check if any areas have source attributes
 		var hasSourceAreas = areas.some( function( area ) {
 			return !isNull( area.attributes.source ) && len( area.attributes.source );
 		} );
-		
+
 		// Generate script for interactive layouts or AJAX sources
 		if( [ "tab", "accordion" ].containsNoCase( layoutType ) || hasSourceAreas ){
 			var script = "<script type=""text/javascript"">";
 			script &= "(function(){";
 			script &= "var layout = document.getElementById('#layoutId#');";
-			
+
 			if( layoutType == "tab" ){
 				script &= generateTabScript( layoutId );
 			} else if( layoutType == "accordion" ){
 				script &= generateAccordionScript( layoutId );
 			}
-			
+
 			// Add AJAX functionality for source attributes
 			if( hasSourceAreas ){
 				script &= generateSourceScript( areas );
 			}
-			
+
 			script &= "})();";
 			script &= "</script>";
-			
+
 			context.writeToBuffer( script );
 		}
 	}

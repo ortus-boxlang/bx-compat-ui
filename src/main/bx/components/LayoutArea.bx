@@ -1,10 +1,10 @@
 /**
  * BoxLang Component Which Generates Layout Areas
- * 
+ *
  * This component implements the functionality of the BoxLang layoutarea component,
  * providing content areas within Layout components.
  */
-@BoxComponent( LayoutArea )
+@BoxComponent( "LayoutArea" )
 @AllowsBody( true )
 @RequiresBody( false )
 class{
@@ -41,7 +41,7 @@ class{
 	 * @return A BodyResult instance or null for a default result return.
 	 */
 	function invoke( required context, Struct attributes, any body, Struct executionState ){
-		
+
 		// Find parent Layout component
 		var layoutParentState = context.findClosestComponent( layoutComponentName );
 		if( isNull( layoutParentState ) ){
@@ -87,7 +87,7 @@ class{
 		// Process body content or load from source
 		var areaContent = "";
 		var hasSource = !isNull( attributes.source ) && len( attributes.source );
-		
+
 		if( hasSource ){
 			// Create placeholder for AJAX content with loading indicator
 			areaContent = "<div class=""bx-source-loading"" data-source=""#encodeForHTMLAttribute( attributes.source )#"">Loading content...</div>";
@@ -157,11 +157,11 @@ class{
 	 */
 	private function renderBorderAreaDirectly( required context, required areaData ){
 		var cssClasses = [ "bx-border-area", "bx-border-" & areaData.position ];
-		
+
 		if( areaData.splitter ){
 			cssClasses.append( "bx-border-splitter" );
 		}
-		
+
 		var styleAttributes = [];
 		if( !isNull( areaData.size ) && len( areaData.size ) ){
 			if( [ "top", "bottom" ].containsNoCase( areaData.position ) ){
@@ -170,7 +170,7 @@ class{
 				styleAttributes.append( "width: #areaData.size#" );
 			}
 		}
-		
+
 		if( !isNull( areaData.minsize ) && len( areaData.minsize ) ){
 			if( [ "top", "bottom" ].containsNoCase( areaData.position ) ){
 				styleAttributes.append( "min-height: #areaData.minsize#" );
@@ -178,7 +178,7 @@ class{
 				styleAttributes.append( "min-width: #areaData.minsize#" );
 			}
 		}
-		
+
 		if( !isNull( areaData.maxsize ) && len( areaData.maxsize ) ){
 			if( [ "top", "bottom" ].containsNoCase( areaData.position ) ){
 				styleAttributes.append( "max-height: #areaData.maxsize#" );
@@ -190,15 +190,15 @@ class{
 		var tagContent = "<div";
 		tagContent &= " id=""#encodeForHTMLAttribute( areaData.id )#""";
 		tagContent &= " class=""#cssClasses.toList( " " )#""";
-		
+
 		if( styleAttributes.len() ){
 			tagContent &= " style=""#styleAttributes.toList( "; " )#""";
 		}
-		
+
 		tagContent &= ">";
 		tagContent &= areaData.content;
 		tagContent &= "</div>";
-		
+
 		context.writeToBuffer( tagContent );
 	}
 
