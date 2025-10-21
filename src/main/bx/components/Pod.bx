@@ -1,0 +1,223 @@
+/**
+ * BoxLang Component Which Generates a Pod Container
+ *
+ * This component implements the functionality of the BoxLang Pod component,
+ * providing a container with optional title bar and body content.
+ */
+@BoxComponent( "Pod" )
+@AllowsBody( true )
+@RequiresBody( false )
+class{
+
+	/**
+	 * The Pod UI component
+	 *
+	 * <pre>
+	 * <bx:pod title="My Pod" height="200" width="300">
+	 *     Content inside the pod
+	 * </bx:pod>
+	 * </pre>
+	 *
+	 * @attribute.title - string, optional - Text to display in the pod's title bar
+	 * @attribute.name - string, optional - The name assigned to the pod control
+	 * @attribute.height - string, optional - Height of the control in pixels
+	 * @attribute.width - string, optional - Width of the control in pixels
+	 * @attribute.bodyStyle - string, optional - CSS style specification for the pod body
+	 * @attribute.headerStyle - string, optional - CSS style specification for the pod header
+	 * @attribute.overflow - string, optional - How to display child content that overflows: auto, hidden, scroll, visible
+	 * @attribute.source - string, optional - URL that returns the content of the pod
+	 * @attribute.onBindError - string, optional - JavaScript function to execute if evaluating bind expression results in error
+	 * @attribute.id - string, optional - HTML element ID (auto-generated if not provided)
+	 * @attribute.class - string, optional - Additional CSS classes
+	 * @attribute.style - string, optional - Additional CSS styles
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Set default values
+		param attributes.title = "";
+		param attributes.name = "";
+		param attributes.height = "";
+		param attributes.width = "";
+		param attributes.bodyStyle = "";
+		param attributes.headerStyle = "";
+		param attributes.overflow = "auto";
+		param attributes.source = "";
+		param attributes.onBindError = "";
+		param attributes.style = "";
+		param attributes.class = "";
+
+		// Validate overflow attribute
+		var validOverflowValues = [ "auto", "hidden", "scroll", "visible" ];
+		if( !validOverflowValues.containsNoCase( attributes.overflow ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The overflow attribute must be one of: #validOverflowValues.toList()#"
+			);
+		}
+
+		// Generate unique ID if not provided
+		if( isNull( attributes.id ) ){
+			attributes.id = "pod_" & listLast( lcase( createUUID() ), "-" );
+		}
+
+		// Non-HTML attributes that should not be passed through
+		var nonHTMLAttributes = [ "title", "bodyStyle", "headerStyle", "overflow", "source", "onBindError" ];
+
+		// Generate CSS classes
+		var cssClasses = [ "bx-pod" ];
+
+		// Add custom classes if provided
+		if( !isNull( attributes.class ) && len( attributes.class ) ){
+			cssClasses.append( attributes.class );
+		}
+
+		// Start building the pod container
+		var podContent = "<div";
+
+		// Add ID
+		podContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+
+		// Add CSS classes
+		podContent &= " class=""#cssClasses.toList( " " )#""";
+
+		// Add name attribute if provided
+		if( !isNull( attributes.name ) && len( attributes.name ) ){
+			podContent &= " data-name=""#encodeForHTMLAttribute( attributes.name )#""";
+		}
+
+		// Build inline styles
+		var inlineStyles = [];
+
+		// Add dimension styles
+		if( !isNull( attributes.height ) && len( attributes.height ) ){
+			inlineStyles.append( "height: #attributes.height#" );
+		}
+		if( !isNull( attributes.width ) && len( attributes.width ) ){
+			inlineStyles.append( "width: #attributes.width#" );
+		}
+
+		// Add any additional styles
+		if( !isNull( attributes.style ) && len( attributes.style ) ){
+			inlineStyles.append( attributes.style );
+		}
+
+		if( inlineStyles.len() ){
+			podContent &= " style=""#inlineStyles.toList( "; " )#""";
+		}
+
+		// Add HTML attributes (excluding non-HTML ones)
+		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" && key != "style" && key != "name" && key != "height" && key != "width" ).each( ( key, value ) => {
+			podContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+		} );
+
+		podContent &= ">";
+
+		// Add title bar if title is provided
+		if( !isNull( attributes.title ) && len( attributes.title ) ){
+			var headerStyle = "";
+			if( !isNull( attributes.headerStyle ) && len( attributes.headerStyle ) ){
+				headerStyle = " style=""#attributes.headerStyle#""";
+			}
+			podContent &= "<div class=""bx-pod-header""#headerStyle#>#attributes.title#</div>";
+		}
+
+		// Add pod body
+		var bodyStyle = "overflow: #attributes.overflow#;";
+		if( !isNull( attributes.bodyStyle ) && len( attributes.bodyStyle ) ){
+			bodyStyle &= " " & attributes.bodyStyle;
+		}
+
+		podContent &= "<div class=""bx-pod-body"" style=""#bodyStyle#"">";
+
+		// Process body content or handle source attribute
+		var hasSource = !isNull( attributes.source ) && len( attributes.source );
+
+		if( hasSource ){
+			// Create placeholder for AJAX content with loading indicator and comment
+			podContent &= "<!-- Content loaded from: #attributes.source# -->";
+			podContent &= "<div class=""bx-source-loading"" data-source=""#attributes.source#"">Loading content...</div>";
+		} else {
+			// Process body content normally
+			var buffer = newBuffer();
+			var bodyResult = processBody( context, body, buffer );
+			podContent &= buffer.toString();
+		}
+
+		// Close pod body and container
+		podContent &= "</div></div>";
+
+		// Write output
+		context.writeToBuffer( podContent );
+
+		// Generate JavaScript for AJAX source loading or error handling
+		if( hasSource || ( !isNull( attributes.onBindError ) && len( attributes.onBindError ) ) ){
+			generatePodScript( context, attributes );
+		}
+	}
+
+	/**
+	 * Generate JavaScript for pod functionality
+	 */
+	private function generatePodScript( required context, required attributes ){
+		var podId = attributes.id;
+		var script = "<script type=""text/javascript"">";
+		script &= "(function(){";
+		script &= "var pod = document.getElementById('#podId#');";
+
+		// Handle AJAX source loading
+		if( !isNull( attributes.source ) && len( attributes.source ) ){
+			script &= generateSourceScript( attributes.source, attributes.onBindError ?: "" );
+		}
+
+		script &= "})();";
+		script &= "</script>";
+
+		context.writeToBuffer( script );
+	}
+
+	/**
+	 * Generate AJAX functionality for source attribute
+	 */
+	private function generateSourceScript( required source, errorHandler = "" ){
+		return "
+			// Load content from source URL using Fetch API
+			document.addEventListener('DOMContentLoaded', function() {
+				pod.querySelectorAll('.bx-source-loading').forEach(function(element) {
+					var sourceUrl = element.getAttribute('data-source');
+					if (sourceUrl) {
+						fetch(sourceUrl)
+							.then(function(response) {
+								if (!response.ok) {
+									throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+								}
+								return response.text();
+							})
+							.then(function(content) {
+								element.innerHTML = content;
+								element.classList.remove('bx-source-loading');
+								element.classList.add('bx-source-loaded');
+							})
+							.catch(function(error) {
+								console.warn('Failed to load content from ' + sourceUrl + ':', error);
+								#len( errorHandler ) ? 'if (typeof ' & errorHandler & ' === "function") { ' & errorHandler & '(500, error.message); } else {' : ''#
+								element.innerHTML = '<div class=""bx-source-error"">' +
+									'<p>Error loading content from: ' + sourceUrl + '</p>' +
+									'<p>Error: ' + error.message + '</p>' +
+									'</div>';
+								element.classList.remove('bx-source-loading');
+								element.classList.add('bx-source-error');
+								#len( errorHandler ) ? '}' : ''#
+							});
+					}
+				});
+			});
+		";
+	}
+}

@@ -1,0 +1,230 @@
+/**
+ * BoxLang Component Which Generates a Dynamic Div Element
+ *
+ * This component implements the functionality of the BoxLang Div component,
+ * providing a dynamic HTML div that can be updated asynchronously via AJAX.
+ */
+@BoxComponent( "Div" )
+@AllowsBody( true )
+@RequiresBody( false )
+class{
+
+	import java:org.apache.commons.text.StringEscapeUtils;
+
+	/**
+	 * The Div UI component
+	 *
+	 * <pre>
+	 * <bx:div id="myDiv" bind="cfc:myComponent.getData()">
+	 *     Initial content
+	 * </bx:div>
+	 * </pre>
+	 *
+	 * @attribute.bind - string, optional - Bind expression that provides content for the div via AJAX
+	 * @attribute.bindOnLoad - boolean, optional - Whether to execute bind expression when tag first loads (default: true)
+	 * @attribute.id - string, optional - HTML ID attribute of the generated div tag
+	 * @attribute.onBindError - string, optional - JavaScript function to handle bind expression errors
+	 * @attribute.tagName - string, optional - HTML tag name to generate (default: div)
+	 * @attribute.class - string, optional - Additional CSS classes
+	 * @attribute.style - string, optional - Additional CSS styles
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Set default values
+		param attributes.bind = "";
+		param attributes.bindOnLoad = true;
+		param attributes.onBindError = "";
+		param attributes.tagName = "div";
+		param attributes.class = "";
+		param attributes.style = "";
+
+		// Validate tagName attribute
+		var validTagNames = [ "div", "span", "p", "section", "article", "aside", "header", "footer", "main", "nav" ];
+		if( !validTagNames.containsNoCase( attributes.tagName ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The tagName attribute must be one of: #validTagNames.toList()#"
+			);
+		}
+
+		// Generate unique ID if not provided
+		if( isNull( attributes.id ) ){
+			attributes.id = "div_" & listLast( lcase( createUUID() ), "-" );
+		}
+
+		// Non-HTML attributes that should not be passed through
+		var nonHTMLAttributes = [ "bind", "bindOnLoad", "onBindError", "tagName" ];
+
+		// Validate that if bind is specified, there should be no body content
+		var hasBind = !isNull( attributes.bind ) && len( attributes.bind );
+		var hasBodyContent = !isNull( body );
+
+		if( hasBind && hasBodyContent ){
+			// Process body to check if it produces content
+			var buffer = newBuffer();
+			var bodyResult = processBody( context, body, buffer );
+			var bodyContentString = buffer.toString();
+
+			if( len( trim( bodyContentString ) ) ){
+				throw(
+					type		= "boxlang.compat.ui.InvalidUsageException",
+					message		= "The Div component cannot have body content when the bind attribute is specified"
+				);
+			}
+		}
+
+		// Generate CSS classes
+		var cssClasses = [ "bx-div" ];
+
+		// Add bind-specific classes
+		if( hasBind ){
+			cssClasses.append( "bx-div-bind" );
+			if( attributes.bindOnLoad ){
+				cssClasses.append( "bx-bind-on-load" );
+			}
+		}
+
+		// Add custom classes if provided
+		if( !isNull( attributes.class ) && len( attributes.class ) ){
+			cssClasses.append( attributes.class );
+		}
+
+		// Start building the div element
+		var tagContent = "<" & lcase( attributes.tagName );
+
+		// Add ID
+		tagContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+
+		// Add CSS classes
+		tagContent &= " class=""#cssClasses.toList( " " )#""";
+
+		// Add bind data attribute if specified
+		if( hasBind ){
+			tagContent &= " data-bind=""#trim( attributes.bind )#""";
+			tagContent &= " data-bind-on-load=""#attributes.bindOnLoad#""";
+		}
+
+		// Add HTML attributes (excluding non-HTML ones)
+		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" ).each( ( key, value ) => {
+			if( key == "style" ){
+				// Don't escape style attribute
+				tagContent &= " style=""#trim(value)#""";
+			} else {
+				tagContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+			}
+		} );
+
+		tagContent &= ">";
+
+		// Handle content based on bind attribute
+		if( hasBind ){
+			if( attributes.bindOnLoad ){
+				// Create placeholder for AJAX content with loading indicator
+				tagContent &= "<div class=""bx-bind-loading"">Loading...</div>";
+			} else {
+				// Empty content until bind is triggered
+				tagContent &= "";
+			}
+		} else {
+			// Process body content normally
+			var buffer = newBuffer();
+			var bodyResult = processBody( context, body, buffer );
+			tagContent &= buffer.toString();
+		}
+
+		// Close the tag
+		tagContent &= "</" & lcase( attributes.tagName ) & ">";
+
+		// Write output
+		context.writeToBuffer( tagContent );
+
+		// Generate JavaScript for bind functionality
+		if( hasBind ){
+			generateDivScript( context, attributes );
+		}
+	}
+
+	/**
+	 * Generate JavaScript for div bind functionality
+	 */
+	private function generateDivScript( required context, required attributes ){
+		var divId = attributes.id;
+		var script = "<script type=""text/javascript"">";
+		script &= "(function(){";
+		script &= "var divElement = document.getElementById('#divId#');";
+
+		// Generate bind functionality
+		script &= generateBindScript( attributes.bind, attributes.bindOnLoad, attributes.onBindError ?: "" );
+
+		script &= "})();";
+		script &= "</script>";
+
+		context.writeToBuffer( script );
+	}
+
+	/**
+	 * Generate bind functionality script
+	 */
+	private function generateBindScript( required bindExpression, required bindOnLoad, errorHandler = "" ){
+		return "
+			function executeBind() {
+				var bindUrl = '#encodeForJavaScript( bindExpression )#';
+
+				// Parse different types of bind expressions
+				if (bindUrl.startsWith('cfc:')) {
+					// Convert CFC bind expression to URL
+					bindUrl = bindUrl.replace('cfc:', '/').replace('.', '/') + '.cfc';
+				} else if (bindUrl.startsWith('url:')) {
+					// Direct URL bind
+					bindUrl = bindUrl.substring(4);
+				}
+				// If no prefix, treat as direct URL
+
+				fetch(bindUrl)
+					.then(function(response) {
+						if (!response.ok) {
+							throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+						}
+						return response.text();
+					})
+					.then(function(content) {
+						divElement.innerHTML = content;
+						divElement.classList.remove('bx-bind-loading');
+						divElement.classList.add('bx-bind-loaded');
+
+						// Fire custom event for bind success
+						var event = new CustomEvent('bindSuccess', { detail: { content: content } });
+						divElement.dispatchEvent(event);
+					})
+					.catch(function(error) {
+						console.warn('Failed to execute bind expression:', error);
+						#len( errorHandler ) ? 'if (typeof ' & errorHandler & ' === "function") { ' & errorHandler & '(error.message || "Unknown error", error); } else {' : ''#
+						divElement.innerHTML = '<div class=""bx-bind-error"">' +
+							'<p>Error executing bind expression</p>' +
+							'<p>Error: ' + error.message + '</p>' +
+							'</div>';
+						divElement.classList.remove('bx-bind-loading');
+						divElement.classList.add('bx-bind-error');
+
+						// Fire custom event for bind error
+						var event = new CustomEvent('bindError', { detail: { error: error } });
+						divElement.dispatchEvent(event);
+						#len( errorHandler ) ? '}' : ''#
+					});
+			}
+
+			// Execute bind on load if specified
+			#bindOnLoad ? 'document.addEventListener("DOMContentLoaded", function() { executeBind(); });' : ''#
+
+			// Expose function for manual triggering
+			divElement.executeBind = executeBind;
+		";
+	}
+}

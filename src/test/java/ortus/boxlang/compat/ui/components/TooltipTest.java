@@ -1,0 +1,285 @@
+/**
+ * [BoxLang]
+ *
+ * Copyright [2023] [Ortus Solutions, Corp]
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS"
+ * BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ */
+package ortus.boxlang.compat.ui.components;
+
+import static com.google.common.truth.Truth.assertThat;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import ortus.boxlang.compat.ui.BaseIntegrationTest;
+import ortus.boxlang.runtime.scopes.Key;
+
+public class TooltipTest extends BaseIntegrationTest {
+
+	@DisplayName( "It can create a basic tooltip" )
+	@Test
+	public void testBasicTooltip() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip tooltip="This is a helpful tooltip" {
+		        writeOutput("Hover over me!");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "bx-tooltip-trigger" );
+		assertThat( output ).contains( "data-tooltip=\"This&#x20;is&#x20;a&#x20;helpful&#x20;tooltip\"" );
+		assertThat( output ).contains( "Hover over me!" );
+		assertThat( output ).contains( "<span" );
+		assertThat( output ).contains( "</span>" );
+	}
+
+	@DisplayName( "It throws error when neither tooltip nor sourceForTooltip is provided" )
+	@Test
+	public void testMissingTooltipAttribute() {
+		try {
+			runtime.executeSource(
+			    """
+			    bx:tooltip {
+			        writeOutput("This should fail");
+			    }
+			    """,
+			    context
+			);
+		} catch ( Exception e ) {
+			assertThat( e.getMessage() ).contains( "Either the tooltip or sourceForTooltip attribute is required" );
+		}
+	}
+
+	@DisplayName( "It can set tooltip timing attributes" )
+	@Test
+	public void testTooltipTiming() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip
+		        tooltip="Timed tooltip"
+		        showDelay="1000"
+		        hideDelay="500"
+		        autoDismissDelay="3000" {
+		        writeOutput("Timed element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "data-show-delay=\"1000\"" );
+		assertThat( output ).contains( "data-hide-delay=\"500\"" );
+		assertThat( output ).contains( "data-auto-dismiss-delay=\"3000\"" );
+		assertThat( output ).contains( "Timed element" );
+	}
+
+	@DisplayName( "It can use sourceForTooltip for dynamic content" )
+	@Test
+	public void testTooltipWithSource() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip sourceForTooltip="/api/tooltip-content" {
+		        writeOutput("Dynamic tooltip element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "bx-tooltip-trigger" );
+		assertThat( output ).contains( "data-source=\"/api/tooltip-content\"" );
+		assertThat( output ).contains( "Dynamic tooltip element" );
+	}
+
+	@DisplayName( "It can prevent overlap with preventOverlap attribute" )
+	@Test
+	public void testTooltipPreventOverlap() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip tooltip="Non-overlapping tooltip" preventOverlap="true" {
+		        writeOutput("Protected element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "data-prevent-overlap=\"true\"" );
+		assertThat( output ).contains( "Protected element" );
+	}
+
+	@DisplayName( "It generates tooltip container and JavaScript" )
+	@Test
+	public void testTooltipJavaScript() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip id="jsTooltip" tooltip="JS tooltip" {
+		        writeOutput("JS element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "<div id=\"jsTooltip_tooltip\" class=\"bx-tooltip\"" );
+		assertThat( output ).contains( "<script type=\"text/javascript\">" );
+		assertThat( output ).contains( "showTooltip" );
+		assertThat( output ).contains( "hideTooltip" );
+		assertThat( output ).contains( "positionTooltip" );
+		assertThat( output ).contains( "mouseenter" );
+		assertThat( output ).contains( "mouseleave" );
+	}
+
+	@DisplayName( "It auto-generates ID when not provided" )
+	@Test
+	public void testTooltipAutoGeneratedID() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip tooltip="Auto ID tooltip" {
+		        writeOutput("Auto ID element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "id=\"tooltip_" );
+		assertThat( output ).contains( "Auto ID element" );
+	}
+
+	@DisplayName( "It can apply custom CSS classes and styles" )
+	@Test
+	public void testTooltipCustomStyling() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip
+		        tooltip="Styled tooltip"
+		        class="my-tooltip-class"
+		        style="font-weight: bold; color: red;" {
+		        writeOutput("Styled element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "bx-tooltip-trigger my-tooltip-class" );
+		assertThat( output ).contains( "font-weight: bold; color: red;" );
+		assertThat( output ).contains( "Styled element" );
+	}
+
+	@DisplayName( "It handles HTML content in tooltip text" )
+	@Test
+	public void testTooltipHTMLContent() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip tooltip="<strong>Bold</strong> tooltip with <em>HTML</em>" {
+		        writeOutput("HTML tooltip element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "data-tooltip=\"&lt;strong&gt;Bold&lt;&#x2f;strong&gt;&#x20;tooltip&#x20;with&#x20;&lt;em&gt;HTML&lt;&#x2f;em&gt;\"" );
+		assertThat( output ).contains( "HTML tooltip element" );
+	}
+
+	@DisplayName( "It generates positioning logic in JavaScript" )
+	@Test
+	public void testTooltipPositioning() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip tooltip="Positioned tooltip" preventOverlap="true" {
+		        writeOutput("Positioning test");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "getBoundingClientRect" );
+		assertThat( output ).contains( "window.innerWidth" );
+		assertThat( output ).contains( "window.innerHeight" );
+		assertThat( output ).contains( "preventOverlap" );
+		assertThat( output ).contains( "pageXOffset" );
+		assertThat( output ).contains( "pageYOffset" );
+	}
+
+	@DisplayName( "It handles dynamic content loading with fetch" )
+	@Test
+	public void testTooltipDynamicContent() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip sourceForTooltip="/api/dynamic-tooltip" showDelay="200" {
+		        writeOutput("Dynamic content element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "data-source=\"/api/dynamic-tooltip\"" );
+		assertThat( output ).contains( "fetch(sourceUrl)" );
+		assertThat( output ).contains( "Loading..." );
+		assertThat( output ).contains( "Error loading content" );
+	}
+
+	@DisplayName( "It handles scroll and resize events" )
+	@Test
+	public void testTooltipEventHandling() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip tooltip="Event handling tooltip" {
+		        writeOutput("Event test element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "addEventListener('scroll', hideTooltip)" );
+		assertThat( output ).contains( "addEventListener('resize', hideTooltip)" );
+		assertThat( output ).contains( "addEventListener('mousemove'" );
+	}
+
+	@DisplayName( "It applies default timing values correctly" )
+	@Test
+	public void testTooltipDefaultTiming() {
+		runtime.executeSource(
+		    """
+		    bx:tooltip tooltip="Default timing tooltip" {
+		        writeOutput("Default timing element");
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "data-show-delay=\"500\"" );
+		assertThat( output ).contains( "data-hide-delay=\"300\"" );
+	}
+}

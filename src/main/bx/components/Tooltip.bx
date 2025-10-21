@@ -1,0 +1,257 @@
+/**
+ * BoxLang Component Which Generates a Tooltip
+ *
+ * This component implements the functionality of the BoxLang Tooltip component,
+ * providing interactive tooltips that appear on hover over HTML elements.
+ */
+@BoxComponent( "Tooltip" )
+@AllowsBody( true )
+@RequiresBody( false )
+class{
+
+	/**
+	 * The Tooltip UI component
+	 *
+	 * <pre>
+	 * <bx:tooltip tooltip="This is a helpful tooltip" showDelay="500">
+	 *     Hover over me!
+	 * </bx:tooltip>
+	 * </pre>
+	 *
+	 * @attribute.tooltip - string, required - Text displayed in the tooltip; can include HTML
+	 * @attribute.autoDismissDelay - number, optional - Time in milliseconds after which tooltip auto-disappears
+	 * @attribute.hideDelay - number, optional - Delay time before tooltip hides after mouse moves away
+	 * @attribute.preventOverlap - boolean, optional - Prevent tooltip from overlapping the component
+	 * @attribute.showDelay - number, optional - Delay before tooltip appears after hovering
+	 * @attribute.sourceForTooltip - string, optional - URL for dynamic content to display in tooltip
+	 * @attribute.style - string, optional - CSS styles for custom tooltip appearance
+	 * @attribute.id - string, optional - HTML element ID (auto-generated if not provided)
+	 * @attribute.class - string, optional - Additional CSS classes
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Validate required tooltip attribute
+		if( isNull( attributes.tooltip ) && isNull( attributes.sourceForTooltip ) ){
+			throw(
+				type		= "boxlang.compat.ui.MissingAttributeException",
+				message		= "Either the tooltip or sourceForTooltip attribute is required for the Tooltip component"
+			);
+		}
+
+		// Set default values
+		param attributes.tooltip = "";
+		param attributes.autoDismissDelay = 0;
+		param attributes.hideDelay = 300;
+		param attributes.preventOverlap = false;
+		param attributes.showDelay = 500;
+		param attributes.sourceForTooltip = "";
+		param attributes.style = "";
+		param attributes.class = "";
+
+		// Generate unique ID if not provided
+		if( isNull( attributes.id ) ){
+			attributes.id = "tooltip_" & listLast( lcase( createUUID() ), "-" );
+		}
+
+		// Non-HTML attributes that should not be passed through
+		var nonHTMLAttributes = [ "tooltip", "autoDismissDelay", "hideDelay", "preventOverlap", "showDelay", "sourceForTooltip" ];
+
+		// Generate CSS classes
+		var cssClasses = [ "bx-tooltip-trigger" ];
+
+		// Add custom classes if provided
+		if( !isNull( attributes.class ) && len( attributes.class ) ){
+			cssClasses.append( attributes.class );
+		}
+
+		// Start building the tooltip trigger element
+		var tooltipContent = "<span";
+
+		// Add ID
+		tooltipContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+
+		// Add CSS classes
+		tooltipContent &= " class=""#cssClasses.toList( " " )#""";
+
+		// Add tooltip data attributes
+		tooltipContent &= " data-tooltip=""#encodeForHTMLAttribute( attributes.tooltip )#""";
+		tooltipContent &= " data-show-delay=""#attributes.showDelay#""";
+		tooltipContent &= " data-hide-delay=""#attributes.hideDelay#""";
+
+		if( attributes.autoDismissDelay > 0 ){
+			tooltipContent &= " data-auto-dismiss-delay=""#attributes.autoDismissDelay#""";
+		}
+
+		if( attributes.preventOverlap ){
+			tooltipContent &= " data-prevent-overlap=""true""";
+		}
+
+		if( !isNull( attributes.sourceForTooltip ) && len( attributes.sourceForTooltip ) ){
+			tooltipContent &= " data-source=""#attributes.sourceForTooltip#""";
+		}
+
+		// Add HTML attributes (excluding non-HTML ones)
+		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" ).each( ( key, value ) => {
+			if( key == "style" ){
+				tooltipContent &= " #key#=""#value#""";
+			} else {
+				tooltipContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+			}
+		} );
+
+		tooltipContent &= ">";
+
+		// Process body content (the element that will have the tooltip)
+		var buffer = newBuffer();
+		var bodyResult = processBody( context, body, buffer );
+		tooltipContent &= buffer.toString();
+
+		// Close the span
+		tooltipContent &= "</span>";
+
+		// Write output
+		context.writeToBuffer( tooltipContent );
+
+		// Generate tooltip container and JavaScript
+		generateTooltipScript( context, attributes );
+	}
+
+	/**
+	 * Generate JavaScript for tooltip functionality
+	 */
+	private function generateTooltipScript( required context, required attributes ){
+		var tooltipId = attributes.id;
+
+		// Generate the tooltip container
+		var tooltipContainer = "<div id=""#tooltipId#_tooltip"" class=""bx-tooltip"" style=""display: none; position: absolute; z-index: 9999; background: ##333; color: white; padding: 8px; border-radius: 4px; font-size: 12px; max-width: 300px; word-wrap: break-word;""></div>";
+
+		context.writeToBuffer( tooltipContainer );
+
+		var script = "<script type=""text/javascript"">";
+		script &= "(function(){";
+		script &= "var trigger = document.getElementById('#tooltipId#');";
+		script &= "var tooltip = document.getElementById('#tooltipId#_tooltip');";
+		script &= generateTooltipBehaviorScript( attributes );
+		script &= "})();";
+		script &= "</script>";
+
+		context.writeToBuffer( script );
+	}
+
+	/**
+	 * Generate tooltip behavior script
+	 */
+	private function generateTooltipBehaviorScript( required attributes ){
+		return "
+			var showTimer, hideTimer, autoDismissTimer;
+			var isTooltipVisible = false;
+
+			function showTooltip(e) {
+				clearTimeout(hideTimer);
+				clearTimeout(autoDismissTimer);
+
+				if (showTimer) return; // Already scheduled to show
+
+				showTimer = setTimeout(function() {
+					var tooltipText = trigger.getAttribute('data-tooltip');
+					var sourceUrl = trigger.getAttribute('data-source');
+
+					if (sourceUrl && sourceUrl.length > 0) {
+						// Load dynamic content
+						tooltip.innerHTML = 'Loading...';
+						fetch(sourceUrl)
+							.then(function(response) {
+								if (!response.ok) {
+									throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+								}
+								return response.text();
+							})
+							.then(function(content) {
+								tooltip.innerHTML = content;
+							})
+							.catch(function(error) {
+								console.warn('Failed to load tooltip content:', error);
+								tooltip.innerHTML = 'Error loading content';
+							});
+					} else {
+						tooltip.innerHTML = tooltipText;
+					}
+
+					positionTooltip(e);
+					tooltip.style.display = 'block';
+					isTooltipVisible = true;
+					showTimer = null;
+
+					// Auto dismiss if configured
+					var autoDismissDelay = parseInt(trigger.getAttribute('data-auto-dismiss-delay')) || 0;
+					if (autoDismissDelay > 0) {
+						autoDismissTimer = setTimeout(hideTooltip, autoDismissDelay);
+					}
+				}, parseInt(trigger.getAttribute('data-show-delay')) || 500);
+			}
+
+			function hideTooltip() {
+				clearTimeout(showTimer);
+				clearTimeout(autoDismissTimer);
+				showTimer = null;
+
+				if (!isTooltipVisible) return;
+
+				var hideDelay = parseInt(trigger.getAttribute('data-hide-delay')) || 300;
+				hideTimer = setTimeout(function() {
+					tooltip.style.display = 'none';
+					isTooltipVisible = false;
+				}, hideDelay);
+			}
+
+			function positionTooltip(e) {
+				var rect = trigger.getBoundingClientRect();
+				var tooltipRect = tooltip.getBoundingClientRect();
+				var preventOverlap = trigger.getAttribute('data-prevent-overlap') === 'true';
+
+				var left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+				var top = rect.bottom + 5; // Default: below the trigger
+
+				// Check for viewport boundaries
+				if (left < 5) left = 5;
+				if (left + tooltipRect.width > window.innerWidth - 5) {
+					left = window.innerWidth - tooltipRect.width - 5;
+				}
+
+				// Check if tooltip would overlap trigger (if preventOverlap is true)
+				if (preventOverlap && top < rect.bottom + 10) {
+					top = rect.top - tooltipRect.height - 5; // Show above instead
+				}
+
+				// Ensure tooltip stays within viewport
+				if (top < 5) top = 5;
+				if (top + tooltipRect.height > window.innerHeight - 5) {
+					top = window.innerHeight - tooltipRect.height - 5;
+				}
+
+				tooltip.style.left = (left + window.pageXOffset) + 'px';
+				tooltip.style.top = (top + window.pageYOffset) + 'px';
+			}
+
+			// Event listeners
+			trigger.addEventListener('mouseenter', showTooltip);
+			trigger.addEventListener('mouseleave', hideTooltip);
+			trigger.addEventListener('mousemove', function(e) {
+				if (isTooltipVisible) {
+					positionTooltip(e);
+				}
+			});
+
+			// Hide tooltip when scrolling
+			window.addEventListener('scroll', hideTooltip);
+			window.addEventListener('resize', hideTooltip);
+		";
+	}
+}

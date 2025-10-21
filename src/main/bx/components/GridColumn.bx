@@ -1,0 +1,272 @@
+/**
+ * BoxLang Component Which Defines a Grid Column
+ *
+ * This component implements the functionality of the BoxLang GridColumn component,
+ * defining columns within Grid components with formatting and behavior options.
+ */
+@BoxComponent( "GridColumn" )
+@AllowsBody( false )
+@RequiresBody( false )
+class{
+
+	variables.gridComponentName = "Grid";
+
+	/**
+	 * The GridColumn UI component
+	 *
+	 * <pre>
+	 * <bx:grid name="myGrid">
+	 *     <bx:gridcolumn name="id" header="ID" width="80" sortable="true" />
+	 *     <bx:gridcolumn name="name" header="Name" width="200" editable="true" />
+	 * </bx:grid>
+	 * </pre>
+	 *
+	 * @attribute.name - string, required - Column data field name
+	 * @attribute.header - string, optional - Column header text (defaults to name)
+	 * @attribute.width - string, optional - Column width (CSS value)
+	 * @attribute.sortable - boolean, optional - Enable sorting for this column (default: true)
+	 * @attribute.editable - boolean, optional - Enable editing for this column (default: false)
+	 * @attribute.dataAlign - string, optional - Data alignment: left, center, right (default: left)
+	 * @attribute.headerAlign - string, optional - Header alignment: left, center, right (default: left)
+	 * @attribute.display - boolean, optional - Whether to display this column (default: true)
+	 * @attribute.type - string, optional - Data type: string, numeric, date, boolean (default: string)
+	 * @attribute.numberFormat - string, optional - Number format mask for numeric columns
+	 * @attribute.dateFormat - string, optional - Date format mask for date columns
+	 * @attribute.values - string, optional - Comma-delimited list of values for dropdown editing
+	 * @attribute.valuesDisplay - string, optional - Display values corresponding to values list
+	 * @attribute.href - string, optional - URL pattern for making column data into links
+	 * @attribute.target - string, optional - Link target (_blank, _self, etc.)
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Find parent Grid component
+		var gridParentState = context.findClosestComponent( gridComponentName );
+		if( isNull( gridParentState ) ){
+			throw(
+				type		= "boxlang.compat.ui.MissingParentException",
+				message		= "GridColumn component must be used within a Grid component"
+			);
+		}
+
+		// Validate required name attribute
+		if( isNull( attributes.name ) ){
+			throw(
+				type		= "boxlang.compat.ui.MissingAttributeException",
+				message		= "The name attribute is required for the GridColumn component"
+			);
+		}
+
+		// Set default values
+		param attributes.header = attributes.name;
+		param attributes.width = "";
+		param attributes.sortable = true;
+		param attributes.editable = false;
+		param attributes.dataAlign = "left";
+		param attributes.headerAlign = "left";
+		param attributes.display = true;
+		param attributes.type = "string";
+		param attributes.numberFormat = "";
+		param attributes.dateFormat = "";
+		param attributes.values = "";
+		param attributes.valuesDisplay = "";
+		param attributes.href = "";
+		param attributes.target = "";
+
+		// Validate alignment attributes
+		var validAlignments = [ "left", "center", "right" ];
+		if( !validAlignments.containsNoCase( attributes.dataAlign ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The dataAlign attribute must be one of: #validAlignments.toList()#"
+			);
+		}
+		if( !validAlignments.containsNoCase( attributes.headerAlign ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The headerAlign attribute must be one of: #validAlignments.toList()#"
+			);
+		}
+
+		// Validate type attribute
+		var validTypes = [ "string", "numeric", "date", "boolean" ];
+		if( !validTypes.containsNoCase( attributes.type ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The type attribute must be one of: #validTypes.toList()#"
+			);
+		}
+
+		// Process values and valuesDisplay for dropdown editing
+		var valuesList = [];
+		var displayList = [];
+
+		if( !isNull( attributes.values ) && len( attributes.values ) ){
+			valuesList = listToArray( attributes.values );
+
+			if( !isNull( attributes.valuesDisplay ) && len( attributes.valuesDisplay ) ){
+				displayList = listToArray( attributes.valuesDisplay );
+			} else {
+				displayList = valuesList; // Use values as display if no separate display list
+			}
+		}
+
+		// Create column data structure to pass to parent Grid
+		var columnData = {
+			"name" : attributes.name,
+			"header" : attributes.header,
+			"width" : attributes.width,
+			"sortable" : attributes.sortable,
+			"editable" : attributes.editable,
+			"dataAlign" : attributes.dataAlign,
+			"headerAlign" : attributes.headerAlign,
+			"display" : attributes.display,
+			"type" : attributes.type,
+			"numberFormat" : attributes.numberFormat,
+			"dateFormat" : attributes.dateFormat,
+			"values" : valuesList,
+			"valuesDisplay" : displayList,
+			"href" : attributes.href,
+			"target" : attributes.target,
+			"attributes" : attributes
+		};
+
+		// Add this column to the parent grid's columns collection
+		if( isNull( gridParentState.columns ) ){
+			gridParentState.columns = [];
+		}
+		gridParentState.columns.append( columnData );
+
+		// Don't write any output here - the parent Grid component will handle rendering
+	}
+
+	/**
+	 * Format cell value based on column type and formatting options
+	 */
+	public static function formatCellValue( required value, required columnData ){
+		var formattedValue = value;
+		var type = lcase( columnData.type );
+
+		try {
+			switch( type ){
+				case "numeric":
+					if( isNumeric( value ) ){
+						if( !isNull( columnData.numberFormat ) && len( columnData.numberFormat ) ){
+							formattedValue = numberFormat( value, columnData.numberFormat );
+						} else {
+							formattedValue = numberFormat( value );
+						}
+					}
+					break;
+
+				case "date":
+					if( isDate( value ) ){
+						if( !isNull( columnData.dateFormat ) && len( columnData.dateFormat ) ){
+							formattedValue = dateFormat( value, columnData.dateFormat );
+						} else {
+							formattedValue = dateFormat( value, "mm/dd/yyyy" );
+						}
+					}
+					break;
+
+				case "boolean":
+					if( isBoolean( value ) ){
+						formattedValue = value ? "Yes" : "No";
+					}
+					break;
+
+				default:
+					// String type or fallback
+					formattedValue = toString( value );
+					break;
+			}
+		} catch( any e ){
+			// If formatting fails, return original value as string
+			formattedValue = toString( value );
+		}
+
+		return formattedValue;
+	}
+
+	/**
+	 * Generate cell HTML with appropriate formatting and links
+	 */
+	public static function generateCellHTML( required value, required columnData, rowData = {} ){
+		var formattedValue = formatCellValue( value, columnData );
+		var cellHTML = encodeForHTML( formattedValue );
+
+		// Handle href attribute for links
+		if( !isNull( columnData.href ) && len( columnData.href ) ){
+			var linkURL = columnData.href;
+
+			// Replace placeholders in href with row data
+			for( var key in rowData ){
+				var placeholder = "{#key#}";
+				if( linkURL.findNoCase( placeholder ) ){
+					linkURL = linkURL.replaceNoCase( placeholder, encodeForURL( rowData[ key ] ), "all" );
+				}
+			}
+
+			var target = !isNull( columnData.target ) && len( columnData.target ) ? " target=""#columnData.target#""" : "";
+			cellHTML = "<a href=""#encodeForHTMLAttribute( linkURL )#""#target#>#cellHTML#</a>";
+		}
+
+		// Handle values/valuesDisplay for display mapping
+		if( columnData.values.len() > 0 ){
+			var valueIndex = columnData.values.findNoCase( value );
+			if( valueIndex > 0 && columnData.valuesDisplay.len() >= valueIndex ){
+				cellHTML = encodeForHTML( columnData.valuesDisplay[ valueIndex ] );
+			}
+		}
+
+		return cellHTML;
+	}
+
+	/**
+	 * Generate edit control HTML for editable cells
+	 */
+	public static function generateEditControlHTML( required value, required columnData ){
+		var controlHTML = "";
+		var type = lcase( columnData.type );
+
+		if( columnData.values.len() > 0 ){
+			// Dropdown/select control
+			controlHTML = "<select class=""bx-grid-edit-select"">";
+			for( var i = 1; i <= columnData.values.len(); i++ ){
+				var optionValue = columnData.values[ i ];
+				var optionDisplay = columnData.valuesDisplay.len() >= i ? columnData.valuesDisplay[ i ] : optionValue;
+				var selected = optionValue == value ? " selected" : "";
+				controlHTML &= "<option value=""#encodeForHTMLAttribute( optionValue )#""#selected#>#encodeForHTML( optionDisplay )#</option>";
+			}
+			controlHTML &= "</select>";
+		} else {
+			switch( type ){
+				case "boolean":
+					var checked = value ? " checked" : "";
+					controlHTML = "<input type=""checkbox"" class=""bx-grid-edit-checkbox""#checked# />";
+					break;
+
+				case "numeric":
+					controlHTML = "<input type=""number"" class=""bx-grid-edit-input"" value=""#encodeForHTMLAttribute( value )#"" />";
+					break;
+
+				case "date":
+					var dateValue = isDate( value ) ? dateFormat( value, "yyyy-mm-dd" ) : "";
+					controlHTML = "<input type=""date"" class=""bx-grid-edit-input"" value=""#encodeForHTMLAttribute( dateValue )#"" />";
+					break;
+
+				default:
+					controlHTML = "<input type=""text"" class=""bx-grid-edit-input"" value=""#encodeForHTMLAttribute( value )#"" />";
+					break;
+			}
+		}
+
+		return controlHTML;
+	}
+}

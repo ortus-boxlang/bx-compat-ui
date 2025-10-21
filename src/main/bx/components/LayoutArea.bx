@@ -91,7 +91,7 @@ class{
 		if( hasSource ){
 			// Create placeholder for AJAX content with loading indicator and comment
 			areaContent = "<!-- Content loaded from: #attributes.source# -->";
-			areaContent &= "<div class=""bx-source-loading"" data-source=""#encodeForHTML( attributes.source )#"">Loading content...</div>";
+			areaContent &= "<div class=""bx-source-loading"" data-source=""#encodeForHTMLAttribute( attributes.source )#"">Loading content...</div>";
 		} else {
 			// Process body content normally
 			var buffer = newBuffer();
@@ -189,7 +189,7 @@ class{
 		}
 
 		var tagContent = "<div";
-		tagContent &= " id=""#encodeForHTML( areaData.id )#""";
+		tagContent &= " id=""#encodeForHTMLAttribute( areaData.id )#""";
 		tagContent &= " class=""#cssClasses.toList( " " )#""";
 
 		if( styleAttributes.len() ){
