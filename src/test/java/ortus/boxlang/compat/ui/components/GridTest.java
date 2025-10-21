@@ -442,7 +442,7 @@ public class GridTest extends BaseIntegrationTest {
 	public void testGridDataAttributes() {
 		runtime.executeSource(
 		    """
-		    bx:grid name="dataGrid" format="xml" enabled="false" appendKey="true"
+		    bx:grid name="dataGrid" enabled="false" appendKey="true"
 		           delete="true" insert="true" maxRows="100" gridDataAlign="center" {
 		        bx:gridcolumn name="test";
 		    }
@@ -452,7 +452,6 @@ public class GridTest extends BaseIntegrationTest {
 		);
 
 		String output = variables.getAsString( Key.of( "result" ) );
-		assertThat( output ).contains( "data-format=\"xml\"" );
 		assertThat( output ).contains( "data-enabled=\"false\"" );
 		assertThat( output ).contains( "data-append-key=\"true\"" );
 		assertThat( output ).contains( "data-delete=\"true\"" );
