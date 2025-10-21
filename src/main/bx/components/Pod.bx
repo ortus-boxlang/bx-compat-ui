@@ -123,7 +123,7 @@ class{
 		if( !isNull( attributes.title ) && len( attributes.title ) ){
 			var headerStyle = "";
 			if( !isNull( attributes.headerStyle ) && len( attributes.headerStyle ) ){
-				headerStyle = " style=""#encodeForHTMLAttribute( attributes.headerStyle )#""";
+				headerStyle = " style=""#attributes.headerStyle#""";
 			}
 			podContent &= "<div class=""bx-pod-header""#headerStyle#>#attributes.title#</div>";
 		}
@@ -134,7 +134,7 @@ class{
 			bodyStyle &= " " & attributes.bodyStyle;
 		}
 
-		podContent &= "<div class=""bx-pod-body"" style=""#encodeForHTMLAttribute( bodyStyle )#"">";
+		podContent &= "<div class=""bx-pod-body"" style=""#bodyStyle#"">";
 
 		// Process body content or handle source attribute
 		var hasSource = !isNull( attributes.source ) && len( attributes.source );
@@ -142,7 +142,7 @@ class{
 		if( hasSource ){
 			// Create placeholder for AJAX content with loading indicator and comment
 			podContent &= "<!-- Content loaded from: #attributes.source# -->";
-			podContent &= "<div class=""bx-source-loading"" data-source=""#encodeForHTMLAttribute( attributes.source )#"">Loading content...</div>";
+			podContent &= "<div class=""bx-source-loading"" data-source=""#attributes.source#"">Loading content...</div>";
 		} else {
 			// Process body content normally
 			var buffer = newBuffer();

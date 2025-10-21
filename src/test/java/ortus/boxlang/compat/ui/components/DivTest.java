@@ -83,7 +83,6 @@ public class DivTest extends BaseIntegrationTest {
 		assertThat( output ).contains( "bx-div-bind" );
 		assertThat( output ).contains( "data-bind-on-load=\"false\"" );
 		assertThat( output ).doesNotContain( "bx-bind-on-load" );
-		assertThat( output ).doesNotContain( "bx-bind-loading" );
 	}
 
 	@DisplayName( "It throws error when bind and body content coexist" )

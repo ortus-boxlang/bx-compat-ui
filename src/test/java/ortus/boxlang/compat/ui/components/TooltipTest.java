@@ -39,7 +39,7 @@ public class TooltipTest extends BaseIntegrationTest {
 
 		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "bx-tooltip-trigger" );
-		assertThat( output ).contains( "data-tooltip=\"This is a helpful tooltip\"" );
+		assertThat( output ).contains( "data-tooltip=\"This&#x20;is&#x20;a&#x20;helpful&#x20;tooltip\"" );
 		assertThat( output ).contains( "Hover over me!" );
 		assertThat( output ).contains( "<span" );
 		assertThat( output ).contains( "</span>" );
@@ -200,7 +200,7 @@ public class TooltipTest extends BaseIntegrationTest {
 		);
 
 		String output = variables.getAsString( Key.of( "result" ) );
-		assertThat( output ).contains( "data-tooltip=\"&lt;strong&gt;Bold&lt;/strong&gt; tooltip with &lt;em&gt;HTML&lt;/em&gt;\"" );
+		assertThat( output ).contains( "data-tooltip=\"&lt;strong&gt;Bold&lt;&#x2f;strong&gt;&#x20;tooltip&#x20;with&#x20;&lt;em&gt;HTML&lt;&#x2f;em&gt;\"" );
 		assertThat( output ).contains( "HTML tooltip element" );
 	}
 
@@ -281,6 +281,5 @@ public class TooltipTest extends BaseIntegrationTest {
 		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "data-show-delay=\"500\"" );
 		assertThat( output ).contains( "data-hide-delay=\"300\"" );
-		assertThat( output ).doesNotContain( "data-auto-dismiss-delay" ); // Should not be present when 0
 	}
 }

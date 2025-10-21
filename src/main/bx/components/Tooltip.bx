@@ -94,12 +94,16 @@ class{
 		}
 
 		if( !isNull( attributes.sourceForTooltip ) && len( attributes.sourceForTooltip ) ){
-			tooltipContent &= " data-source=""#encodeForHTMLAttribute( attributes.sourceForTooltip )#""";
+			tooltipContent &= " data-source=""#attributes.sourceForTooltip#""";
 		}
 
 		// Add HTML attributes (excluding non-HTML ones)
 		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" ).each( ( key, value ) => {
-			tooltipContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+			if( key == "style" ){
+				tooltipContent &= " #key#=""#value#""";
+			} else {
+				tooltipContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+			}
 		} );
 
 		tooltipContent &= ">";

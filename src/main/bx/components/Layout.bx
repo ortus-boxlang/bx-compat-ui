@@ -119,7 +119,7 @@ class{
 				if( !isNull( attributes.width ) && len( attributes.width ) ){
 					styleValue &= "; width: #attributes.width#";
 				}
-				tagContent &= " style=""#encodeForHTMLAttribute( styleValue )#""";
+				tagContent &= " style=""#styleValue#""";
 			} else if( key != "height" && key != "width" && key != "style" ){
 				tagContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
 			}
@@ -135,7 +135,7 @@ class{
 				if( !isNull( attributes.width ) && len( attributes.width ) ){
 					inlineStyle &= " width: #attributes.width#;";
 				}
-				tagContent &= " style=""#encodeForHTMLAttribute( inlineStyle )#""";
+				tagContent &= " style=""#inlineStyle#""";
 			}
 		}
 
@@ -257,7 +257,7 @@ class{
 			var area = areas[i];
 			var activeClass = i == 1 ? " active" : "";
 			var tabId = !isNull( area.id ) ? area.id : "#layoutId#_tab_#i#";
-			tabHeaders &= "<button class=""bx-tab-header#activeClass#"" data-tab=""#tabId#"">#encodeForHTMLAttribute( area.title ?: 'Tab #i#' )#</button>";
+			tabHeaders &= "<button class=""bx-tab-header#activeClass#"" data-tab=""#tabId#"">#encodeForHTML( area.title ?: 'Tab #i#' )#</button>";
 		}
 		tabHeaders &= "</div>";
 
@@ -286,7 +286,7 @@ class{
 			var collapsedClass = area.initcollapsed ? " collapsed" : "";
 
 			context.writeToBuffer( "<div class=""bx-accordion-panel#collapsedClass#"">" );
-			context.writeToBuffer( "<div class=""bx-accordion-header"">#encodeForHTMLAttribute( area.title ?: 'Panel #i#' )#</div>" );
+			context.writeToBuffer( "<div class=""bx-accordion-header"">#encodeForHTML( area.title ?: 'Panel #i#' )#</div>" );
 			context.writeToBuffer( "<div class=""bx-accordion-content"">" );
 			context.writeToBuffer( area.content );
 			context.writeToBuffer( "</div></div>" );
