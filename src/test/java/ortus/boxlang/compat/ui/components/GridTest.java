@@ -355,4 +355,171 @@ public class GridTest extends BaseIntegrationTest {
 		assertThat( output ).contains( "CustomEvent" );
 		assertThat( output ).contains( "dispatchEvent" );
 	}
+
+	@DisplayName( "It can handle color attributes" )
+	@Test
+	public void testGridColorAttributes() {
+		runtime.executeSource(
+		    """
+		    bx:grid name="colorGrid" bgColor="##f0f0f0" textColor="##333333" {
+		        bx:gridcolumn name="test";
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "background-color: #f0f0f0" );
+		assertThat( output ).contains( "color: #333333" );
+	}
+
+	@DisplayName( "It can handle font attributes" )
+	@Test
+	public void testGridFontAttributes() {
+		runtime.executeSource(
+		    """
+		    bx:grid name="fontGrid" font="Arial" fontSize="14" bold="true" italic="true" {
+		        bx:gridcolumn name="test";
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "font-family: Arial" );
+		assertThat( output ).contains( "font-size: 14px" );
+		assertThat( output ).contains( "font-weight: bold" );
+		assertThat( output ).contains( "font-style: italic" );
+	}
+
+	@DisplayName( "It can handle column header styling" )
+	@Test
+	public void testGridColumnHeaderStyling() {
+		runtime.executeSource(
+		    """
+		    bx:grid name="headerGrid" colHeaderBold="true" colHeaderItalic="true" 
+		           colHeaderFont="Helvetica" colHeaderFontSize="16" colHeaderTextColor="##666" {
+		        bx:gridcolumn name="test" header="Test Column";
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "font-weight: bold" );
+		assertThat( output ).contains( "font-style: italic" );
+		assertThat( output ).contains( "font-family: Helvetica" );
+		assertThat( output ).contains( "font-size: 16px" );
+		assertThat( output ).contains( "color: #666" );
+	}
+
+	@DisplayName( "It can handle action buttons" )
+	@Test
+	public void testGridActionButtons() {
+		runtime.executeSource(
+		    """
+		    bx:grid name="actionGrid" insertButton="true" deleteButton="true" {
+		        bx:gridcolumn name="test";
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "bx-grid-actions" );
+		assertThat( output ).contains( "bx-grid-insert-btn" );
+		assertThat( output ).contains( "bx-grid-delete-btn" );
+		assertThat( output ).contains( "Insert" );
+		assertThat( output ).contains( "Delete" );
+	}
+
+	@DisplayName( "It can handle data attributes" )
+	@Test
+	public void testGridDataAttributes() {
+		runtime.executeSource(
+		    """
+		    bx:grid name="dataGrid" format="xml" enabled="false" appendKey="true" 
+		           delete="true" insert="true" maxRows="100" gridDataAlign="center" {
+		        bx:gridcolumn name="test";
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "data-format=\"xml\"" );
+		assertThat( output ).contains( "data-enabled=\"false\"" );
+		assertThat( output ).contains( "data-append-key=\"true\"" );
+		assertThat( output ).contains( "data-delete=\"true\"" );
+		assertThat( output ).contains( "data-insert=\"true\"" );
+		assertThat( output ).contains( "data-max-rows=\"100\"" );
+		assertThat( output ).contains( "data-data-align=\"center\"" );
+	}
+
+	@DisplayName( "It can handle multirowselect mapping" )
+	@Test
+	public void testGridMultirowSelect() {
+		runtime.executeSource(
+		    """
+		    bx:grid name="multiGrid" multirowselect="true" {
+		        bx:gridcolumn name="test";
+		    }
+		    result = getBoxContext().getBuffer().toString()
+		    """,
+		    context
+		);
+
+		String output = variables.getAsString( Key.of( "result" ) );
+		assertThat( output ).contains( "data-select-mode=\"multi\"" );
+		assertThat( output ).contains( "type=\"checkbox\"" );
+	}
+
+	@DisplayName( "It validates format attribute" )
+	@Test
+	public void testGridFormatValidation() {
+		runtime.executeSource(
+		    """
+		    try {
+		        bx:grid name="invalidGrid" format="invalid" {
+		            bx:gridcolumn name="test";
+		        }
+		        hasError = false;
+		    } catch (any e) {
+		        hasError = true;
+		        errorMessage = e.message;
+		    }
+		    """,
+		    context
+		);
+
+		Boolean hasError = variables.getAsBoolean( Key.of( "hasError" ) );
+		assertThat( hasError ).isTrue();
+	}
+
+	@DisplayName( "It validates gridDataAlign attribute" )
+	@Test
+	public void testGridDataAlignValidation() {
+		runtime.executeSource(
+		    """
+		    try {
+		        bx:grid name="invalidGrid" gridDataAlign="invalid" {
+		            bx:gridcolumn name="test";
+		        }
+		        hasError = false;
+		    } catch (any e) {
+		        hasError = true;
+		        errorMessage = e.message;
+		    }
+		    """,
+		    context
+		);
+
+		Boolean hasError = variables.getAsBoolean( Key.of( "hasError" ) );
+		assertThat( hasError ).isTrue();
+	}
 }

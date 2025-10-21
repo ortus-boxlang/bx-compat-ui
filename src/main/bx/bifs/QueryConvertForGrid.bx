@@ -1,0 +1,80 @@
+/**
+ * BoxLang BIF: QueryConvertForGrid
+ *
+ * Converts a query object to a format suitable for grid display.
+ */
+@BoxBIF( "QueryConvertForGrid" )
+class {
+
+    /**
+     * Converts a query for grid display with pagination and sorting
+     *
+     * @query The query object to convert
+     * @page The page number (1-based, default: 1)
+     * @pagesize The number of rows per page (default: 25)
+     */
+    function invoke() {
+        // Extract arguments with defaults - BIF gets positional args as numbered arguments
+        var query = arguments[ 1 ] ?: arguments.query ?: null;
+        var page = arguments[ 2 ] ?: arguments.page ?: 1;
+        var pageSize = arguments[ 3 ] ?: arguments.pagesize ?: 25;
+
+        // Validate required query parameter
+        if( isNull( query ) || !isQuery( query ) ){
+            throw(
+                type = "boxlang.compat.ui.InvalidArgumentException",
+                message = "The query parameter is required and must be a valid query object"
+            );
+        }
+
+        // Validate page parameter
+        if( !isNumeric( page ) || page < 1 ){
+            page = 1;
+        }
+
+        // Validate pageSize parameter
+        if( !isNumeric( pageSize ) || pageSize < 1 ){
+            pageSize = 25;
+        }
+
+        var totalRows = query.recordCount;
+        var totalPages = ceiling( totalRows / pageSize );
+
+        // Ensure page doesn't exceed total pages
+        if( page > totalPages && totalPages > 0 ){
+            page = totalPages;
+        }
+
+        // Calculate row range for the current page
+        var startRow = ( page - 1 ) * pageSize + 1;
+        var endRow = min( startRow + pageSize - 1, totalRows );
+
+        // Create a copy of the query to avoid modifying the original
+        var gridQuery = query;
+
+        // Extract the page of data
+        var pageQuery = queryNew( query.columnList );
+
+        if( totalRows > 0 ){
+            for( var i = startRow; i <= endRow; i++ ){
+                var newRow = {};
+                for( var columnName in query.columnArray ){
+                    newRow[ columnName ] = gridQuery.getCell( columnName, i );
+                }
+                queryAddRow( pageQuery, newRow );
+            }
+        }
+
+        var result = {
+            "TOTALROWCOUNT" = totalRows,
+            "QUERY" = pageQuery,
+            "PAGE" = page,
+            "PAGESIZE" = pageSize,
+            "TOTALPAGES" = totalPages,
+            "STARTROW" = startRow,
+            "ENDROW" = endRow
+        };
+
+        return result;
+    }
+}
