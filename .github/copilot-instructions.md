@@ -14,67 +14,20 @@ This is a BoxLang module for Excel spreadsheet manipulation built on Apache POI.
 ### Module Structure
 
 - `src/main/bx/ModuleConfig.bx` - BoxLang module descriptor defining registration, settings, and lifecycle
-- `src/main/java/ortus/boxlang/spreadsheet/` - Core Java implementation
-  - `SpreadsheetFile.java` - Main fluent API class (1200+ lines)
-  - `SpreadsheetUtil.java` - Apache POI utilities and static helpers
+- `src/main/java/ortus/boxlang/compat/ui/` - Root directory for Compiled Java classes
+- `src/main/bx/` - Root directory for Boxlang components and BIFs
   - `bifs/` - Individual BIF function implementations (`@BoxBIF` annotated)
-  - `components/Spreadsheet.java` - Component tag implementation (`@BoxComponent` annotated)
-  - `interceptors/LicenseInterceptor.java` - License validation interceptor
+  - `components/` - Component tag implementations (`@BoxComponent` annotated)
   - `util/KeyDictionary.java` - Centralized Key constants
 
-### Key Code Patterns
-
-**CRITICAL ARCHITECTURE PRINCIPLE: Thin Controllers**
-BIFs and Components are CONTROLLERS - they should be thin wrappers that delegate to business logic in `SpreadsheetFile` and `SpreadsheetUtil`. Never implement complex logic directly in BIFs/Components.
-
-**BIF Implementation Pattern (Thin Controller):**
-
-```java
-@BoxBIF(description = "Creates a new spreadsheet object")
-public class SpreadsheetNew extends BIF {
-    public SpreadsheetNew() {
-        declaredArguments = new Argument[] {
-            new Argument(false, Argument.STRING, Key.of("sheetname")),
-            new Argument(false, Argument.BOOLEAN, Key.of("xmlformat"))
-        };
-    }
-
-    public Object _invoke(IBoxContext context, ArgumentsScope arguments) {
-        // Extract arguments
-        String sheetName = arguments.getAsString(Key.of("sheetname"));
-        Boolean xmlFormat = arguments.getAsBoolean(Key.of("xmlformat"));
-
-        // Delegate to SpreadsheetFile - NO business logic here
-        return new SpreadsheetFile(xmlFormat, sheetName);
-    }
-}
-```
-
-**Component Implementation Pattern (Thin Controller):**
-
-```java
-@BoxComponent(name = "Spreadsheet", allowsBody = false, requiresBody = false)
-public class Spreadsheet extends Component {
-    // Declare all supported attributes in constructor
-    // Switch on action attribute in _invoke method
-    // Delegate ALL operations to SpreadsheetFile/SpreadsheetUtil
-}
-```
-
-**Business Logic Location:**
-
-- `SpreadsheetFile.java` - High-level fluent API operations, state management
-- `SpreadsheetUtil.java` - Low-level Apache POI operations, static utilities
-- BIFs/Components - ONLY argument extraction and delegation
-
-**Fluent API Pattern:**
-All methods in `SpreadsheetFile` return `this` for chaining, with explicit state management via private fields (`workbook`, `activeSheetName`, `path`, etc.).
 
 ## Development Workflows
 
 ### Build & Test
 
 ```bash
+./gradlew downloadBoxLang
+./gradlew installESAPIModule
 ./gradlew build          # Full build with tests
 ./gradlew test           # Run tests only
 ./gradlew shadowJar      # Create fat JAR with dependencies
@@ -184,12 +137,6 @@ if (attempt.wasSuccessful()) {
 
 ## Project-Specific Conventions
 
-### Licensing
-
-- Requires BoxLang+ (bx-plus) license via `LicenseInterceptor`
-- License check happens on `onRuntimeStart` interception point
-- Uses `DynamicInteropService` to call license service methods
-
 ### File Format Handling
 
 - Default `xmlFormat = true` creates `.xlsx` files
@@ -225,6 +172,6 @@ if (attempt.wasSuccessful()) {
 
 ## Common Gotchas
 
-- Module depends on BoxLang+ license - ensure license service available
 - Test module loading requires physical path resolution in `BaseIntegrationTest`
 - File paths need expansion via `FileSystemUtil.expandPath(context, path)`
+
