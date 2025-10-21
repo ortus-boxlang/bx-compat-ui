@@ -106,10 +106,10 @@ class{
 		// Process values and valuesDisplay for dropdown editing
 		var valuesList = [];
 		var displayList = [];
-		
+
 		if( !isNull( attributes.values ) && len( attributes.values ) ){
 			valuesList = listToArray( attributes.values );
-			
+
 			if( !isNull( attributes.valuesDisplay ) && len( attributes.valuesDisplay ) ){
 				displayList = listToArray( attributes.valuesDisplay );
 			} else {
@@ -164,7 +164,7 @@ class{
 						}
 					}
 					break;
-				
+
 				case "date":
 					if( isDate( value ) ){
 						if( !isNull( columnData.dateFormat ) && len( columnData.dateFormat ) ){
@@ -174,13 +174,13 @@ class{
 						}
 					}
 					break;
-				
+
 				case "boolean":
 					if( isBoolean( value ) ){
 						formattedValue = value ? "Yes" : "No";
 					}
 					break;
-				
+
 				default:
 					// String type or fallback
 					formattedValue = toString( value );
@@ -204,7 +204,7 @@ class{
 		// Handle href attribute for links
 		if( !isNull( columnData.href ) && len( columnData.href ) ){
 			var linkURL = columnData.href;
-			
+
 			// Replace placeholders in href with row data
 			for( var key in rowData ){
 				var placeholder = "{#key#}";
@@ -212,9 +212,9 @@ class{
 					linkURL = linkURL.replaceNoCase( placeholder, encodeForURL( rowData[ key ] ), "all" );
 				}
 			}
-			
+
 			var target = !isNull( columnData.target ) && len( columnData.target ) ? " target=""#columnData.target#""" : "";
-			cellHTML = "<a href=""#encodeForHTML( linkURL )#""#target#>#cellHTML#</a>";
+			cellHTML = "<a href=""#encodeForHTMLAttribute( linkURL )#""#target#>#cellHTML#</a>";
 		}
 
 		// Handle values/valuesDisplay for display mapping
@@ -242,7 +242,7 @@ class{
 				var optionValue = columnData.values[ i ];
 				var optionDisplay = columnData.valuesDisplay.len() >= i ? columnData.valuesDisplay[ i ] : optionValue;
 				var selected = optionValue == value ? " selected" : "";
-				controlHTML &= "<option value=""#encodeForHTML( optionValue )#""#selected#>#encodeForHTML( optionDisplay )#</option>";
+				controlHTML &= "<option value=""#encodeForHTMLAttribute( optionValue )#""#selected#>#encodeForHTML( optionDisplay )#</option>";
 			}
 			controlHTML &= "</select>";
 		} else {
@@ -251,18 +251,18 @@ class{
 					var checked = value ? " checked" : "";
 					controlHTML = "<input type=""checkbox"" class=""bx-grid-edit-checkbox""#checked# />";
 					break;
-				
+
 				case "numeric":
-					controlHTML = "<input type=""number"" class=""bx-grid-edit-input"" value=""#encodeForHTML( value )#"" />";
+					controlHTML = "<input type=""number"" class=""bx-grid-edit-input"" value=""#encodeForHTMLAttribute( value )#"" />";
 					break;
-				
+
 				case "date":
 					var dateValue = isDate( value ) ? dateFormat( value, "yyyy-mm-dd" ) : "";
-					controlHTML = "<input type=""date"" class=""bx-grid-edit-input"" value=""#encodeForHTML( dateValue )#"" />";
+					controlHTML = "<input type=""date"" class=""bx-grid-edit-input"" value=""#encodeForHTMLAttribute( dateValue )#"" />";
 					break;
-				
+
 				default:
-					controlHTML = "<input type=""text"" class=""bx-grid-edit-input"" value=""#encodeForHTML( value )#"" />";
+					controlHTML = "<input type=""text"" class=""bx-grid-edit-input"" value=""#encodeForHTMLAttribute( value )#"" />";
 					break;
 			}
 		}

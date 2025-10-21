@@ -12,4 +12,5 @@ bin/**
 ### BOXLANG ###
 /libs/
 src/test/resources/libs/*
+src/test/resources/modules/*
 !src/test/resources/libs/.gitkeep

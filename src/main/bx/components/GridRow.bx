@@ -66,20 +66,20 @@ class{
 		// Process body content to extract cell data if no data attribute provided
 		var rowData = attributes.data;
 		var hasBodyContent = !isNull( body );
-		
+
 		if( hasBodyContent && ( isNull( attributes.data ) || !structCount( attributes.data ) ) ){
 			// Process body to extract data - this could contain custom content or data
 			var buffer = newBuffer();
 			var bodyResult = processBody( context, body, buffer );
 			var bodyContent = buffer.toString();
-			
+
 			// Store body content for custom rendering
 			rowData[ "_bodyContent" ] = bodyContent;
 		}
 
 		// Build style attributes
 		var inlineStyles = [];
-		
+
 		if( !isNull( attributes.bgcolor ) && len( attributes.bgcolor ) ){
 			inlineStyles.append( "background-color: #attributes.bgcolor#" );
 		}
@@ -131,66 +131,66 @@ class{
 	 */
 	public static function generateRowHTML( required rowData, required columns, gridState = {} ){
 		var rowHTML = "<tr";
-		
+
 		// Add ID if provided
 		if( !isNull( rowData.id ) && len( rowData.id ) ){
-			rowHTML &= " id=""#encodeForHTML( rowData.id )#""";
+			rowHTML &= " id=""#encodeForHTMLAttribute( rowData.id )#""";
 		}
-		
+
 		// Add CSS classes
 		var cssClasses = [ "bx-grid-row" ];
 		if( !isNull( rowData.cssClasses ) && isArray( rowData.cssClasses ) ){
 			cssClasses.addAll( rowData.cssClasses );
 		}
-		
+
 		if( cssClasses.len() > 0 ){
 			rowHTML &= " class=""#cssClasses.toList( " " )#""";
 		}
-		
+
 		// Add inline styles
 		if( !isNull( rowData.inlineStyles ) && isArray( rowData.inlineStyles ) && rowData.inlineStyles.len() > 0 ){
 			rowHTML &= " style=""#rowData.inlineStyles.toList( "; " )#""";
 		}
-		
+
 		// Add data attributes
 		if( rowData.selected ){
 			rowHTML &= " data-selected=""true""";
 		}
-		
+
 		rowHTML &= ">";
-		
+
 		// Add selection cell if grid supports selection
 		var selectMode = gridState.selectMode ?: "single";
 		if( selectMode != "none" ){
 			var selectType = selectMode == "multi" ? "checkbox" : "radio";
 			var gridName = gridState.gridName ?: "grid";
 			var checkedAttr = rowData.selected ? " checked" : "";
-			
+
 			rowHTML &= "<td class=""bx-grid-select-cell"">";
-			rowHTML &= "<input type=""#selectType#"" name=""#gridName#_select"" value=""#encodeForHTML( rowData.id )#""#checkedAttr# />";
+			rowHTML &= "<input type=""#selectType#"" name=""#gridName#_select"" value=""#encodeForHTMLAttribute( rowData.id )#""#checkedAttr# />";
 			rowHTML &= "</td>";
 		}
-		
+
 		// Generate cells for each column
 		for( var column in columns ){
 			var cellValue = "";
 			var cellData = rowData.data ?: {};
-			
+
 			// Check if row has data for this column
 			if( structKeyExists( cellData, column.name ) ){
 				cellValue = cellData[ column.name ];
 			} else if( structKeyExists( rowData, column.name ) ){
 				cellValue = rowData[ column.name ];
 			}
-			
+
 			// Check for custom body content
 			var hasBodyContent = structKeyExists( cellData, "_bodyContent" ) && len( cellData[ "_bodyContent" ] );
-			
+
 			rowHTML &= generateCellHTML( cellValue, column, rowData, hasBodyContent ? cellData[ "_bodyContent" ] : "" );
 		}
-		
+
 		rowHTML &= "</tr>";
-		
+
 		return rowHTML;
 	}
 
@@ -199,20 +199,20 @@ class{
 	 */
 	private static function generateCellHTML( required value, required column, required rowData, bodyContent = "" ){
 		var cellHTML = "<td class=""bx-grid-cell""";
-		cellHTML &= " data-column=""#encodeForHTML( column.name )#""";
-		
+		cellHTML &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
+
 		// Add column-specific styling
 		if( !isNull( column.dataAlign ) && column.dataAlign != "left" ){
 			cellHTML &= " style=""text-align: #column.dataAlign#""";
 		}
-		
+
 		// Add editable attribute if column is editable
 		if( column.editable ){
 			cellHTML &= " contenteditable=""true"" class=""bx-grid-cell bx-grid-editable-cell""";
 		}
-		
+
 		cellHTML &= ">";
-		
+
 		// Use body content if available, otherwise format the value
 		if( len( bodyContent ) ){
 			cellHTML &= bodyContent;
@@ -220,9 +220,9 @@ class{
 			// Use GridColumn's formatting functionality
 			cellHTML &= invokeStatic( "bx:components.GridColumn", "generateCellHTML", [ value, column, rowData.data ?: {} ] );
 		}
-		
+
 		cellHTML &= "</td>";
-		
+
 		return cellHTML;
 	}
 
@@ -231,7 +231,7 @@ class{
 	 */
 	public static function createRowDataFromStruct( required data, id = "" ){
 		var autoId = len( id ) ? id : "gridrow_" & listLast( lcase( createUUID() ), "-" );
-		
+
 		return {
 			"id" : autoId,
 			"data" : data,
@@ -249,17 +249,17 @@ class{
 		if( isNull( rowData.data ) ){
 			rowData.data = {};
 		}
-		
+
 		// Merge updates into existing data
 		for( var key in updates ){
 			rowData.data[ key ] = updates[ key ];
-			
+
 			// Also update top-level if column exists
 			if( structKeyExists( rowData, key ) ){
 				rowData[ key ] = updates[ key ];
 			}
 		}
-		
+
 		return rowData;
 	}
 }

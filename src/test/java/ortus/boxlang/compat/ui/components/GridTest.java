@@ -30,8 +30,8 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="myGrid" {
-		        bx:gridcolumn name="id" header="ID" /
-		        bx:gridcolumn name="name" header="Name" /
+		        bx:gridcolumn name="id" header="ID";
+		        bx:gridcolumn name="name" header="Name";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -53,7 +53,7 @@ public class GridTest extends BaseIntegrationTest {
 			runtime.executeSource(
 			    """
 			    bx:grid {
-			        bx:gridcolumn name="test" /
+			        bx:gridcolumn name="test";
 			    }
 			    """,
 			    context
@@ -68,13 +68,13 @@ public class GridTest extends BaseIntegrationTest {
 	public void testGridDimensions() {
 		runtime.executeSource(
 		    """
-		    bx:grid 
-		        name="sizedGrid" 
-		        height="400px" 
+		    bx:grid
+		        name="sizedGrid"
+		        height="400px"
 		        width="600px"
 		        class="my-grid-class"
 		        style="border: 1px solid gray;" {
-		        bx:gridcolumn name="col1" /
+		        bx:gridcolumn name="col1";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -93,14 +93,14 @@ public class GridTest extends BaseIntegrationTest {
 	public void testGridBehaviorAttributes() {
 		runtime.executeSource(
 		    """
-		    bx:grid 
+		    bx:grid
 		        name="behaviorGrid"
 		        sortable="true"
 		        editable="true"
 		        selectMode="multi"
 		        pageSize="50"
 		        stripeRows="false" {
-		        bx:gridcolumn name="id" /
+		        bx:gridcolumn name="id";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -124,7 +124,7 @@ public class GridTest extends BaseIntegrationTest {
 			runtime.executeSource(
 			    """
 			    bx:grid name="testGrid" selectMode="invalid" {
-			        bx:gridcolumn name="test" /
+			        bx:gridcolumn name="test";
 			    }
 			    """,
 			    context
@@ -140,9 +140,9 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="headerGrid" showHeaders="true" {
-		        bx:gridcolumn name="id" header="ID Column" width="80px" /
-		        bx:gridcolumn name="name" header="Name Column" width="200px" /
-		        bx:gridcolumn name="email" header="Email Address" /
+		        bx:gridcolumn name="id" header="ID Column" width="80px";
+		        bx:gridcolumn name="name" header="Name Column" width="200px";
+		        bx:gridcolumn name="email" header="Email Address";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -165,7 +165,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="noHeaderGrid" showHeaders="false" {
-		        bx:gridcolumn name="col1" header="Hidden Header" /
+		        bx:gridcolumn name="col1" header="Hidden Header";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -184,14 +184,14 @@ public class GridTest extends BaseIntegrationTest {
 	public void testGridJavaScript() {
 		runtime.executeSource(
 		    """
-		    bx:grid 
-		        name="jsGrid" 
-		        sortable="true" 
+		    bx:grid
+		        name="jsGrid"
+		        sortable="true"
 		        editable="true"
 		        onLoad="gridLoaded"
 		        onEdit="cellEdited"
 		        onSort="columnSorted" {
-		        bx:gridcolumn name="test" /
+		        bx:gridcolumn name="test";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -215,7 +215,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="autoIdGrid" {
-		        bx:gridcolumn name="test" /
+		        bx:gridcolumn name="test";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -232,10 +232,10 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="manualRowGrid" {
-		        bx:gridcolumn name="id" header="ID" /
-		        bx:gridcolumn name="name" header="Name" /
-		        bx:gridrow data="#{ id: 1, name: 'John' }#" /
-		        bx:gridrow data="#{ id: 2, name: 'Jane' }#" /
+		        bx:gridcolumn name="id" header="ID";
+		        bx:gridcolumn name="name" header="Name";
+		        bx:gridrow data="#{ id: 1, name: 'John' }#";
+		        bx:gridrow data="#{ id: 2, name: 'Jane' }#";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -255,7 +255,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="multiSelectGrid" selectMode="multi" {
-		        bx:gridcolumn name="name" header="Name" /
+		        bx:gridcolumn name="name" header="Name";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -274,7 +274,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="singleSelectGrid" selectMode="single" {
-		        bx:gridcolumn name="name" header="Name" /
+		        bx:gridcolumn name="name" header="Name";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -293,7 +293,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="noSelectGrid" selectMode="none" {
-		        bx:gridcolumn name="name" header="Name" /
+		        bx:gridcolumn name="name" header="Name";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -315,10 +315,10 @@ public class GridTest extends BaseIntegrationTest {
 		        [1, "Record 1"], [2, "Record 2"], [3, "Record 3"],
 		        [4, "Record 4"], [5, "Record 5"], [6, "Record 6"]
 		    ]);
-		    
+
 		    bx:grid name="paginatedGrid" query="#myQuery#" pageSize="3" {
-		        bx:gridcolumn name="id" header="ID" /
-		        bx:gridcolumn name="name" header="Name" /
+		        bx:gridcolumn name="id" header="ID";
+		        bx:gridcolumn name="name" header="Name";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -337,7 +337,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="eventGrid" sortable="true" editable="true" {
-		        bx:gridcolumn name="test" /
+		        bx:gridcolumn name="test";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,

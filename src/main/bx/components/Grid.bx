@@ -101,19 +101,19 @@ class{
 
 		// Generate CSS classes
 		var cssClasses = [ "bx-grid" ];
-		
+
 		if( attributes.stripeRows ){
 			cssClasses.append( "bx-grid-striped" );
 		}
-		
+
 		if( attributes.sortable ){
 			cssClasses.append( "bx-grid-sortable" );
 		}
-		
+
 		if( attributes.editable ){
 			cssClasses.append( "bx-grid-editable" );
 		}
-		
+
 		// Add custom classes if provided
 		if( !isNull( attributes.class ) && len( attributes.class ) ){
 			cssClasses.append( attributes.class );
@@ -121,15 +121,15 @@ class{
 
 		// Start building the grid container
 		var gridContent = "<div";
-		
+
 		// Add ID
-		gridContent &= " id=""#encodeForHTML( attributes.id )#""";
-		
+		gridContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+
 		// Add CSS classes
 		gridContent &= " class=""#cssClasses.toList( " " )#""";
-		
+
 		// Add data attributes
-		gridContent &= " data-name=""#encodeForHTML( attributes.name )#""";
+		gridContent &= " data-name=""#encodeForHTMLAttribute( attributes.name )#""";
 		gridContent &= " data-page-size=""#attributes.pageSize#""";
 		gridContent &= " data-sortable=""#attributes.sortable#""";
 		gridContent &= " data-editable=""#attributes.editable#""";
@@ -137,7 +137,7 @@ class{
 
 		// Build inline styles
 		var inlineStyles = [];
-		
+
 		if( !isNull( attributes.height ) && len( attributes.height ) ){
 			inlineStyles.append( "height: #attributes.height#" );
 		}
@@ -147,14 +147,14 @@ class{
 		if( !isNull( attributes.style ) && len( attributes.style ) ){
 			inlineStyles.append( attributes.style );
 		}
-		
+
 		if( inlineStyles.len() ){
 			gridContent &= " style=""#inlineStyles.toList( "; " )#""";
 		}
 
 		// Add HTML attributes (excluding non-HTML ones)
 		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" && key != "style" ).each( ( key, value ) => {
-			gridContent &= " #key#=""#encodeForHTML( value )#""";
+			gridContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
 		} );
 
 		gridContent &= ">";
@@ -181,24 +181,24 @@ class{
 	 */
 	private function generateGridStructure( required context, required attributes, required executionState ){
 		var tableContent = "<table class=""bx-grid-table"">";
-		
+
 		// Generate headers if enabled
 		if( attributes.showHeaders ){
 			tableContent &= generateGridHeaders( executionState );
 		}
-		
+
 		// Generate body
 		tableContent &= "<tbody class=""bx-grid-body"">";
 		tableContent &= generateGridRows( executionState );
 		tableContent &= "</tbody>";
-		
+
 		tableContent &= "</table>";
-		
+
 		// Add pagination if needed
 		if( executionState.pageSize > 0 ){
 			tableContent &= generateGridPagination( executionState );
 		}
-		
+
 		context.writeToBuffer( tableContent );
 	}
 
@@ -207,7 +207,9 @@ class{
 	 */
 	private function generateGridHeaders( required executionState ){
 		var headContent = "<thead class=""bx-grid-header""><tr>";
-		
+
+		param executionState.gridSelectMode = "none";
+
 		// Add selection column if needed
 		if( executionState.gridSelectMode != "none" ){
 			var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
@@ -217,7 +219,7 @@ class{
 			}
 			headContent &= "</th>";
 		}
-		
+
 		// Generate column headers
 		var columns = executionState.columns ?: [];
 		for( var column in columns ){
@@ -225,25 +227,25 @@ class{
 			if( executionState.sortColumn == column.name ){
 				sortClass = " bx-grid-sorted bx-grid-sort-" & lcase( executionState.sortDirection );
 			}
-			
+
 			headContent &= "<th class=""bx-grid-column-header#sortClass#""";
-			headContent &= " data-column=""#encodeForHTML( column.name )#""";
-			
+			headContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
+
 			if( !isNull( column.width ) && len( column.width ) ){
 				headContent &= " style=""width: #column.width#""";
 			}
-			
+
 			headContent &= ">";
 			headContent &= encodeForHTML( column.header ?: column.name );
-			
+
 			// Add sort indicator if sortable
 			if( column.sortable ){
 				headContent &= "<span class=""bx-grid-sort-indicator""></span>";
 			}
-			
+
 			headContent &= "</th>";
 		}
-		
+
 		headContent &= "</tr></thead>";
 		return headContent;
 	}
@@ -256,15 +258,15 @@ class{
 		var query = executionState.query;
 		var rows = executionState.rows ?: [];
 		var columns = executionState.columns ?: [];
-		
+
 		// Handle query data
 		if( !isNull( query ) && isQuery( query ) ){
 			var startRow = ( executionState.currentPage - 1 ) * executionState.pageSize + 1;
 			var endRow = min( startRow + executionState.pageSize - 1, query.recordCount );
-			
+
 			for( var i = startRow; i <= endRow; i++ ){
 				rowsContent &= "<tr class=""bx-grid-row"" data-row=""#i#"">";
-				
+
 				// Add selection column if needed
 				if( executionState.gridSelectMode != "none" ){
 					var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
@@ -272,35 +274,35 @@ class{
 					rowsContent &= "<input type=""#selectType#"" name=""#executionState.gridName#_select"" value=""#i#"" />";
 					rowsContent &= "</td>";
 				}
-				
+
 				// Generate data cells
 				for( var column in columns ){
 					var cellValue = "";
 					if( query.columnExists( column.name ) ){
 						cellValue = query.getCell( column.name, i );
 					}
-					
+
 					rowsContent &= "<td class=""bx-grid-cell""";
-					rowsContent &= " data-column=""#encodeForHTML( column.name )#""";
-					
+					rowsContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
+
 					if( column.editable ){
 						rowsContent &= " contenteditable=""true""";
 						rowsContent &= " class=""bx-grid-cell bx-grid-editable-cell""";
 					}
-					
+
 					rowsContent &= ">";
-					rowsContent &= encodeForHTML( cellValue );
+					rowsContent &= cellValue;
 					rowsContent &= "</td>";
 				}
-				
+
 				rowsContent &= "</tr>";
 			}
 		}
-		
+
 		// Handle manual rows
 		for( var row in rows ){
 			rowsContent &= "<tr class=""bx-grid-row"">";
-			
+
 			// Add selection column if needed
 			if( executionState.gridSelectMode != "none" ){
 				var selectType = executionState.gridSelectMode == "multi" ? "checkbox" : "radio";
@@ -308,27 +310,27 @@ class{
 				rowsContent &= "<input type=""#selectType#"" name=""#executionState.gridName#_select"" />";
 				rowsContent &= "</td>";
 			}
-			
+
 			// Generate data cells from row data
 			for( var column in columns ){
 				var cellValue = row[ column.name ] ?: "";
-				
+
 				rowsContent &= "<td class=""bx-grid-cell""";
-				rowsContent &= " data-column=""#encodeForHTML( column.name )#""";
-				
+				rowsContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
+
 				if( column.editable ){
 					rowsContent &= " contenteditable=""true""";
 					rowsContent &= " class=""bx-grid-cell bx-grid-editable-cell""";
 				}
-				
+
 				rowsContent &= ">";
 				rowsContent &= encodeForHTML( cellValue );
 				rowsContent &= "</td>";
 			}
-			
+
 			rowsContent &= "</tr>";
 		}
-		
+
 		return rowsContent;
 	}
 
@@ -342,37 +344,37 @@ class{
 		} else {
 			totalRows = executionState.rows.len();
 		}
-		
+
 		var totalPages = ceiling( totalRows / executionState.pageSize );
 		var currentPage = executionState.currentPage;
-		
+
 		if( totalPages <= 1 ){
 			return "";
 		}
-		
+
 		var paginationContent = "<div class=""bx-grid-pagination"">";
-		
+
 		// Previous button
 		if( currentPage > 1 ){
 			paginationContent &= "<button class=""bx-grid-page-btn"" data-page=""#currentPage - 1#"">&laquo; Previous</button>";
 		}
-		
+
 		// Page numbers
 		var startPage = max( 1, currentPage - 2 );
 		var endPage = min( totalPages, currentPage + 2 );
-		
+
 		for( var i = startPage; i <= endPage; i++ ){
 			var activeClass = i == currentPage ? " active" : "";
 			paginationContent &= "<button class=""bx-grid-page-btn#activeClass#"" data-page=""#i#"">#i#</button>";
 		}
-		
+
 		// Next button
 		if( currentPage < totalPages ){
 			paginationContent &= "<button class=""bx-grid-page-btn"" data-page=""#currentPage + 1#"">Next &raquo;</button>";
 		}
-		
+
 		paginationContent &= "</div>";
-		
+
 		return paginationContent;
 	}
 
@@ -404,19 +406,19 @@ class{
 					var column = header.dataset.column;
 					sortColumn(column);
 				}
-				
+
 				// Handle pagination
 				if (e.target.classList.contains('bx-grid-page-btn')) {
 					var page = parseInt(e.target.dataset.page);
 					goToPage(page);
 				}
-				
+
 				// Handle select all
 				if (e.target.classList.contains('bx-grid-select-all')) {
 					toggleSelectAll(e.target.checked);
 				}
 			});
-			
+
 			// Handle cell editing
 			if (grid.dataset.editable === 'true') {
 				grid.addEventListener('blur', function(e) {
@@ -424,58 +426,58 @@ class{
 						var column = e.target.dataset.column;
 						var row = e.target.closest('.bx-grid-row').dataset.row;
 						var value = e.target.textContent;
-						
+
 						// Fire edit event
 						#len( attributes.onEdit ) ? attributes.onEdit & '(column, row, value);' : ''#
-						
+
 						// Fire custom event
-						var event = new CustomEvent('gridCellEdit', { 
-							detail: { column: column, row: row, value: value } 
+						var event = new CustomEvent('gridCellEdit', {
+							detail: { column: column, row: row, value: value }
 						});
 						grid.dispatchEvent(event);
 					}
 				}, true);
 			}
-			
+
 			function sortColumn(column) {
 				var header = grid.querySelector('.bx-grid-column-header[data-column=\"' + column + '\"]');
-				var currentSort = header.classList.contains('bx-grid-sort-asc') ? 'asc' : 
+				var currentSort = header.classList.contains('bx-grid-sort-asc') ? 'asc' :
 								  header.classList.contains('bx-grid-sort-desc') ? 'desc' : 'none';
 				var newSort = currentSort === 'asc' ? 'desc' : 'asc';
-				
+
 				// Remove all sort classes
 				grid.querySelectorAll('.bx-grid-column-header').forEach(function(h) {
 					h.classList.remove('bx-grid-sorted', 'bx-grid-sort-asc', 'bx-grid-sort-desc');
 				});
-				
+
 				// Add new sort class
 				header.classList.add('bx-grid-sorted', 'bx-grid-sort-' + newSort);
-				
+
 				// Fire sort event
 				#len( attributes.onSort ) ? attributes.onSort & '(column, newSort);' : ''#
-				
+
 				// Fire custom event
-				var event = new CustomEvent('gridSort', { 
-					detail: { column: column, direction: newSort } 
+				var event = new CustomEvent('gridSort', {
+					detail: { column: column, direction: newSort }
 				});
 				grid.dispatchEvent(event);
 			}
-			
+
 			function goToPage(page) {
 				// This would typically reload grid data for the specified page
 				// Fire custom event for now
-				var event = new CustomEvent('gridPageChange', { 
-					detail: { page: page } 
+				var event = new CustomEvent('gridPageChange', {
+					detail: { page: page }
 				});
 				grid.dispatchEvent(event);
 			}
-			
+
 			function toggleSelectAll(checked) {
 				grid.querySelectorAll('input[name=\"#executionState.gridName#_select\"]').forEach(function(cb) {
 					cb.checked = checked;
 				});
 			}
-			
+
 			// Fire load event
 			#len( attributes.onLoad ) ? 'setTimeout(function() { ' & attributes.onLoad & '(); }, 0);' : ''#
 		";

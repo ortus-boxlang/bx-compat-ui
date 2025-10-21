@@ -29,11 +29,11 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateDatabase() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="myGrid"
 		        dataSource="myDataSource"
 		        tableName="employees"
-		        keyOnly="false" /
+		        keyOnly="false";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -53,12 +53,12 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateURL() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="urlGrid"
 		        url="/api/update-grid"
 		        method="PUT"
 		        onSuccess="handleSuccess"
-		        onError="handleError" /
+		        onError="handleError";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -79,9 +79,9 @@ public class GridUpdateTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			    bx:gridupdate 
+			    bx:gridupdate
 			        dataSource="test"
-			        tableName="test" /
+			        tableName="test";
 			    """,
 			    context
 			);
@@ -96,7 +96,7 @@ public class GridUpdateTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			    bx:gridupdate grid="testGrid" /
+			    bx:gridupdate grid="testGrid";
 			    """,
 			    context
 			);
@@ -111,10 +111,10 @@ public class GridUpdateTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			    bx:gridupdate 
+			    bx:gridupdate
 			        grid="testGrid"
 			        url="/api/update"
-			        method="INVALID" /
+			        method="INVALID";
 			    """,
 			    context
 			);
@@ -128,10 +128,10 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateChangeTracking() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="trackingGrid"
 		        dataSource="testDB"
-		        tableName="testTable" /
+		        tableName="testTable";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -152,9 +152,9 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdatePublicFunction() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="publicFunctionGrid"
-		        url="/api/save" /
+		        url="/api/save";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -170,13 +170,13 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateDatabaseAuth() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="authGrid"
 		        dataSource="secureDB"
 		        tableName="secureTable"
 		        username="dbuser"
 		        password="dbpass"
-		        keyOnly="true" /
+		        keyOnly="true";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -193,10 +193,10 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateDatabaseEndpoint() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="endpointGrid"
 		        dataSource="myDB"
-		        tableName="myTable" /
+		        tableName="myTable";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -214,10 +214,10 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateURLFormData() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="formGrid"
 		        url="/update-endpoint"
-		        method="POST" /
+		        method="POST";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -234,11 +234,11 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateEvents() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="eventGrid"
 		        url="/api/events"
 		        onSuccess="mySuccess"
-		        onError="myError" /
+		        onError="myError";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -258,9 +258,9 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateContentType() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="contentTypeGrid"
-		        url="/api/flexible-response" /
+		        url="/api/flexible-response";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -278,12 +278,12 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateTableMetadata() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="metadataGrid"
 		        dataSource="catalogDB"
 		        tableName="products"
 		        tableOwner="inventory"
-		        tableQualifier="production" /
+		        tableQualifier="production";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context
@@ -300,9 +300,9 @@ public class GridUpdateTest extends BaseIntegrationTest {
 	public void testGridUpdateTrackingClear() {
 		runtime.executeSource(
 		    """
-		    bx:gridupdate 
+		    bx:gridupdate
 		        grid="clearGrid"
-		        url="/api/clear-test" /
+		        url="/api/clear-test";
 		    result = getBoxContext().getBuffer().toString()
 		    """,
 		    context

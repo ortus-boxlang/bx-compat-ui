@@ -30,10 +30,10 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="rowTest" {
-		        bx:gridcolumn name="id" header="ID" /
-		        bx:gridcolumn name="name" header="Name" /
-		        bx:gridrow data="#{ id: 1, name: 'John Doe' }#" /
-		        bx:gridrow data="#{ id: 2, name: 'Jane Smith' }#" /
+		        bx:gridcolumn name="id" header="ID";
+		        bx:gridcolumn name="name" header="Name";
+		        bx:gridrow data="#{ id: 1, name: 'John Doe' }#";
+		        bx:gridrow data="#{ id: 2, name: 'Jane Smith' }#";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -55,7 +55,7 @@ public class GridRowTest extends BaseIntegrationTest {
 		try {
 			runtime.executeSource(
 			    """
-			    bx:gridrow data="#{ test: 'value' }#" /
+			    bx:gridrow data="#{ test: 'value' }#";
 			    """,
 			    context
 			);
@@ -70,8 +70,8 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="autoIdRowGrid" {
-		        bx:gridcolumn name="test" /
-		        bx:gridrow data="#{ test: 'auto id test' }#" /
+		        bx:gridcolumn name="test";
+		        bx:gridrow data="#{ test: 'auto id test' }#";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -89,8 +89,8 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="customIdRowGrid" {
-		        bx:gridcolumn name="test" /
-		        bx:gridrow id="myCustomRow" data="#{ test: 'custom id test' }#" /
+		        bx:gridcolumn name="test";
+		        bx:gridrow id="myCustomRow" data="#{ test: 'custom id test' }#";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -108,13 +108,13 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="styledRowGrid" {
-		        bx:gridcolumn name="name" /
-		        bx:gridrow 
+		        bx:gridcolumn name="name";
+		        bx:gridrow
 		            data="#{ name: 'Styled Row' }#"
 		            bgcolor="lightblue"
 		            textColor="darkblue"
 		            class="my-row-class"
-		            style="font-weight: bold;" /
+		            style="font-weight: bold;";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -135,9 +135,9 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="selectedRowGrid" selectMode="single" {
-		        bx:gridcolumn name="name" /
-		        bx:gridrow data="#{ name: 'Normal Row' }#" selected="false" /
-		        bx:gridrow data="#{ name: 'Selected Row' }#" selected="true" /
+		        bx:gridcolumn name="name";
+		        bx:gridrow data="#{ name: 'Normal Row' }#" selected="false";
+		        bx:gridrow data="#{ name: 'Selected Row' }#" selected="true";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -157,9 +157,9 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="emptyRowGrid" {
-		        bx:gridcolumn name="col1" /
-		        bx:gridcolumn name="col2" /
-		        bx:gridrow data="#{}#" /
+		        bx:gridcolumn name="col1";
+		        bx:gridcolumn name="col2";
+		        bx:gridrow data="#{}#";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -179,7 +179,7 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="bodyContentRowGrid" {
-		        bx:gridcolumn name="content" /
+		        bx:gridcolumn name="content";
 		        bx:gridrow {
 		            writeOutput("Body content for row");
 		        }
@@ -200,9 +200,9 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="selectableRowGrid" selectMode="multi" {
-		        bx:gridcolumn name="name" /
-		        bx:gridrow data="#{ name: 'Selectable Row 1' }#" /
-		        bx:gridrow data="#{ name: 'Selectable Row 2' }#" selected="true" /
+		        bx:gridcolumn name="name";
+		        bx:gridrow data="#{ name: 'Selectable Row 1' }#";
+		        bx:gridrow data="#{ name: 'Selectable Row 2' }#" selected="true";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -224,10 +224,10 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="multiStyleRowGrid" stripeRows="true" {
-		        bx:gridcolumn name="status" /
-		        bx:gridrow data="#{ status: 'Active' }#" bgcolor="lightgreen" /
-		        bx:gridrow data="#{ status: 'Inactive' }#" bgcolor="lightcoral" /
-		        bx:gridrow data="#{ status: 'Pending' }#" bgcolor="lightyellow" /
+		        bx:gridcolumn name="status";
+		        bx:gridrow data="#{ status: 'Active' }#" bgcolor="lightgreen";
+		        bx:gridrow data="#{ status: 'Inactive' }#" bgcolor="lightcoral";
+		        bx:gridrow data="#{ status: 'Pending' }#" bgcolor="lightyellow";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -250,11 +250,11 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="partialDataGrid" {
-		        bx:gridcolumn name="id" /
-		        bx:gridcolumn name="name" /
-		        bx:gridcolumn name="email" /
-		        bx:gridrow data="#{ id: 1, name: 'John' }#" / // Missing email
-		        bx:gridrow data="#{ name: 'Jane', email: 'jane@test.com' }#" / // Missing id
+		        bx:gridcolumn name="id";
+		        bx:gridcolumn name="name";
+		        bx:gridcolumn name="email";
+		        bx:gridrow data="#{ id: 1, name: 'John' }#"; // Missing email
+		        bx:gridrow data="#{ name: 'Jane', email: 'jane@test.com' }#"; // Missing id
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,
@@ -276,10 +276,10 @@ public class GridRowTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="multiClassRowGrid" {
-		        bx:gridcolumn name="type" /
-		        bx:gridrow data="#{ type: 'Error' }#" class="error-row critical" /
-		        bx:gridrow data="#{ type: 'Warning' }#" class="warning-row" /
-		        bx:gridrow data="#{ type: 'Info' }#" class="info-row normal" /
+		        bx:gridcolumn name="type";
+		        bx:gridrow data="#{ type: 'Error' }#" class="error-row critical";
+		        bx:gridrow data="#{ type: 'Warning' }#" class="warning-row";
+		        bx:gridrow data="#{ type: 'Info' }#" class="info-row normal";
 		    }
 		    result = getBoxContext().getBuffer().toString()
 		    """,

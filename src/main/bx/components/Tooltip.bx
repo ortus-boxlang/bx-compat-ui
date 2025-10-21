@@ -65,7 +65,7 @@ class{
 
 		// Generate CSS classes
 		var cssClasses = [ "bx-tooltip-trigger" ];
-		
+
 		// Add custom classes if provided
 		if( !isNull( attributes.class ) && len( attributes.class ) ){
 			cssClasses.append( attributes.class );
@@ -73,33 +73,33 @@ class{
 
 		// Start building the tooltip trigger element
 		var tooltipContent = "<span";
-		
+
 		// Add ID
-		tooltipContent &= " id=""#encodeForHTML( attributes.id )#""";
-		
+		tooltipContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+
 		// Add CSS classes
 		tooltipContent &= " class=""#cssClasses.toList( " " )#""";
-		
+
 		// Add tooltip data attributes
-		tooltipContent &= " data-tooltip=""#encodeForHTML( attributes.tooltip )#""";
+		tooltipContent &= " data-tooltip=""#encodeForHTMLAttribute( attributes.tooltip )#""";
 		tooltipContent &= " data-show-delay=""#attributes.showDelay#""";
 		tooltipContent &= " data-hide-delay=""#attributes.hideDelay#""";
-		
+
 		if( attributes.autoDismissDelay > 0 ){
 			tooltipContent &= " data-auto-dismiss-delay=""#attributes.autoDismissDelay#""";
 		}
-		
+
 		if( attributes.preventOverlap ){
 			tooltipContent &= " data-prevent-overlap=""true""";
 		}
-		
+
 		if( !isNull( attributes.sourceForTooltip ) && len( attributes.sourceForTooltip ) ){
-			tooltipContent &= " data-source=""#encodeForHTML( attributes.sourceForTooltip )#""";
+			tooltipContent &= " data-source=""#encodeForHTMLAttribute( attributes.sourceForTooltip )#""";
 		}
 
 		// Add HTML attributes (excluding non-HTML ones)
 		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" ).each( ( key, value ) => {
-			tooltipContent &= " #key#=""#encodeForHTML( value )#""";
+			tooltipContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
 		} );
 
 		tooltipContent &= ">";
@@ -124,12 +124,12 @@ class{
 	 */
 	private function generateTooltipScript( required context, required attributes ){
 		var tooltipId = attributes.id;
-		
+
 		// Generate the tooltip container
 		var tooltipContainer = "<div id=""#tooltipId#_tooltip"" class=""bx-tooltip"" style=""display: none; position: absolute; z-index: 9999; background: ##333; color: white; padding: 8px; border-radius: 4px; font-size: 12px; max-width: 300px; word-wrap: break-word;""></div>";
-		
+
 		context.writeToBuffer( tooltipContainer );
-		
+
 		var script = "<script type=""text/javascript"">";
 		script &= "(function(){";
 		script &= "var trigger = document.getElementById('#tooltipId#');";
@@ -148,17 +148,17 @@ class{
 		return "
 			var showTimer, hideTimer, autoDismissTimer;
 			var isTooltipVisible = false;
-			
+
 			function showTooltip(e) {
 				clearTimeout(hideTimer);
 				clearTimeout(autoDismissTimer);
-				
+
 				if (showTimer) return; // Already scheduled to show
-				
+
 				showTimer = setTimeout(function() {
 					var tooltipText = trigger.getAttribute('data-tooltip');
 					var sourceUrl = trigger.getAttribute('data-source');
-					
+
 					if (sourceUrl && sourceUrl.length > 0) {
 						// Load dynamic content
 						tooltip.innerHTML = 'Loading...';
@@ -179,12 +179,12 @@ class{
 					} else {
 						tooltip.innerHTML = tooltipText;
 					}
-					
+
 					positionTooltip(e);
 					tooltip.style.display = 'block';
 					isTooltipVisible = true;
 					showTimer = null;
-					
+
 					// Auto dismiss if configured
 					var autoDismissDelay = parseInt(trigger.getAttribute('data-auto-dismiss-delay')) || 0;
 					if (autoDismissDelay > 0) {
@@ -192,50 +192,50 @@ class{
 					}
 				}, parseInt(trigger.getAttribute('data-show-delay')) || 500);
 			}
-			
+
 			function hideTooltip() {
 				clearTimeout(showTimer);
 				clearTimeout(autoDismissTimer);
 				showTimer = null;
-				
+
 				if (!isTooltipVisible) return;
-				
+
 				var hideDelay = parseInt(trigger.getAttribute('data-hide-delay')) || 300;
 				hideTimer = setTimeout(function() {
 					tooltip.style.display = 'none';
 					isTooltipVisible = false;
 				}, hideDelay);
 			}
-			
+
 			function positionTooltip(e) {
 				var rect = trigger.getBoundingClientRect();
 				var tooltipRect = tooltip.getBoundingClientRect();
 				var preventOverlap = trigger.getAttribute('data-prevent-overlap') === 'true';
-				
+
 				var left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
 				var top = rect.bottom + 5; // Default: below the trigger
-				
+
 				// Check for viewport boundaries
 				if (left < 5) left = 5;
 				if (left + tooltipRect.width > window.innerWidth - 5) {
 					left = window.innerWidth - tooltipRect.width - 5;
 				}
-				
+
 				// Check if tooltip would overlap trigger (if preventOverlap is true)
 				if (preventOverlap && top < rect.bottom + 10) {
 					top = rect.top - tooltipRect.height - 5; // Show above instead
 				}
-				
+
 				// Ensure tooltip stays within viewport
 				if (top < 5) top = 5;
 				if (top + tooltipRect.height > window.innerHeight - 5) {
 					top = window.innerHeight - tooltipRect.height - 5;
 				}
-				
+
 				tooltip.style.left = (left + window.pageXOffset) + 'px';
 				tooltip.style.top = (top + window.pageYOffset) + 'px';
 			}
-			
+
 			// Event listeners
 			trigger.addEventListener('mouseenter', showTooltip);
 			trigger.addEventListener('mouseleave', hideTooltip);
@@ -244,7 +244,7 @@ class{
 					positionTooltip(e);
 				}
 			});
-			
+
 			// Hide tooltip when scrolling
 			window.addEventListener('scroll', hideTooltip);
 			window.addEventListener('resize', hideTooltip);

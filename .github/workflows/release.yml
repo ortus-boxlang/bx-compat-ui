@@ -89,6 +89,7 @@ jobs:
           npm install -g markdownlint-cli
           markdownlint changelog.md --fix
           ./gradlew downloadBoxLang
+          ./gradlew installESAPIModule
           ./gradlew build -x test --stacktrace --console=plain
 
       - name: Commit Changelog [unreleased] with latest version

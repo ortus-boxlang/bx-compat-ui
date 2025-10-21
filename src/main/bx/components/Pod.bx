@@ -72,7 +72,7 @@ class{
 
 		// Generate CSS classes
 		var cssClasses = [ "bx-pod" ];
-		
+
 		// Add custom classes if provided
 		if( !isNull( attributes.class ) && len( attributes.class ) ){
 			cssClasses.append( attributes.class );
@@ -80,21 +80,21 @@ class{
 
 		// Start building the pod container
 		var podContent = "<div";
-		
+
 		// Add ID
-		podContent &= " id=""#encodeForHTML( attributes.id )#""";
-		
+		podContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+
 		// Add CSS classes
 		podContent &= " class=""#cssClasses.toList( " " )#""";
-		
+
 		// Add name attribute if provided
 		if( !isNull( attributes.name ) && len( attributes.name ) ){
-			podContent &= " data-name=""#encodeForHTML( attributes.name )#""";
+			podContent &= " data-name=""#encodeForHTMLAttribute( attributes.name )#""";
 		}
 
 		// Build inline styles
 		var inlineStyles = [];
-		
+
 		// Add dimension styles
 		if( !isNull( attributes.height ) && len( attributes.height ) ){
 			inlineStyles.append( "height: #attributes.height#" );
@@ -102,19 +102,19 @@ class{
 		if( !isNull( attributes.width ) && len( attributes.width ) ){
 			inlineStyles.append( "width: #attributes.width#" );
 		}
-		
+
 		// Add any additional styles
 		if( !isNull( attributes.style ) && len( attributes.style ) ){
 			inlineStyles.append( attributes.style );
 		}
-		
+
 		if( inlineStyles.len() ){
 			podContent &= " style=""#inlineStyles.toList( "; " )#""";
 		}
 
 		// Add HTML attributes (excluding non-HTML ones)
 		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" && key != "style" && key != "name" && key != "height" && key != "width" ).each( ( key, value ) => {
-			podContent &= " #key#=""#encodeForHTML( value )#""";
+			podContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
 		} );
 
 		podContent &= ">";
@@ -123,7 +123,7 @@ class{
 		if( !isNull( attributes.title ) && len( attributes.title ) ){
 			var headerStyle = "";
 			if( !isNull( attributes.headerStyle ) && len( attributes.headerStyle ) ){
-				headerStyle = " style=""#encodeForHTML( attributes.headerStyle )#""";
+				headerStyle = " style=""#encodeForHTMLAttribute( attributes.headerStyle )#""";
 			}
 			podContent &= "<div class=""bx-pod-header""#headerStyle#>#attributes.title#</div>";
 		}
@@ -133,16 +133,16 @@ class{
 		if( !isNull( attributes.bodyStyle ) && len( attributes.bodyStyle ) ){
 			bodyStyle &= " " & attributes.bodyStyle;
 		}
-		
-		podContent &= "<div class=""bx-pod-body"" style=""#encodeForHTML( bodyStyle )#"">";
+
+		podContent &= "<div class=""bx-pod-body"" style=""#encodeForHTMLAttribute( bodyStyle )#"">";
 
 		// Process body content or handle source attribute
 		var hasSource = !isNull( attributes.source ) && len( attributes.source );
-		
+
 		if( hasSource ){
 			// Create placeholder for AJAX content with loading indicator and comment
 			podContent &= "<!-- Content loaded from: #attributes.source# -->";
-			podContent &= "<div class=""bx-source-loading"" data-source=""#encodeForHTML( attributes.source )#"">Loading content...</div>";
+			podContent &= "<div class=""bx-source-loading"" data-source=""#encodeForHTMLAttribute( attributes.source )#"">Loading content...</div>";
 		} else {
 			// Process body content normally
 			var buffer = newBuffer();

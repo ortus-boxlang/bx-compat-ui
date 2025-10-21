@@ -61,7 +61,7 @@ class {
     /**
 	 * The module dependencies that this module needs to be activated before this module is activated
 	 */
-	this.dependencies = [];
+	this.dependencies = ["bx-esapi"];
 
 	/**
 	 * --------------------------------------------------------------------------

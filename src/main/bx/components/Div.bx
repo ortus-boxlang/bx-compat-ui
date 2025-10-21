@@ -9,6 +9,8 @@
 @RequiresBody( false )
 class{
 
+	import java:org.apache.commons.text.StringEscapeUtils;
+
 	/**
 	 * The Div UI component
 	 *
@@ -63,13 +65,13 @@ class{
 		// Validate that if bind is specified, there should be no body content
 		var hasBind = !isNull( attributes.bind ) && len( attributes.bind );
 		var hasBodyContent = !isNull( body );
-		
+
 		if( hasBind && hasBodyContent ){
 			// Process body to check if it produces content
 			var buffer = newBuffer();
 			var bodyResult = processBody( context, body, buffer );
 			var bodyContentString = buffer.toString();
-			
+
 			if( len( trim( bodyContentString ) ) ){
 				throw(
 					type		= "boxlang.compat.ui.InvalidUsageException",
@@ -80,7 +82,7 @@ class{
 
 		// Generate CSS classes
 		var cssClasses = [ "bx-div" ];
-		
+
 		// Add bind-specific classes
 		if( hasBind ){
 			cssClasses.append( "bx-div-bind" );
@@ -88,7 +90,7 @@ class{
 				cssClasses.append( "bx-bind-on-load" );
 			}
 		}
-		
+
 		// Add custom classes if provided
 		if( !isNull( attributes.class ) && len( attributes.class ) ){
 			cssClasses.append( attributes.class );
@@ -96,22 +98,27 @@ class{
 
 		// Start building the div element
 		var tagContent = "<" & lcase( attributes.tagName );
-		
+
 		// Add ID
-		tagContent &= " id=""#encodeForHTML( attributes.id )#""";
-		
+		tagContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+
 		// Add CSS classes
 		tagContent &= " class=""#cssClasses.toList( " " )#""";
-		
+
 		// Add bind data attribute if specified
 		if( hasBind ){
-			tagContent &= " data-bind=""#encodeForHTML( attributes.bind )#""";
+			tagContent &= " data-bind=""#trim( attributes.bind )#""";
 			tagContent &= " data-bind-on-load=""#attributes.bindOnLoad#""";
 		}
 
 		// Add HTML attributes (excluding non-HTML ones)
 		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" ).each( ( key, value ) => {
-			tagContent &= " #key#=""#encodeForHTML( value )#""";
+			if( key == "style" ){
+				// Don't escape style attribute
+				tagContent &= " style=""#trim(value)#""";
+			} else {
+				tagContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+			}
 		} );
 
 		tagContent &= ">";
@@ -169,7 +176,7 @@ class{
 		return "
 			function executeBind() {
 				var bindUrl = '#encodeForJavaScript( bindExpression )#';
-				
+
 				// Parse different types of bind expressions
 				if (bindUrl.startsWith('cfc:')) {
 					// Convert CFC bind expression to URL
@@ -179,7 +186,7 @@ class{
 					bindUrl = bindUrl.substring(4);
 				}
 				// If no prefix, treat as direct URL
-				
+
 				fetch(bindUrl)
 					.then(function(response) {
 						if (!response.ok) {
@@ -191,7 +198,7 @@ class{
 						divElement.innerHTML = content;
 						divElement.classList.remove('bx-bind-loading');
 						divElement.classList.add('bx-bind-loaded');
-						
+
 						// Fire custom event for bind success
 						var event = new CustomEvent('bindSuccess', { detail: { content: content } });
 						divElement.dispatchEvent(event);
@@ -205,17 +212,17 @@ class{
 							'</div>';
 						divElement.classList.remove('bx-bind-loading');
 						divElement.classList.add('bx-bind-error');
-						
+
 						// Fire custom event for bind error
 						var event = new CustomEvent('bindError', { detail: { error: error } });
 						divElement.dispatchEvent(event);
 						#len( errorHandler ) ? '}' : ''#
 					});
 			}
-			
+
 			// Execute bind on load if specified
 			#bindOnLoad ? 'document.addEventListener("DOMContentLoaded", function() { executeBind(); });' : ''#
-			
+
 			// Expose function for manual triggering
 			divElement.executeBind = executeBind;
 		";
