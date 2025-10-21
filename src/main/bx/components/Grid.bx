@@ -266,13 +266,13 @@ class{
 		var gridContent = "<div";
 
 		// Add ID
-		gridContent &= " id=""#htmlEditFormat( attributes.id )#""";
+		gridContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
 
 		// Add CSS classes
 		gridContent &= " class=""#cssClasses.toList( " " )#""";
 
 		// Add data attributes
-		gridContent &= " data-name=""#htmlEditFormat( attributes.name )#""";
+		gridContent &= " data-name=""#encodeForHTMLAttribute( attributes.name )#""";
 		gridContent &= " data-page-size=""#attributes.pageSize#""";
 		gridContent &= " data-sortable=""#attributes.sortable#""";
 		gridContent &= " data-editable=""#attributes.editable#""";
@@ -287,29 +287,29 @@ class{
 		gridContent &= " data-select-on-load=""#attributes.selectOnLoad#""";
 		gridContent &= " data-data-align=""#attributes.gridDataAlign#""";
 		if( !isNull( attributes.bind ) && len( attributes.bind ) ){
-			gridContent &= " data-bind=""#htmlEditFormat( attributes.bind )#""";
+			gridContent &= " data-bind=""#encodeForHTMLAttribute( attributes.bind )#""";
 			gridContent &= " data-bind-on-load=""#attributes.bindOnLoad#""";
 		}
 		if( !isNull( attributes.href ) && len( attributes.href ) ){
-			gridContent &= " data-href=""#htmlEditFormat( attributes.href )#""";
+			gridContent &= " data-href=""#encodeForHTMLAttribute( attributes.href )#""";
 		}
 		if( !isNull( attributes.hrefKey ) && len( attributes.hrefKey ) ){
-			gridContent &= " data-href-key=""#htmlEditFormat( attributes.hrefKey )#""";
+			gridContent &= " data-href-key=""#encodeForHTMLAttribute( attributes.hrefKey )#""";
 		}
 		if( !isNull( attributes.target ) && len( attributes.target ) ){
-			gridContent &= " data-target=""#htmlEditFormat( attributes.target )#""";
+			gridContent &= " data-target=""#encodeForHTMLAttribute( attributes.target )#""";
 		}
 		if( attributes.maxRows > 0 ){
 			gridContent &= " data-max-rows=""#attributes.maxRows#""";
 		}
 		if( !isNull( attributes.groupfield ) && len( attributes.groupfield ) ){
-			gridContent &= " data-group-field=""#htmlEditFormat( attributes.groupfield )#""";
+			gridContent &= " data-group-field=""#encodeForHTMLAttribute( attributes.groupfield )#""";
 		}
 		if( !isNull( attributes.title ) && len( attributes.title ) ){
-			gridContent &= " title=""#htmlEditFormat( attributes.title )#""";
+			gridContent &= " title=""#encodeForHTMLAttribute( attributes.title )#""";
 		}
 		if( !isNull( attributes.tooltip ) && len( attributes.tooltip ) ){
-			gridContent &= " data-tooltip=""#htmlEditFormat( attributes.tooltip )#""";
+			gridContent &= " data-tooltip=""#encodeForHTMLAttribute( attributes.tooltip )#""";
 		}
 
 		// Build inline styles
@@ -364,7 +364,7 @@ class{
 
 		// Add HTML attributes (excluding non-HTML ones)
 		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" && key != "style" ).each( ( key, value ) => {
-			gridContent &= " #key#=""#htmlEditFormat( value )#""";
+			gridContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
 		} );
 
 		gridContent &= ">";
@@ -440,7 +440,7 @@ class{
 			}
 
 			headContent &= "<th class=""bx-grid-column-header#sortClass#""";
-			headContent &= " data-column=""#htmlEditFormat( column.name )#""";
+			headContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
 
 			// Build column header styles
 			var headerStyles = [];
@@ -468,7 +468,7 @@ class{
 			}
 
 			headContent &= ">";
-			headContent &= htmlEditFormat( column.header ?: column.name );
+			headContent &= encodeForHTML( column.header ?: column.name );
 
 			// Add sort indicator if sortable
 			if( column.sortable ){
@@ -515,7 +515,7 @@ class{
 					}
 
 					rowsContent &= "<td class=""bx-grid-cell""";
-					rowsContent &= " data-column=""#htmlEditFormat( column.name )#""";
+					rowsContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
 
 					if( column.editable ){
 						rowsContent &= " contenteditable=""true""";
@@ -553,7 +553,7 @@ class{
 					var cellValue = row[ column.name ] ?: "";
 
 					rowsContent &= "<td class=""bx-grid-cell""";
-					rowsContent &= " data-column=""#htmlEditFormat( column.name )#""";
+					rowsContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
 
 					if( column.editable ){
 						rowsContent &= " contenteditable=""true""";
@@ -561,7 +561,7 @@ class{
 					}
 
 					rowsContent &= ">";
-					rowsContent &= htmlEditFormat( cellValue );
+					rowsContent &= encodeForHTML( cellValue );
 					rowsContent &= "</td>";
 				}
 

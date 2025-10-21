@@ -144,7 +144,7 @@ class{
 
 		// Add ID if provided
 		if( !isNull( rowData.id ) && len( rowData.id ) ){
-			rowHTML &= " id=""#htmlEditFormat( rowData.id )#""";
+			rowHTML &= " id=""#encodeForHTMLAttribute( rowData.id )#""";
 		}
 
 		// Add CSS classes
@@ -177,7 +177,7 @@ class{
 			var checkedAttr = rowData.selected ? " checked" : "";
 
 			rowHTML &= "<td class=""bx-grid-select-cell"">";
-			rowHTML &= "<input type=""#selectType#"" name=""#gridName#_select"" value=""#htmlEditFormat( rowData.id )#""#checkedAttr# />";
+			rowHTML &= "<input type=""#selectType#"" name=""#gridName#_select"" value=""#encodeForHTMLAttribute( rowData.id )#""#checkedAttr# />";
 			rowHTML &= "</td>";
 		}
 
@@ -209,7 +209,7 @@ class{
 	 */
 	private static function generateCellHTML( required value, required column, required rowData, bodyContent = "" ){
 		var cellHTML = "<td class=""bx-grid-cell""";
-		cellHTML &= " data-column=""#htmlEditFormat( column.name )#""";
+		cellHTML &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
 
 		// Add column-specific styling
 		if( !isNull( column.dataAlign ) && column.dataAlign != "left" ){
