@@ -89,8 +89,9 @@ class{
 		var hasSource = !isNull( attributes.source ) && len( attributes.source );
 
 		if( hasSource ){
-			// Create placeholder for AJAX content with loading indicator
-			areaContent = "<div class=""bx-source-loading"" data-source=""#encodeForHTML( attributes.source )#"">Loading content...</div>";
+			// Create placeholder for AJAX content with loading indicator and comment
+			areaContent = "<!-- Content loaded from: #attributes.source# -->";
+			areaContent &= "<div class=""bx-source-loading"" data-source=""#encodeForHTML( attributes.source )#"">Loading content...</div>";
 		} else {
 			// Process body content normally
 			var buffer = newBuffer();

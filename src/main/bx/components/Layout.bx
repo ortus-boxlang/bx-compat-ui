@@ -256,7 +256,8 @@ class{
 		for( var i = 1; i <= areas.len(); i++ ){
 			var area = areas[i];
 			var activeClass = i == 1 ? " active" : "";
-			tabHeaders &= "<button class=""bx-tab-header#activeClass#"" data-tab=""#layoutId#_tab_#i#"">#encodeForHTML( area.title ?: 'Tab #i#' )#</button>";
+			var tabId = !isNull( area.id ) ? area.id : "#layoutId#_tab_#i#";
+			tabHeaders &= "<button class=""bx-tab-header#activeClass#"" data-tab=""#tabId#"">#encodeForHTML( area.title ?: 'Tab #i#' )#</button>";
 		}
 		tabHeaders &= "</div>";
 
@@ -267,7 +268,8 @@ class{
 		for( var i = 1; i <= areas.len(); i++ ){
 			var area = areas[i];
 			var activeClass = i == 1 ? " active" : "";
-			context.writeToBuffer( "<div id=""#layoutId#_tab_#i#"" class=""bx-tab-panel#activeClass#"">" );
+			var tabId = !isNull( area.id ) ? area.id : "#layoutId#_tab_#i#";
+			context.writeToBuffer( "<div id=""#tabId#"" class=""bx-tab-panel#activeClass#"">" );
 			context.writeToBuffer( area.content );
 			context.writeToBuffer( "</div>" );
 		}
