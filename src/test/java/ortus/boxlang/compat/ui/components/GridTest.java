@@ -361,7 +361,7 @@ public class GridTest extends BaseIntegrationTest {
 	public void testGridColorAttributes() {
 		runtime.executeSource(
 		    """
-		    bx:grid name="colorGrid" bgColor="#f0f0f0" textColor="#333333" {
+		    bx:grid name="colorGrid" bgColor="##f0f0f0" textColor="##333333" {
 		        bx:gridcolumn name="test";
 		    }
 		    result = getBoxContext().getBuffer().toString()
@@ -400,7 +400,7 @@ public class GridTest extends BaseIntegrationTest {
 		runtime.executeSource(
 		    """
 		    bx:grid name="headerGrid" colHeaderBold="true" colHeaderItalic="true" 
-		           colHeaderFont="Helvetica" colHeaderFontSize="16" colHeaderTextColor="#666" {
+		           colHeaderFont="Helvetica" colHeaderFontSize="16" colHeaderTextColor="##666" {
 		        bx:gridcolumn name="test" header="Test Column";
 		    }
 		    result = getBoxContext().getBuffer().toString()

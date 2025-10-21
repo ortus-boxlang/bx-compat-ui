@@ -1,0 +1,154 @@
+/**
+ * BoxLang BIF: QueryConvertForGrid
+ *
+ * Converts a query object to a format suitable for grid display.
+ * This BIF provides compatibility with Adobe ColdFusion's QueryConvertForGrid function.
+ */
+@BoxBIF( "QueryConvertForGrid" )
+class {
+
+    /**
+     * Converts a query for grid display with pagination and sorting
+     *
+     * @query The query object to convert
+     * @page The page number (1-based, default: 1)
+     * @pagesize The number of rows per page (default: 25)
+     * @gridsortcolumn The column to sort by (optional)
+     * @gridsortdirection The sort direction: ASC or DESC (default: ASC)
+     */
+    function invoke() {
+        // Extract arguments with defaults - BIF gets positional args as numbered arguments
+        var query = arguments[ 1 ] ?: arguments.query ?: null;
+        var page = arguments[ 2 ] ?: arguments.page ?: 1;
+        var pageSize = arguments[ 3 ] ?: arguments.pagesize ?: 25;
+        var sortColumn = arguments[ 4 ] ?: arguments.gridsortcolumn ?: "";
+        var sortDirection = arguments[ 5 ] ?: arguments.gridsortdirection ?: "ASC";
+
+        // Validate required query parameter
+        if( isNull( query ) || !isQuery( query ) ){
+            throw( 
+                type = "boxlang.compat.ui.InvalidArgumentException",
+                message = "The query parameter is required and must be a valid query object"
+            );
+        }
+
+        // Validate page parameter
+        if( !isNumeric( page ) || page < 1 ){
+            page = 1;
+        }
+
+        // Validate pageSize parameter  
+        if( !isNumeric( pageSize ) || pageSize < 1 ){
+            pageSize = 25;
+        }
+
+        // Validate sort direction
+        var validDirections = [ "ASC", "DESC" ];
+        if( !validDirections.containsNoCase( sortDirection ) ){
+            sortDirection = "ASC";
+        }
+
+        var totalRows = query.recordCount;
+        var totalPages = ceiling( totalRows / pageSize );
+        
+        // Ensure page doesn't exceed total pages
+        if( page > totalPages && totalPages > 0 ){
+            page = totalPages;
+        }
+
+        // Calculate row range for the current page
+        var startRow = ( page - 1 ) * pageSize + 1;
+        var endRow = min( startRow + pageSize - 1, totalRows );
+
+        // Create a copy of the query to avoid modifying the original
+        var gridQuery = query;
+
+        // Sort the query if sort column is specified
+        if( len( sortColumn ) && query.columnExists( sortColumn ) ){
+            gridQuery = querySort( query, sortColumn, sortDirection );
+        }
+
+        // Extract the page of data
+        var pageQuery = queryNew( query.columnList );
+        
+        if( totalRows > 0 ){
+            for( var i = startRow; i <= endRow; i++ ){
+                var newRow = {};
+                for( var columnName in query.columnArray ){
+                    newRow[ columnName ] = gridQuery.getCell( columnName, i );
+                }
+                queryAddRow( pageQuery, newRow );
+            }
+        }
+
+        // Build the result structure matching ColdFusion's format
+        var result = {
+            "TOTALROWCOUNT" = totalRows,
+            "QUERY" = pageQuery,
+            "PAGE" = page,
+            "PAGESIZE" = pageSize,
+            "TOTALPAGES" = totalPages,
+            "STARTROW" = startRow,
+            "ENDROW" = endRow
+        };
+
+        // Add sort information if provided
+        if( len( sortColumn ) ){
+            result[ "GRIDSORTCOLUMN" ] = sortColumn;
+            result[ "GRIDSORTDIRECTION" ] = ucase( sortDirection );
+        }
+
+        return result;
+    }
+
+    /**
+     * Helper function to sort a query
+     */
+    private function querySort( required query, required sortColumn, sortDirection = "ASC" ){
+        // Create array of structs from query for sorting
+        var dataArray = [];
+        
+        for( var i = 1; i <= query.recordCount; i++ ){
+            var row = {};
+            for( var columnName in query.columnArray ){
+                row[ columnName ] = query.getCell( columnName, i );
+            }
+            row[ "_originalIndex" ] = i;
+            dataArray.append( row );
+        }
+
+        // Sort the array
+        dataArray.sort( function( a, b ){
+            var aVal = a[ sortColumn ] ?: "";
+            var bVal = b[ sortColumn ] ?: "";
+            
+            // Handle numeric sorting
+            if( isNumeric( aVal ) && isNumeric( bVal ) ){
+                return sortDirection == "ASC" ? 
+                    ( aVal < bVal ? -1 : ( aVal > bVal ? 1 : 0 ) ) :
+                    ( aVal > bVal ? -1 : ( aVal < bVal ? 1 : 0 ) );
+            }
+            
+            // Handle string sorting (case insensitive)
+            aVal = lcase( toString( aVal ) );
+            bVal = lcase( toString( bVal ) );
+            
+            return sortDirection == "ASC" ? 
+                ( aVal < bVal ? -1 : ( aVal > bVal ? 1 : 0 ) ) :
+                ( aVal > bVal ? -1 : ( aVal < bVal ? 1 : 0 ) );
+        } );
+
+        // Create new sorted query
+        var sortedQuery = queryNew( query.columnList );
+        
+        for( var rowData in dataArray ){
+            var newRow = {};
+            for( var columnName in query.columnArray ){
+                newRow[ columnName ] = rowData[ columnName ];
+            }
+            queryAddRow( sortedQuery, newRow );
+        }
+
+        return sortedQuery;
+    }
+}

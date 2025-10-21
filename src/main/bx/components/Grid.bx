@@ -36,8 +36,6 @@ class{
 	 * @attribute.id - string, optional - HTML element ID (auto-generated if not provided)
 	 * @attribute.class - string, optional - Additional CSS classes
 	 * @attribute.style - string, optional - Additional CSS styles
-	 * 
-	 * Additional Adobe ColdFusion cfgrid compatible attributes:
 	 * @attribute.appendKey - boolean, optional - Append key field to form data (default: false)
 	 * @attribute.bgColor - string, optional - Background color for grid
 	 * @attribute.bind - string, optional - Data binding expression for AJAX
@@ -116,6 +114,52 @@ class{
 		param attributes.onSort = "";
 		param attributes.class = "";
 		param attributes.style = "";
+		
+		// Additional cfgrid attributes
+		param attributes.appendKey = false;
+		param attributes.bgColor = "";
+		param attributes.bind = "";
+		param attributes.bindOnLoad = true;
+		param attributes.bold = false;
+		param attributes.colHeaderBold = false;
+		param attributes.colHeaderFont = "";
+		param attributes.colHeaderFontSize = "";
+		param attributes.colHeaderItalic = false;
+		param attributes.colHeaderTextColor = "";
+		param attributes.collapsible = false;
+		param attributes.delete = false;
+		param attributes.deleteButton = false;
+		param attributes.enabled = true;
+		param attributes.font = "";
+		param attributes.fontSize = "";
+		param attributes.format = "html";
+		param attributes.gridDataAlign = "left";
+		param attributes.groupfield = "";
+		param attributes.href = "";
+		param attributes.hrefKey = "";
+		param attributes.hSpace = 0;
+		param attributes.insert = false;
+		param attributes.insertButton = false;
+		param attributes.italic = false;
+		param attributes.maxRows = 0;
+		param attributes.multirowselect = false;
+		param attributes.notSupported = "";
+		param attributes.onBlur = "";
+		param attributes.onChange = "";
+		param attributes.onError = "";
+		param attributes.onFocus = "";
+		param attributes.onValidate = "";
+		param attributes.preservePageOnSort = false;
+		param attributes.resetHead = false;
+		param attributes.rowHeight = "";
+		param attributes.selectColor = "";
+		param attributes.selectOnLoad = false;
+		param attributes.stripeRowColor = "";
+		param attributes.target = "";
+		param attributes.textColor = "";
+		param attributes.title = "";
+		param attributes.tooltip = "";
+		param attributes.visible = true;
 
 		// Validate selectMode attribute
 		var validSelectModes = [ "none", "single", "multi" ];
@@ -126,13 +170,44 @@ class{
 			);
 		}
 
+		// Validate format attribute
+		var validFormats = [ "html", "xml", "flash" ];
+		if( !validFormats.containsNoCase( attributes.format ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The format attribute must be one of: #validFormats.toList()#"
+			);
+		}
+
+		// Validate gridDataAlign attribute
+		var validDataAligns = [ "left", "center", "right" ];
+		if( len( attributes.gridDataAlign ) && !validDataAligns.containsNoCase( attributes.gridDataAlign ) ){
+			throw(
+				type		= "boxlang.compat.ui.InvalidAttributeException",
+				message		= "The gridDataAlign attribute must be one of: #validDataAligns.toList()#"
+			);
+		}
+
+		// Handle multirowselect mapping to selectMode
+		if( attributes.multirowselect ){
+			attributes.selectMode = "multi";
+		}
+
 		// Generate unique ID if not provided
 		if( isNull( attributes.id ) ){
 			attributes.id = "grid_" & listLast( lcase( createUUID() ), "-" );
 		}
 
 		// Non-HTML attributes that should not be passed through
-		var nonHTMLAttributes = [ "name", "query", "pageSize", "sortable", "editable", "autoWidth", "stripeRows", "showHeaders", "selectMode", "onLoad", "onEdit", "onSort" ];
+		var nonHTMLAttributes = [ 
+			"name", "query", "pageSize", "sortable", "editable", "autoWidth", "stripeRows", "showHeaders", "selectMode", 
+			"onLoad", "onEdit", "onSort", "appendKey", "bind", "bindOnLoad", "bold", "colHeaderBold", "colHeaderFont", 
+			"colHeaderFontSize", "colHeaderItalic", "colHeaderTextColor", "collapsible", "delete", "deleteButton", 
+			"enabled", "font", "fontSize", "format", "gridDataAlign", "groupfield", "href", "hrefKey", "hSpace", 
+			"insert", "insertButton", "italic", "maxRows", "multirowselect", "notSupported", "onBlur", "onChange", 
+			"onError", "onFocus", "onValidate", "preservePageOnSort", "resetHead", "rowHeight", "selectColor", 
+			"selectOnLoad", "stripeRowColor", "target", "textColor", "title", "tooltip", "visible"
+		];
 
 		// Initialize grid state
 		executionState.gridName = attributes.name;
@@ -161,6 +236,27 @@ class{
 			cssClasses.append( "bx-grid-editable" );
 		}
 
+		if( attributes.collapsible ){
+			cssClasses.append( "bx-grid-collapsible" );
+		}
+
+		if( attributes.delete ){
+			cssClasses.append( "bx-grid-deletable" );
+		}
+
+		if( attributes.insert ){
+			cssClasses.append( "bx-grid-insertable" );
+		}
+
+		if( !attributes.enabled ){
+			cssClasses.append( "bx-grid-disabled" );
+		}
+
+		// Add data alignment class
+		if( len( attributes.gridDataAlign ) ){
+			cssClasses.append( "bx-grid-align-#lcase( attributes.gridDataAlign )#" );
+		}
+
 		// Add custom classes if provided
 		if( !isNull( attributes.class ) && len( attributes.class ) ){
 			cssClasses.append( attributes.class );
@@ -170,17 +266,51 @@ class{
 		var gridContent = "<div";
 
 		// Add ID
-		gridContent &= " id=""#encodeForHTMLAttribute( attributes.id )#""";
+		gridContent &= " id=""#htmlEditFormat( attributes.id )#""";
 
 		// Add CSS classes
 		gridContent &= " class=""#cssClasses.toList( " " )#""";
 
 		// Add data attributes
-		gridContent &= " data-name=""#encodeForHTMLAttribute( attributes.name )#""";
+		gridContent &= " data-name=""#htmlEditFormat( attributes.name )#""";
 		gridContent &= " data-page-size=""#attributes.pageSize#""";
 		gridContent &= " data-sortable=""#attributes.sortable#""";
 		gridContent &= " data-editable=""#attributes.editable#""";
 		gridContent &= " data-select-mode=""#attributes.selectMode#""";
+		gridContent &= " data-format=""#attributes.format#""";
+		gridContent &= " data-enabled=""#attributes.enabled#""";
+		gridContent &= " data-append-key=""#attributes.appendKey#""";
+		gridContent &= " data-delete=""#attributes.delete#""";
+		gridContent &= " data-insert=""#attributes.insert#""";
+		gridContent &= " data-collapsible=""#attributes.collapsible#""";
+		gridContent &= " data-preserve-page=""#attributes.preservePageOnSort#""";
+		gridContent &= " data-select-on-load=""#attributes.selectOnLoad#""";
+		gridContent &= " data-data-align=""#attributes.gridDataAlign#""";
+		if( !isNull( attributes.bind ) && len( attributes.bind ) ){
+			gridContent &= " data-bind=""#htmlEditFormat( attributes.bind )#""";
+			gridContent &= " data-bind-on-load=""#attributes.bindOnLoad#""";
+		}
+		if( !isNull( attributes.href ) && len( attributes.href ) ){
+			gridContent &= " data-href=""#htmlEditFormat( attributes.href )#""";
+		}
+		if( !isNull( attributes.hrefKey ) && len( attributes.hrefKey ) ){
+			gridContent &= " data-href-key=""#htmlEditFormat( attributes.hrefKey )#""";
+		}
+		if( !isNull( attributes.target ) && len( attributes.target ) ){
+			gridContent &= " data-target=""#htmlEditFormat( attributes.target )#""";
+		}
+		if( attributes.maxRows > 0 ){
+			gridContent &= " data-max-rows=""#attributes.maxRows#""";
+		}
+		if( !isNull( attributes.groupfield ) && len( attributes.groupfield ) ){
+			gridContent &= " data-group-field=""#htmlEditFormat( attributes.groupfield )#""";
+		}
+		if( !isNull( attributes.title ) && len( attributes.title ) ){
+			gridContent &= " title=""#htmlEditFormat( attributes.title )#""";
+		}
+		if( !isNull( attributes.tooltip ) && len( attributes.tooltip ) ){
+			gridContent &= " data-tooltip=""#htmlEditFormat( attributes.tooltip )#""";
+		}
 
 		// Build inline styles
 		var inlineStyles = [];
@@ -190,6 +320,39 @@ class{
 		}
 		if( !isNull( attributes.width ) && len( attributes.width ) ){
 			inlineStyles.append( "width: #attributes.width#" );
+		}
+		if( !isNull( attributes.bgColor ) && len( attributes.bgColor ) ){
+			inlineStyles.append( "background-color: #attributes.bgColor#" );
+		}
+		if( !isNull( attributes.textColor ) && len( attributes.textColor ) ){
+			inlineStyles.append( "color: #attributes.textColor#" );
+		}
+		if( !isNull( attributes.font ) && len( attributes.font ) ){
+			inlineStyles.append( "font-family: #attributes.font#" );
+		}
+		if( !isNull( attributes.fontSize ) && len( attributes.fontSize ) ){
+			inlineStyles.append( "font-size: #attributes.fontSize#px" );
+		}
+		if( attributes.bold ){
+			inlineStyles.append( "font-weight: bold" );
+		}
+		if( attributes.italic ){
+			inlineStyles.append( "font-style: italic" );
+		}
+		if( !isNull( attributes.rowHeight ) && len( attributes.rowHeight ) ){
+			inlineStyles.append( "--bx-grid-row-height: #attributes.rowHeight#px" );
+		}
+		if( !isNull( attributes.selectColor ) && len( attributes.selectColor ) ){
+			inlineStyles.append( "--bx-grid-select-color: #attributes.selectColor#" );
+		}
+		if( !isNull( attributes.stripeRowColor ) && len( attributes.stripeRowColor ) ){
+			inlineStyles.append( "--bx-grid-stripe-color: #attributes.stripeRowColor#" );
+		}
+		if( !isNull( attributes.hSpace ) && attributes.hSpace > 0 ){
+			inlineStyles.append( "margin-left: #attributes.hSpace#px; margin-right: #attributes.hSpace#px" );
+		}
+		if( !attributes.visible ){
+			inlineStyles.append( "display: none" );
 		}
 		if( !isNull( attributes.style ) && len( attributes.style ) ){
 			inlineStyles.append( attributes.style );
@@ -201,7 +364,7 @@ class{
 
 		// Add HTML attributes (excluding non-HTML ones)
 		attributes.filter( ( key, value ) => !isNull( value ) && !nonHTMLAttributes.containsNoCase( key ) && key != "id" && key != "class" && key != "style" ).each( ( key, value ) => {
-			gridContent &= " #key#=""#encodeForHTMLAttribute( value )#""";
+			gridContent &= " #key#=""#htmlEditFormat( value )#""";
 		} );
 
 		gridContent &= ">";
@@ -231,7 +394,7 @@ class{
 
 		// Generate headers if enabled
 		if( attributes.showHeaders ){
-			tableContent &= generateGridHeaders( executionState );
+			tableContent &= generateGridHeaders( attributes, executionState );
 		}
 
 		// Generate body
@@ -240,6 +403,11 @@ class{
 		tableContent &= "</tbody>";
 
 		tableContent &= "</table>";
+
+		// Add action buttons if enabled
+		if( attributes.insertButton || attributes.deleteButton ){
+			tableContent &= generateGridActionButtons( attributes );
+		}
 
 		// Add pagination if needed
 		if( executionState.pageSize > 0 ){
@@ -252,7 +420,7 @@ class{
 	/**
 	 * Generate grid headers
 	 */
-	private function generateGridHeaders( required executionState ){
+	private function generateGridHeaders( required attributes, required executionState ){
 		var headContent = "<thead class=""bx-grid-header""><tr>";
 
 		// Add selection column if needed
@@ -272,14 +440,35 @@ class{
 			}
 
 			headContent &= "<th class=""bx-grid-column-header#sortClass#""";
-			headContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
+			headContent &= " data-column=""#htmlEditFormat( column.name )#""";
 
+			// Build column header styles
+			var headerStyles = [];
 			if( !isNull( column.width ) && len( column.width ) ){
-				headContent &= " style=""width: #column.width#""";
+				headerStyles.append( "width: #column.width#" );
+			}
+			if( !isNull( attributes.colHeaderTextColor ) && len( attributes.colHeaderTextColor ) ){
+				headerStyles.append( "color: #attributes.colHeaderTextColor#" );
+			}
+			if( !isNull( attributes.colHeaderFont ) && len( attributes.colHeaderFont ) ){
+				headerStyles.append( "font-family: #attributes.colHeaderFont#" );
+			}
+			if( !isNull( attributes.colHeaderFontSize ) && len( attributes.colHeaderFontSize ) ){
+				headerStyles.append( "font-size: #attributes.colHeaderFontSize#px" );
+			}
+			if( attributes.colHeaderBold ){
+				headerStyles.append( "font-weight: bold" );
+			}
+			if( attributes.colHeaderItalic ){
+				headerStyles.append( "font-style: italic" );
+			}
+			
+			if( headerStyles.len() ){
+				headContent &= " style=""#headerStyles.toList( "; " )#""";
 			}
 
 			headContent &= ">";
-			headContent &= encodeForHTML( column.header ?: column.name );
+			headContent &= htmlEditFormat( column.header ?: column.name );
 
 			// Add sort indicator if sortable
 			if( column.sortable ){
@@ -326,7 +515,7 @@ class{
 					}
 
 					rowsContent &= "<td class=""bx-grid-cell""";
-					rowsContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
+					rowsContent &= " data-column=""#htmlEditFormat( column.name )#""";
 
 					if( column.editable ){
 						rowsContent &= " contenteditable=""true""";
@@ -364,7 +553,7 @@ class{
 					var cellValue = row[ column.name ] ?: "";
 
 					rowsContent &= "<td class=""bx-grid-cell""";
-					rowsContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
+					rowsContent &= " data-column=""#htmlEditFormat( column.name )#""";
 
 					if( column.editable ){
 						rowsContent &= " contenteditable=""true""";
@@ -372,7 +561,7 @@ class{
 					}
 
 					rowsContent &= ">";
-					rowsContent &= encodeForHTML( cellValue );
+					rowsContent &= htmlEditFormat( cellValue );
 					rowsContent &= "</td>";
 				}
 
@@ -425,6 +614,24 @@ class{
 		paginationContent &= "</div>";
 
 		return paginationContent;
+	}
+
+	/**
+	 * Generate grid action buttons
+	 */
+	private function generateGridActionButtons( required attributes ){
+		var buttonContent = "<div class=""bx-grid-actions"">";
+
+		if( attributes.insertButton ){
+			buttonContent &= "<button type=""button"" class=""bx-grid-insert-btn"" data-action=""insert"">Insert</button>";
+		}
+
+		if( attributes.deleteButton ){
+			buttonContent &= "<button type=""button"" class=""bx-grid-delete-btn"" data-action=""delete"">Delete</button>";
+		}
+
+		buttonContent &= "</div>";
+		return buttonContent;
 	}
 
 	/**
