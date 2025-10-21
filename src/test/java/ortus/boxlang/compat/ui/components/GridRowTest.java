@@ -267,7 +267,7 @@ public class GridRowTest extends BaseIntegrationTest {
 		assertThat( output ).contains( "data-column=\"email\"" );
 		assertThat( output ).contains( "John" );
 		assertThat( output ).contains( "Jane" );
-		assertThat( output ).contains( "jane@test.com" );
+		assertThat( output ).contains( "jane&#x40;test.com" );
 	}
 
 	@DisplayName( "It preserves CSS classes across multiple rows" )
