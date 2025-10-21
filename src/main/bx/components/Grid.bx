@@ -298,36 +298,42 @@ class{
 			}
 		}
 
-		// Handle manual rows
+		// Handle manual rows - use pre-generated HTML from GridRow components
 		for( var row in rows ){
-			rowsContent &= "<tr class=""bx-grid-row"">";
+			if( structKeyExists( row, "html" ) && len( row.html ) ){
+				// Use pre-generated HTML from GridRow component
+				rowsContent &= row.html;
+			} else {
+				// Fallback to basic row generation for backward compatibility
+				rowsContent &= "<tr class=""bx-grid-row"">";
 
-			// Add selection column if needed
-			if( executionState.selectMode != "none" ){
-				var selectType = executionState.selectMode == "multi" ? "checkbox" : "radio";
-				rowsContent &= "<td class=""bx-grid-select-cell"">";
-				rowsContent &= "<input type=""#selectType#"" name=""#executionState.gridName#_select"" />";
-				rowsContent &= "</td>";
-			}
-
-			// Generate data cells from row data
-			for( var column in columns ){
-				var cellValue = row[ column.name ] ?: "";
-
-				rowsContent &= "<td class=""bx-grid-cell""";
-				rowsContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
-
-				if( column.editable ){
-					rowsContent &= " contenteditable=""true""";
-					rowsContent &= " class=""bx-grid-cell bx-grid-editable-cell""";
+				// Add selection column if needed
+				if( executionState.selectMode != "none" ){
+					var selectType = executionState.selectMode == "multi" ? "checkbox" : "radio";
+					rowsContent &= "<td class=""bx-grid-select-cell"">";
+					rowsContent &= "<input type=""#selectType#"" name=""#executionState.gridName#_select"" />";
+					rowsContent &= "</td>";
 				}
 
-				rowsContent &= ">";
-				rowsContent &= encodeForHTML( cellValue );
-				rowsContent &= "</td>";
-			}
+				// Generate data cells from row data
+				for( var column in columns ){
+					var cellValue = row[ column.name ] ?: "";
 
-			rowsContent &= "</tr>";
+					rowsContent &= "<td class=""bx-grid-cell""";
+					rowsContent &= " data-column=""#encodeForHTMLAttribute( column.name )#""";
+
+					if( column.editable ){
+						rowsContent &= " contenteditable=""true""";
+						rowsContent &= " class=""bx-grid-cell bx-grid-editable-cell""";
+					}
+
+					rowsContent &= ">";
+					rowsContent &= encodeForHTML( cellValue );
+					rowsContent &= "</td>";
+				}
+
+				rowsContent &= "</tr>";
+			}
 		}
 
 		return rowsContent;

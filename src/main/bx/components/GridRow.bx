@@ -117,6 +117,14 @@ class{
 			}
 		}
 
+		// Generate the HTML for this row using the columns from the parent grid
+		var gridColumns = gridParentState.columns ?: [];
+		var gridState = {
+			"selectMode" : gridParentState.selectMode ?: "single",
+			"gridName" : gridParentState.gridName ?: "grid"
+		};
+		rowDataStruct.html = generateRowHTML( rowDataStruct, gridColumns, gridState );
+
 		// Add this row to the parent grid's rows collection
 		if( isNull( gridParentState.rows ) ){
 			gridParentState.rows = [];
