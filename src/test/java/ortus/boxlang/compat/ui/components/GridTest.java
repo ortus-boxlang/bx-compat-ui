@@ -399,7 +399,7 @@ public class GridTest extends BaseIntegrationTest {
 	public void testGridColumnHeaderStyling() {
 		runtime.executeSource(
 		    """
-		    bx:grid name="headerGrid" colHeaderBold="true" colHeaderItalic="true" 
+		    bx:grid name="headerGrid" colHeaderBold="true" colHeaderItalic="true"
 		           colHeaderFont="Helvetica" colHeaderFontSize="16" colHeaderTextColor="##666" {
 		        bx:gridcolumn name="test" header="Test Column";
 		    }
@@ -442,7 +442,7 @@ public class GridTest extends BaseIntegrationTest {
 	public void testGridDataAttributes() {
 		runtime.executeSource(
 		    """
-		    bx:grid name="dataGrid" format="xml" enabled="false" appendKey="true" 
+		    bx:grid name="dataGrid" format="xml" enabled="false" appendKey="true"
 		           delete="true" insert="true" maxRows="100" gridDataAlign="center" {
 		        bx:gridcolumn name="test";
 		    }
