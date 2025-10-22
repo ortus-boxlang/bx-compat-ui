@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BoxLang UI Components - Demo Gallery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* Modern CSS Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .header .version {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Demo Grid */
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .demo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .demo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 64px rgba(0,0,0,0.15);
+        }
+        
+        .demo-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .demo-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .demo-card .description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .demo-card .features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        
+        .demo-card .features li {
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            padding-left: 15px;
+            position: relative;
+        }
+        
+        .demo-card .features li:before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .demo-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .demo-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Component Categories */
+        .category-section {
+            margin-bottom: 50px;
+        }
+        
+        .category-title {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 300;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        /* Stats Section */
+        .stats-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffd700;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Quick Start */
+        .quick-start {
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .quick-start h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            opacity: 0.8;
+        }
+        
+        .footer a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.5rem; }
+            .demo-grid { grid-template-columns: 1fr; }
+            .container { padding: 15px; }
+        }
+        
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .demo-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .demo-card:nth-child(1) { animation-delay: 0.1s; }
+        .demo-card:nth-child(2) { animation-delay: 0.2s; }
+        .demo-card:nth-child(3) { animation-delay: 0.3s; }
+        .demo-card:nth-child(4) { animation-delay: 0.4s; }
+        .demo-card:nth-child(5) { animation-delay: 0.5s; }
+        .demo-card:nth-child(6) { animation-delay: 0.6s; }
+        .demo-card:nth-child(7) { animation-delay: 0.7s; }
+        .demo-card:nth-child(8) { animation-delay: 0.8s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>BoxLang UI Components</h1>
+            <p class="subtitle">Interactive Demo Gallery & Component Showcase</p>
+            <div class="version">bx-compat-ui Module v1.0.0</div>
+        </div>
+        
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <h3>📊 Component Library Overview</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">12+</span>
+                    <span class="stat-label">UI Components</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">3</span>
+                    <span class="stat-label">Built-in Functions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">7</span>
+                    <span class="stat-label">Demo Pages</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100+</span>
+                    <span class="stat-label">Code Examples</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Start -->
+        <div class="quick-start">
+            <h3>🚀 Quick Start Guide</h3>
+            <p>Get started with BoxLang UI components in your application:</p>
+            
+            <div class="code-block">
+&lt;!-- 1. Import the UI module dependencies --&gt;
+&lt;bx:ajaximport /&gt;
+
+&lt;!-- 2. Use any UI component --&gt;
+&lt;bx:layout type="tab"&gt;
+    &lt;bx:layoutarea title="Welcome"&gt;
+        &lt;bx:pod title="Getting Started"&gt;
+            Welcome to BoxLang UI Components!
+        &lt;/bx:pod&gt;
+    &lt;/bx:layoutarea&gt;
+&lt;/bx:layout&gt;</div>
+            
+            <p><strong>Tip:</strong> Each demo page includes complete, copy-paste ready examples with detailed explanations.</p>
+        </div>
+        
+        <!-- UI Components Section -->
+        <div class="category-section">
+            <h2 class="category-title">🎨 UI Components</h2>
+            
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <span class="icon">📐</span>
+                    <h3>Layout & LayoutArea</h3>
+                    <p class="description">
+                        Create sophisticated layouts with tabs, accordions, border regions, and flexbox containers.
+                    </p>
+                    <ul class="features">
+                        <li>Tab layouts with switching</li>
+                        <li>Collapsible accordions</li>
+                        <li>Border region positioning</li>
+                        <li>Horizontal/vertical boxes</li>
+                        <li>Nested layout support</li>
+                        <li>AJAX content loading</li>
+                    </ul>
+                    <a href="layout_demo.bxm" class="demo-link">Explore Layouts →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <span class="icon">📊</span>
+                    <h3>Grid & GridColumn</h3>
+                    <p class="description">
+                        Powerful data grids with sorting, editing, pagination, and selection capabilities.
+                    </p>
+                    <ul class="features">
+                        <li>Query data binding</li>
+                        <li>Sortable columns</li>
+                        <li>In-place editing</li>
+                        <li>Row selection</li>
+                        <li>Pagination controls</li>
+                        <li>Custom styling</li>
+                    </ul>
+                    <a href="grid_demo.bxm" class="demo-link">View Grid Examples →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <span class="icon">📦</span>
+                    <h3>Pod Component</h3>
+                    <p class="description">
+                        Flexible container component with titles, AJAX content loading, and dashboard layouts.
+                    </p>
+                    <ul class="features">
+                        <li>Optional title bars</li>
+                        <li>AJAX content sources</li>
+                        <li>Custom overflow handling</li>
+                        <li>Flexible sizing</li>
+                        <li>Dashboard-style layouts</li>
+                        <li>Custom styling options</li>
+                    </ul>
+                    <a href="pod_demo.bxm" class="demo-link">Discover Pods →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <span class="icon">🔲</span>
+                    <h3>Div Component</h3>
+                    <p class="description">
+                        Dynamic div elements with AJAX binding, multiple tag types, and programmable updates.
+                    </p>
+                    <ul class="features">
+                        <li>AJAX data binding</li>
+                        <li>Multiple HTML tags</li>
+                        <li>Conditional loading</li>
+                        <li>Error handling</li>
+                        <li>Custom styling</li>
+                        <li>Event callbacks</li>
+                    </ul>
+                    <a href="div_demo.bxm" class="demo-link">Explore Divs →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <span class="icon">💬</span>
+                    <h3>Tooltip Component</h3>
+                    <p class="description">
+                        Interactive tooltips with custom timing, HTML content, and dynamic AJAX loading.
+                    </p>
+                    <ul class="features">
+                        <li>Hover interactions</li>
+                        <li>Custom show/hide delays</li>
+                        <li>Rich HTML content</li>
+                        <li>AJAX content sources</li>
+                        <li>Smart positioning</li>
+                        <li>Auto-dismiss options</li>
+                    </ul>
+                    <a href="tooltip_demo.bxm" class="demo-link">Try Tooltips →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <span class="icon">⚡</span>
+                    <h3>AJAX Components</h3>
+                    <p class="description">
+                        Complete AJAX integration with imports, CFC proxies, and grid update functionality.
+                    </p>
+                    <ul class="features">
+                        <li>AjaxImport for dependencies</li>
+                        <li>CFC JavaScript proxies</li>
+                        <li>Bind expression execution</li>
+                        <li>GridUpdate operations</li>
+                        <li>Error handling</li>
+                        <li>Real-time updates</li>
+                    </ul>
+                    <a href="ajax_components_demo.bxm" class="demo-link">AJAX Demos →</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BIFs Section -->
+        <div class="category-section">
+            <h2 class="category-title">🛠️ Built-in Functions (BIFs)</h2>
+            
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <span class="icon">🔗</span>
+                    <h3>AJAX BIFs</h3>
+                    <p class="description">
+                        Built-in functions for AJAX link generation, page load scripts, and grid data conversion.
+                    </p>
+                    <ul class="features">
+                        <li>AjaxLink() URL generation</li>
+                        <li>AjaxOnLoad() registration</li>
+                        <li>QueryConvertForGrid() utility</li>
+                        <li>Interactive testing tools</li>
+                        <li>Real-world examples</li>
+                        <li>Performance optimized</li>
+                    </ul>
+                    <a href="bifs_demo.bxm" class="demo-link">Test BIFs →</a>
+                </div>
+                
+                <div class="demo-card">
+                    <span class="icon">📋</span>
+                    <h3>Original AJAX Demo</h3>
+                    <p class="description">
+                        The original comprehensive demonstration showing all AJAX components working together.
+                    </p>
+                    <ul class="features">
+                        <li>Complete integration</li>
+                        <li>Component interactions</li>
+                        <li>Layout combinations</li>
+                        <li>Practical examples</li>
+                        <li>Error handling</li>
+                        <li>Best practices</li>
+                    </ul>
+                    <a href="ajax_demo.bxm" class="demo-link">Original Demo →</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Usage Examples -->
+        <div class="quick-start">
+            <h3>💡 Usage Examples</h3>
+            <p><strong>Create a Dashboard:</strong></p>
+            <div class="code-block">
+&lt;bx:layout type="border" height="400px"&gt;
+    &lt;bx:layoutarea position="north"&gt;Dashboard Header&lt;/bx:layoutarea&gt;
+    &lt;bx:layoutarea position="center"&gt;
+        &lt;bx:pod title="Statistics"&gt;
+            &lt;bx:grid name="statsGrid" query="#myData#" /&gt;
+        &lt;/bx:pod&gt;
+    &lt;/bx:layoutarea&gt;
+&lt;/bx:layout&gt;</div>
+            
+            <p><strong>Add Interactive Tooltips:</strong></p>
+            <div class="code-example">
+&lt;bx:tooltip tooltip="Helpful information here"&gt;
+    Hover for more details
+&lt;/bx:tooltip&gt;</div>
+            
+            <p><strong>Dynamic Content Loading:</strong></p>
+            <div class="code-block">
+&lt;bx:div bind="cfc:dataservice.getContent()" 
+        onBindError="handleError"&gt;
+&lt;/bx:div&gt;</div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>
+                <strong>BoxLang UI Components</strong> | 
+                <a href="https://boxlang.ortusbooks.com/">Documentation</a> | 
+                <a href="https://github.com/ortus-boxlang/bx-compat-ui">GitHub Repository</a>
+            </p>
+            <p>
+                Built with ❤️ by the <a href="https://www.ortussolutions.com/">Ortus Solutions</a> team
+            </p>
+        </div>
+    </div>
+    
+    <!-- Demo Page Analytics -->
+    <script type="text/javascript">
+        // Initialize demo gallery
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('BoxLang UI Components Demo Gallery loaded');
+            console.log('Available demos:', [
+                'Layout & LayoutArea Components',
+                'Grid Components (Grid, GridColumn, GridRow)',
+                'Pod Component',
+                'Div Component', 
+                'Tooltip Component',
+                'AJAX Components (AjaxImport, AjaxProxy, GridUpdate)',
+                'BIFs (AjaxLink, AjaxOnLoad, QueryConvertForGrid)',
+                'Original AJAX Demo'
+            ]);
+            
+            // Add click tracking for demo links
+            var demoLinks = document.querySelectorAll('.demo-link');
+            demoLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    var demoName = this.textContent.trim();
+                    console.log('Demo accessed:', demoName);
+                    
+                    // Show loading state
+                    var originalText = this.textContent;
+                    this.textContent = 'Loading...';
+                    
+                    setTimeout(function() {
+                        link.textContent = originalText;
+                    }, 1000);
+                });
+            });
+            
+            // Add animation delays to cards
+            var cards = document.querySelectorAll('.demo-card');
+            cards.forEach(function(card, index) {
+                card.style.animationDelay = (index * 0.1) + 's';
+            });
+        });
+    </script>
+</body>
+</html>

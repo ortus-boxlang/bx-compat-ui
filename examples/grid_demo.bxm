@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BoxLang Grid Components Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .demo-section { border: 1px solid #ccc; margin: 20px 0; padding: 15px; }
+        .demo-section h2 { margin-top: 0; color: #333; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
+        
+        /* Grid styling */
+        .bx-grid { border: 1px solid #ddd; width: 100%; margin: 10px 0; }
+        .bx-grid-table { width: 100%; border-collapse: collapse; }
+        .bx-grid-header th { background: #f5f5f5; padding: 8px; text-align: left; border-bottom: 2px solid #ddd; }
+        .bx-grid-header th.bx-grid-sorted { background: #e0e0e0; }
+        .bx-grid-header th.bx-grid-sort-asc:after { content: ' ↑'; }
+        .bx-grid-header th.bx-grid-sort-desc:after { content: ' ↓'; }
+        .bx-grid-row { border-bottom: 1px solid #eee; }
+        .bx-grid-striped .bx-grid-row:nth-child(even) { background: #f9f9f9; }
+        .bx-grid-cell { padding: 8px; border-right: 1px solid #eee; }
+        .bx-grid-select-cell { width: 30px; text-align: center; }
+        .bx-grid-editable-cell { background: #fff8dc; cursor: text; }
+        .bx-grid-editable-cell:focus { outline: 2px solid #007cba; background: white; }
+        .bx-grid-actions { margin: 10px 0; }
+        .bx-grid-actions button { margin-right: 5px; padding: 5px 10px; }
+        .bx-grid-pagination { margin: 10px 0; text-align: center; }
+        .bx-grid-page-btn { margin: 0 2px; padding: 5px 10px; border: 1px solid #ddd; background: #f5f5f5; cursor: pointer; }
+        .bx-grid-page-btn.active { background: #007cba; color: white; }
+        .bx-grid-sortable .bx-grid-column-header { cursor: pointer; }
+        .bx-grid-sortable .bx-grid-column-header:hover { background: #e8e8e8; }
+    </style>
+</head>
+<body>
+    <h1>BoxLang Grid, GridColumn, GridRow, and GridUpdate Components Demo</h1>
+    <p>This demonstrates the data grid functionality with various features and configurations.</p>
+
+    <cfset sampleData = queryNew("id,name,email,department,salary", "integer,varchar,varchar,varchar,decimal", [
+        [1, "John Smith", "john@example.com", "Engineering", 75000],
+        [2, "Jane Doe", "jane@example.com", "Marketing", 65000],
+        [3, "Bob Johnson", "bob@example.com", "Sales", 55000],
+        [4, "Alice Brown", "alice@example.com", "Engineering", 80000],
+        [5, "Charlie Davis", "charlie@example.com", "HR", 60000],
+        [6, "Diana Wilson", "diana@example.com", "Engineering", 72000],
+        [7, "Eve Martinez", "eve@example.com", "Marketing", 68000],
+        [8, "Frank Miller", "frank@example.com", "Sales", 58000],
+        [9, "Grace Lee", "grace@example.com", "Engineering", 85000],
+        [10, "Henry Taylor", "henry@example.com", "HR", 62000]
+    ]) />
+
+    <div class="demo-section">
+        <h2>1. Basic Grid with Query Data</h2>
+        <p>Simple grid displaying query data with sortable columns:</p>
+        <div class="result">
+            <bx:grid name="basicGrid" query="#sampleData#" sortable="true" stripeRows="true">
+                <bx:gridcolumn name="id" header="ID" width="60px" />
+                <bx:gridcolumn name="name" header="Full Name" width="150px" />
+                <bx:gridcolumn name="email" header="Email Address" width="200px" />
+                <bx:gridcolumn name="department" header="Department" width="120px" />
+                <bx:gridcolumn name="salary" header="Salary" width="100px" />
+            </bx:grid>
+        </div>
+        <p><strong>Expected:</strong> A sortable grid with striped rows showing employee data.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. Grid with Pagination</h2>
+        <p>Grid with limited page size showing pagination controls:</p>
+        <div class="result">
+            <bx:grid name="paginatedGrid" query="#sampleData#" pageSize="4" sortable="true">
+                <bx:gridcolumn name="id" header="ID" width="60px" />
+                <bx:gridcolumn name="name" header="Name" width="150px" />
+                <bx:gridcolumn name="department" header="Department" width="120px" />
+                <bx:gridcolumn name="salary" header="Salary" width="100px" />
+            </bx:grid>
+        </div>
+        <p><strong>Expected:</strong> Grid showing 4 rows per page with pagination buttons.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. Editable Grid</h2>
+        <p>Grid with editable cells (click to edit):</p>
+        <div class="result">
+            <bx:grid name="editableGrid" query="#sampleData#" editable="true" pageSize="5" 
+                     onEdit="handleCellEdit">
+                <bx:gridcolumn name="id" header="ID" width="60px" editable="false" />
+                <bx:gridcolumn name="name" header="Name" width="150px" editable="true" />
+                <bx:gridcolumn name="email" header="Email" width="200px" editable="true" />
+                <bx:gridcolumn name="department" header="Department" width="120px" editable="true" />
+                <bx:gridcolumn name="salary" header="Salary" width="100px" editable="false" />
+            </bx:grid>
+        </div>
+        <p><strong>Expected:</strong> Grid where name, email, and department cells can be clicked and edited.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>4. Grid with Row Selection</h2>
+        <p>Grid with single and multiple row selection modes:</p>
+        <div class="result">
+            <h4>Single Selection:</h4>
+            <bx:grid name="singleSelectGrid" query="#sampleData#" selectMode="single" pageSize="4">
+                <bx:gridcolumn name="name" header="Name" width="150px" />
+                <bx:gridcolumn name="email" header="Email" width="200px" />
+                <bx:gridcolumn name="department" header="Department" width="120px" />
+            </bx:grid>
+
+            <h4>Multiple Selection:</h4>
+            <bx:grid name="multiSelectGrid" query="#sampleData#" selectMode="multi" pageSize="4">
+                <bx:gridcolumn name="name" header="Name" width="150px" />
+                <bx:gridcolumn name="email" header="Email" width="200px" />
+                <bx:gridcolumn name="department" header="Department" width="120px" />
+            </bx:grid>
+        </div>
+        <p><strong>Expected:</strong> First grid has radio buttons, second has checkboxes with "select all" option.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>5. Grid with Action Buttons</h2>
+        <p>Grid with insert and delete functionality:</p>
+        <div class="result">
+            <bx:grid name="actionGrid" query="#sampleData#" selectMode="multi" 
+                     insertButton="true" deleteButton="true" pageSize="5">
+                <bx:gridcolumn name="id" header="ID" width="60px" />
+                <bx:gridcolumn name="name" header="Name" width="150px" />
+                <bx:gridcolumn name="email" header="Email" width="200px" />
+                <bx:gridcolumn name="department" header="Department" width="120px" />
+            </bx:grid>
+        </div>
+        <p><strong>Expected:</strong> Grid with Insert and Delete buttons below the data.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>6. Manual Grid with GridRow Components</h2>
+        <p>Grid built manually using GridRow and GridColumn components:</p>
+        <div class="result">
+            <bx:grid name="manualGrid" sortable="true">
+                <bx:gridcolumn name="product" header="Product" width="200px" />
+                <bx:gridcolumn name="category" header="Category" width="150px" />
+                <bx:gridcolumn name="price" header="Price" width="100px" />
+                <bx:gridcolumn name="stock" header="In Stock" width="80px" />
+                
+                <bx:gridrow>
+                    <bx:gridcell column="product">Laptop Computer</bx:gridcell>
+                    <bx:gridcell column="category">Electronics</bx:gridcell>
+                    <bx:gridcell column="price">$899.99</bx:gridcell>
+                    <bx:gridcell column="stock">15</bx:gridcell>
+                </bx:gridrow>
+                
+                <bx:gridrow>
+                    <bx:gridcell column="product">Wireless Mouse</bx:gridcell>
+                    <bx:gridcell column="category">Electronics</bx:gridcell>
+                    <bx:gridcell column="price">$29.99</bx:gridcell>
+                    <bx:gridcell column="stock">45</bx:gridcell>
+                </bx:gridrow>
+                
+                <bx:gridrow>
+                    <bx:gridcell column="product">Office Chair</bx:gridcell>
+                    <bx:gridcell column="category">Furniture</bx:gridcell>
+                    <bx:gridcell column="price">$199.99</bx:gridcell>
+                    <bx:gridcell column="stock">8</bx:gridcell>
+                </bx:gridrow>
+            </bx:grid>
+        </div>
+        <p><strong>Expected:</strong> Grid with manually defined rows and columns showing product data.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>7. Styled Grid</h2>
+        <p>Grid with custom styling and formatting:</p>
+        <div class="result">
+            <bx:grid name="styledGrid" query="#sampleData#" 
+                     height="200px" 
+                     bgColor="#f8f9fa" 
+                     textColor="#333"
+                     colHeaderBold="true"
+                     colHeaderTextColor="#007cba"
+                     stripeRowColor="#e9ecef"
+                     pageSize="5">
+                <bx:gridcolumn name="id" header="Employee ID" width="100px" />
+                <bx:gridcolumn name="name" header="Full Name" width="180px" />
+                <bx:gridcolumn name="department" header="Department" width="150px" />
+                <bx:gridcolumn name="salary" header="Annual Salary" width="120px" />
+            </bx:grid>
+        </div>
+        <p><strong>Expected:</strong> Grid with custom colors, bold headers, and limited height with scrolling.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>8. Grid with AJAX Binding</h2>
+        <p>Grid that loads data dynamically via AJAX:</p>
+        <div class="result">
+            <bx:grid name="ajaxGrid" 
+                     bind="cfc:dataservice.getEmployees()" 
+                     bindOnLoad="true"
+                     sortable="true" 
+                     pageSize="5"
+                     onError="handleGridError">
+                <bx:gridcolumn name="id" header="ID" width="60px" />
+                <bx:gridcolumn name="name" header="Name" width="150px" />
+                <bx:gridcolumn name="email" header="Email" width="200px" />
+                <bx:gridcolumn name="department" header="Department" width="120px" />
+            </bx:grid>
+        </div>
+        <p><strong>Expected:</strong> Grid attempts to load data from the bind expression (will show error if service doesn't exist).</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>9. GridUpdate Component</h2>
+        <p>Component for updating grid data programmatically:</p>
+        <div class="result">
+            <button onclick="addNewEmployee()">Add New Employee</button>
+            <button onclick="removeSelected()">Remove Selected</button>
+            <button onclick="refreshGrid()">Refresh Grid</button>
+            
+            <div id="updateTargetGrid">
+                <bx:grid name="updateableGrid" query="#sampleData#" selectMode="multi" pageSize="6">
+                    <bx:gridcolumn name="id" header="ID" width="60px" />
+                    <bx:gridcolumn name="name" header="Name" width="150px" />
+                    <bx:gridcolumn name="email" header="Email" width="200px" />
+                    <bx:gridcolumn name="department" header="Department" width="120px" />
+                </bx:grid>
+            </div>
+            
+            <bx:gridupdate grid="updateableGrid" />
+        </div>
+        <p><strong>Expected:</strong> Buttons to demonstrate programmatic grid updates.</p>
+    </div>
+
+    <script type="text/javascript">
+        // Grid event handlers
+        function handleCellEdit(column, row, value) {
+            console.log('Cell edited - Column:', column, 'Row:', row, 'New Value:', value);
+            alert('Cell updated: ' + column + ' = ' + value + ' for row ' + row);
+        }
+        
+        function handleGridError(errorCode, errorMessage) {
+            console.error('Grid error:', errorCode, errorMessage);
+            alert('Grid Error: ' + errorMessage);
+        }
+        
+        // Demo functions for GridUpdate
+        function addNewEmployee() {
+            // Simulate adding a new employee
+            var newEmployee = {
+                id: Math.floor(Math.random() * 1000) + 100,
+                name: 'New Employee',
+                email: 'new@example.com',
+                department: 'New Hire'
+            };
+            
+            console.log('Adding new employee:', newEmployee);
+            alert('Adding new employee: ' + newEmployee.name);
+            
+            // In a real application, this would update the grid data
+            // For demo purposes, we'll just log it
+        }
+        
+        function removeSelected() {
+            var grid = document.getElementById('updateableGrid');
+            var selected = grid.querySelectorAll('input[name="updateableGrid_select"]:checked');
+            
+            if (selected.length === 0) {
+                alert('Please select rows to remove');
+                return;
+            }
+            
+            console.log('Removing', selected.length, 'selected rows');
+            alert('Removing ' + selected.length + ' selected employees');
+            
+            // In a real application, this would remove the selected rows
+        }
+        
+        function refreshGrid() {
+            console.log('Refreshing grid data');
+            alert('Refreshing grid data from server');
+            
+            // In a real application, this would reload the grid
+            var grid = document.getElementById('updateableGrid');
+            if (grid && grid.refresh) {
+                grid.refresh();
+            }
+        }
+        
+        // Initialize grid demos
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Grid demos initialized');
+            
+            // Add event listeners for grid interactions
+            var grids = document.querySelectorAll('.bx-grid');
+            grids.forEach(function(grid) {
+                // Listen for custom grid events
+                grid.addEventListener('gridSort', function(e) {
+                    console.log('Grid sorted:', e.detail);
+                });
+                
+                grid.addEventListener('gridCellEdit', function(e) {
+                    console.log('Grid cell edited:', e.detail);
+                });
+                
+                grid.addEventListener('gridPageChange', function(e) {
+                    console.log('Grid page changed:', e.detail);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
