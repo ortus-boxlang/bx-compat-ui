@@ -61,20 +61,20 @@ class{
 		var tags = attributes.tags;
 
 		// Core BoxLang AJAX CSS
-		cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/boxlang-ajax-core.css"" />";
+		cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/ajax-core.css"" />";
 
 		// Tag-specific CSS
 		if( len( tags ) > 0 ){
 			var tagList = tags.listToArray( "," );
 			for( var tag in tagList ){
 				var tagName = trim( tag );
-				cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/boxlang-#lcase(tagName)#.css"" />";
+				cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/#lcase(tagName)#.css"" />";
 			}
 		} else {
 			// Import all common AJAX CSS files
 			var commonTags = [ "layout", "div", "grid", "tooltip", "pod" ];
 			for( var tag in commonTags ){
-				cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/boxlang-#tag#.css"" />";
+				cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/#tag#.css"" />";
 			}
 		}
 
@@ -90,20 +90,20 @@ class{
 		var tags = attributes.tags;
 
 		// Core BoxLang AJAX JavaScript
-		jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/boxlang-ajax-core.js""></script>";
+		jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/ajax-core.js""></script>";
 
 		// Tag-specific JavaScript
 		if( len( tags ) > 0 ){
 			var tagList = tags.listToArray( "," );
 			for( var tag in tagList ){
 				var tagName = trim( tag );
-				jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/boxlang-#lcase(tagName)#.js""></script>";
+				jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/#lcase(tagName)#.js""></script>";
 			}
 		} else {
 			// Import all common AJAX JavaScript files
 			var commonTags = [ "layout", "div", "grid", "tooltip", "pod", "ajaxproxy" ];
 			for( var tag in commonTags ){
-				jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/boxlang-#tag#.js""></script>";
+				jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/#tag#.js""></script>";
 			}
 		}
 

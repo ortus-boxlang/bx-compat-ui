@@ -8,7 +8,7 @@
         .demo-section h2 { margin-top: 0; color: #333; }
         .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
         .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
-        
+
         /* Pod styling */
         .bx-pod { border: 1px solid #ccc; margin: 10px 0; background: white; border-radius: 4px; overflow: hidden; }
         .bx-pod-header { background: linear-gradient(to bottom, #f8f9fa, #e9ecef); padding: 10px 15px; border-bottom: 1px solid #ddd; font-weight: bold; color: #333; }
@@ -16,19 +16,19 @@
         .bx-source-loading { color: #666; font-style: italic; text-align: center; padding: 20px; }
         .bx-source-error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 4px; }
         .bx-source-loaded { /* Loaded content styling */ }
-        
+
         /* Demo grid for pods */
         .pod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0; }
         .pod-row { display: flex; gap: 15px; margin: 10px 0; }
         .pod-row .bx-pod { flex: 1; }
-        
+
         /* Custom pod styles for demos */
         .dashboard-pod { background: #f8f9fa; }
         .dashboard-pod .bx-pod-header { background: linear-gradient(to right, #007bff, #0056b3); color: white; }
-        
+
         .alert-pod { background: #fff3cd; border-color: #ffeaa7; }
         .alert-pod .bx-pod-header { background: #ffc107; color: #212529; }
-        
+
         .success-pod { background: #d4edda; border-color: #c3e6cb; }
         .success-pod .bx-pod-header { background: #28a745; color: white; }
     </style>
@@ -78,7 +78,7 @@
                     <p>This is a longer paragraph to demonstrate the scrolling behavior when there's more content than space.</p>
                     <p>You should see a vertical scrollbar appear in this pod.</p>
                 </bx:pod>
-                
+
                 <bx:pod title="Hidden Overflow" height="120px" overflow="hidden">
                     <p>This pod has overflow set to "hidden".</p>
                     <p>Content that doesn't fit will be clipped and hidden from view.</p>
@@ -94,10 +94,10 @@
         <h2>4. Pod with AJAX Source</h2>
         <p>Pod that loads content from an external URL:</p>
         <div class="result">
-            <bx:pod title="Dynamic Content" 
-                    source="/api/dashboard/stats" 
-                    width="400px" 
-                    height="200px"
+            <bx:pod title="Dynamic Content"
+                    source="data/dashboard-stats.html"
+                    width="800px"
+                    height="400px"
                     onBindError="handlePodError">
                 <!-- Initial content shown while loading -->
                 <div class="bx-source-loading">
@@ -114,29 +114,29 @@
         <p>Pods with custom styling using style attributes:</p>
         <div class="result">
             <div class="pod-row">
-                <bx:pod title="Info Pod" 
+                <bx:pod title="Info Pod"
                         width="200px"
-                        headerStyle="background: #17a2b8; color: white; text-align: center;"
-                        bodyStyle="background: #e7f7ff; color: #0c5460;">
+                        headerStyle="background: ##17a2b8; color: white; text-align: center;"
+                        bodyStyle="background: ##e7f7ff; color: ##0c5460;">
                     <p>📊 Statistics</p>
                     <p><strong>Users:</strong> 1,234</p>
                     <p><strong>Orders:</strong> 567</p>
                     <p><strong>Revenue:</strong> $89,012</p>
                 </bx:pod>
-                
-                <bx:pod title="Alert Pod" 
+
+                <bx:pod title="Alert Pod"
                         width="200px"
-                        headerStyle="background: #dc3545; color: white; text-align: center;"
-                        bodyStyle="background: #f8d7da; color: #721c24; text-align: center;">
+                        headerStyle="background: ##dc3545; color: white; text-align: center;"
+                        bodyStyle="background: ##f8d7da; color: ##721c24; text-align: center;">
                     <p>⚠️ Warning</p>
                     <p>System maintenance scheduled for tonight at 11 PM.</p>
                     <p>Expected downtime: 2 hours</p>
                 </bx:pod>
-                
-                <bx:pod title="Success Pod" 
+
+                <bx:pod title="Success Pod"
                         width="200px"
-                        headerStyle="background: #28a745; color: white; text-align: center;"
-                        bodyStyle="background: #d4edda; color: #155724; text-align: center;">
+                        headerStyle="background: ##28a745; color: white; text-align: center;"
+                        bodyStyle="background: ##d4edda; color: ##155724; text-align: center;">
                     <p>✅ Success</p>
                     <p>Backup completed successfully!</p>
                     <p>All files saved to cloud storage.</p>
@@ -159,7 +159,7 @@
                         <tr><td>YTD:</td><td style="text-align: right;"><strong>$1,234,567</strong></td></tr>
                     </table>
                 </bx:pod>
-                
+
                 <bx:pod title="👥 User Activity" class="dashboard-pod">
                     <div style="font-size: 14px;">
                         <p><span style="color: #28a745;">●</span> 145 users online</p>
@@ -169,7 +169,7 @@
                         <p><small>Last updated: <span id="lastUpdate">Just now</span></small></p>
                     </div>
                 </bx:pod>
-                
+
                 <bx:pod title="📋 Recent Orders" class="dashboard-pod" height="200px" overflow="auto">
                     <div style="font-size: 13px;">
                         <div style="border-bottom: 1px solid #eee; padding: 5px 0;">
@@ -194,7 +194,7 @@
                         </div>
                     </div>
                 </bx:pod>
-                
+
                 <bx:pod title="🔧 System Status" class="dashboard-pod">
                     <div style="font-size: 14px;">
                         <p><span style="color: #28a745;">✓</span> Web Server: Online</p>
@@ -214,9 +214,9 @@
         <h2>7. Named Pod with JavaScript Interaction</h2>
         <p>Pod with a name attribute for programmatic access:</p>
         <div class="result">
-            <bx:pod title="Interactive Content" 
-                    name="interactivePod" 
-                    width="400px" 
+            <bx:pod title="Interactive Content"
+                    name="interactivePod"
+                    width="400px"
                     id="myInteractivePod">
                 <div id="podContent">
                     <p>This pod can be updated dynamically using JavaScript.</p>
@@ -252,30 +252,30 @@
 
     <script type="text/javascript">
         var clickCount = 0;
-        
+
         function updatePodContent() {
             clickCount++;
             document.getElementById('clickCount').textContent = clickCount;
-            
+
             var content = document.getElementById('podContent');
             var currentTime = new Date().toLocaleTimeString();
-            
+
             // Add a timestamp message
             var timeMsg = document.createElement('p');
             timeMsg.innerHTML = '<small style="color: #666;">Updated at: ' + currentTime + '</small>';
             timeMsg.style.borderTop = '1px solid #eee';
             timeMsg.style.paddingTop = '5px';
             timeMsg.style.marginTop = '10px';
-            
+
             // Remove any existing timestamp
             var existing = content.querySelector('small');
             if (existing && existing.parentElement) {
                 existing.parentElement.remove();
             }
-            
+
             content.appendChild(timeMsg);
         }
-        
+
         function togglePodVisibility() {
             var pod = document.getElementById('myInteractivePod');
             if (pod.style.display === 'none') {
@@ -288,12 +288,12 @@
                 }, 2000);
             }
         }
-        
+
         function handlePodError(errorMessage, error) {
             console.error('Pod loading error:', errorMessage, error);
             alert('Pod Error: ' + errorMessage);
         }
-        
+
         // Update the "last updated" timestamp periodically
         function updateLastUpdateTime() {
             var element = document.getElementById('lastUpdate');
@@ -302,19 +302,19 @@
                 element.textContent = now.toLocaleTimeString();
             }
         }
-        
+
         // Initialize pod demos
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Pod demos initialized');
-            
+
             // Update timestamp every 30 seconds
             setInterval(updateLastUpdateTime, 30000);
-            
+
             // Listen for pod events
             document.addEventListener('bindSuccess', function(e) {
                 console.log('Pod content loaded successfully:', e.target);
             });
-            
+
             document.addEventListener('bindError', function(e) {
                 console.log('Pod content loading failed:', e.detail);
             });

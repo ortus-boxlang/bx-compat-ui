@@ -1,0 +1,26 @@
+{
+	"success": true,
+	"timestamp": "2024-12-19T10:30:00Z",
+	"data": {
+		"title": "📊 Live Dashboard Statistics",
+		"stats": {
+			"activeUsers": 1247,
+			"totalOrders": 5634,
+			"revenue": "$234,567.89",
+			"conversionRate": "3.2%",
+			"serverUptime": "99.8%",
+			"responseTime": "145ms"
+		},
+		"alerts": [
+			{
+				"type": "success",
+				"message": "All systems operational"
+			},
+			{
+				"type": "warning",
+				"message": "High traffic detected - scaling servers"
+			}
+		],
+		"lastUpdated": "2 minutes ago"
+	}
+}

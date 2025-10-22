@@ -166,6 +166,12 @@ class{
 					if (sourceUrl && sourceUrl.length > 0) {
 						// Load dynamic content
 						tooltip.innerHTML = 'Loading...';
+						// Make tooltip invisible but rendered so we can calculate position
+						tooltip.style.visibility = 'hidden';
+						tooltip.style.display = 'block';
+						positionTooltip(e);
+						tooltip.style.visibility = 'visible';
+
 						fetch(sourceUrl)
 							.then(function(response) {
 								if (!response.ok) {
@@ -175,17 +181,23 @@ class{
 							})
 							.then(function(content) {
 								tooltip.innerHTML = content;
+								// Recalculate position after content loads
+								positionTooltip(e);
 							})
 							.catch(function(error) {
 								console.warn('Failed to load tooltip content:', error);
 								tooltip.innerHTML = 'Error loading content';
+								positionTooltip(e);
 							});
 					} else {
 						tooltip.innerHTML = tooltipText;
+						// Make tooltip invisible but rendered so we can calculate position
+						tooltip.style.visibility = 'hidden';
+						tooltip.style.display = 'block';
+						positionTooltip(e);
+						tooltip.style.visibility = 'visible';
 					}
 
-					positionTooltip(e);
-					tooltip.style.display = 'block';
 					isTooltipVisible = true;
 					showTimer = null;
 
@@ -207,6 +219,7 @@ class{
 				var hideDelay = parseInt(trigger.getAttribute('data-hide-delay')) || 300;
 				hideTimer = setTimeout(function() {
 					tooltip.style.display = 'none';
+					tooltip.style.visibility = 'visible'; // Reset for next show
 					isTooltipVisible = false;
 				}, hideDelay);
 			}
@@ -217,7 +230,7 @@ class{
 				var preventOverlap = trigger.getAttribute('data-prevent-overlap') === 'true';
 
 				var left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-				var top = rect.bottom + 5; // Default: below the trigger
+				var top = rect.top - tooltipRect.height - 5; // Default: above the trigger
 
 				// Check for viewport boundaries
 				if (left < 5) left = 5;
@@ -225,13 +238,21 @@ class{
 					left = window.innerWidth - tooltipRect.width - 5;
 				}
 
-				// Check if tooltip would overlap trigger (if preventOverlap is true)
-				if (preventOverlap && top < rect.bottom + 10) {
-					top = rect.top - tooltipRect.height - 5; // Show above instead
+				// Check if tooltip would go above viewport, show below instead
+				if (top < 5) {
+					top = rect.bottom + 5; // Show below instead
 				}
 
-				// Ensure tooltip stays within viewport
-				if (top < 5) top = 5;
+				// Check if tooltip would overlap trigger (if preventOverlap is true) and we're showing below
+				if (preventOverlap && top > rect.top && top < rect.bottom + 10) {
+					// Try to show above again if there's space
+					var topAbove = rect.top - tooltipRect.height - 5;
+					if (topAbove >= 5) {
+						top = topAbove;
+					}
+				}
+
+				// Ensure tooltip stays within viewport vertically
 				if (top + tooltipRect.height > window.innerHeight - 5) {
 					top = window.innerHeight - tooltipRect.height - 5;
 				}

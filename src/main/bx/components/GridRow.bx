@@ -69,14 +69,21 @@ class{
 		var rowData = attributes.data;
 		var hasBodyContent = !isNull( body );
 
-		if( hasBodyContent && ( isNull( attributes.data ) || !structCount( attributes.data ) ) ){
-			// Process body to extract data - this could contain custom content or data
-			var buffer = newBuffer();
-			var bodyResult = processBody( context, body, buffer );
-			var bodyContent = buffer.toString();
+		// Handle rowData as delimited string - transform to struct using column positions
+		if( isSimpleValue( rowData ) && len( rowData ) ){
+			var gridColumns = gridParentState.columns ?: [];
+			var parsedData = {};
+			var rowValues = listToArray( rowData );
 
-			// Store body content for custom rendering
-			rowData[ "_bodyContent" ] = bodyContent;
+			// Map values to columns by position
+			for( var i = 1; i <= arrayLen( rowValues ); i++ ){
+				if( i <= arrayLen( gridColumns ) ){
+					var columnName = gridColumns[ i ].name;
+					parsedData[ columnName ] = trim( rowValues[ i ] );
+				}
+			}
+
+			rowData = parsedData;
 		}
 
 		// Build style attributes

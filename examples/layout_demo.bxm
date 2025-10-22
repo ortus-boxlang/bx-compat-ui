@@ -8,7 +8,7 @@
         .demo-section h2 { margin-top: 0; color: #333; }
         .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
         .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
-        
+
         /* Basic styling for layouts */
         .bx-layout { border: 1px solid #ddd; margin: 10px 0; }
         .bx-layout-tab .bx-tab-headers { background: #f5f5f5; border-bottom: 1px solid #ddd; }
@@ -16,19 +16,19 @@
         .bx-layout-tab .bx-tab-header.active { background: #007cba; color: white; }
         .bx-layout-tab .bx-tab-panel { padding: 15px; display: none; }
         .bx-layout-tab .bx-tab-panel.active { display: block; }
-        
+
         .bx-layout-accordion .bx-accordion-header { background: #f5f5f5; padding: 10px; border: 1px solid #ddd; cursor: pointer; margin-bottom: 1px; }
         .bx-layout-accordion .bx-accordion-header:hover { background: #e0e0e0; }
         .bx-layout-accordion .bx-accordion-content { padding: 15px; border: 1px solid #ddd; border-top: none; }
         .bx-layout-accordion .bx-accordion-panel.collapsed .bx-accordion-content { display: none; }
-        
+
         .bx-layout-border { position: relative; min-height: 300px; }
-        .bx-border-north { position: absolute; top: 0; left: 0; right: 0; height: 60px; background: #e8f4fd; border-bottom: 1px solid #ccc; padding: 10px; }
-        .bx-border-south { position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: #e8f4fd; border-top: 1px solid #ccc; padding: 10px; }
+        .bx-border-top { position: absolute; top: 0; left: 0; right: 0; height: 60px; background: #e8f4fd; border-bottom: 1px solid #ccc; padding: 10px; }
+        .bx-border-bottom { position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: #e8f4fd; border-top: 1px solid #ccc; padding: 10px; }
         .bx-border-west { position: absolute; top: 70px; left: 0; bottom: 50px; width: 150px; background: #f0f8ff; border-right: 1px solid #ccc; padding: 10px; }
         .bx-border-east { position: absolute; top: 70px; right: 0; bottom: 50px; width: 150px; background: #f0f8ff; border-left: 1px solid #ccc; padding: 10px; }
         .bx-border-center { position: absolute; top: 70px; left: 170px; right: 170px; bottom: 50px; padding: 10px; }
-        
+
         .bx-layout-hbox, .bx-layout-vbox { display: flex; }
         .bx-layout-hbox { flex-direction: row; }
         .bx-layout-vbox { flex-direction: column; }
@@ -111,19 +111,19 @@
         <p>Creates regions positioned around the container:</p>
         <div class="result">
             <bx:layout type="border" id="borderDemo" height="300px">
-                <bx:layoutarea position="north">
-                    <strong>Header (North)</strong> - Application title and navigation
+                <bx:layoutarea position="top">
+                    <strong>Header (top)</strong> - Application title and navigation
                 </bx:layoutarea>
-                <bx:layoutarea position="south">
-                    <small>Footer (South) - Copyright © 2024</small>
+                <bx:layoutarea position="bottom">
+                    <small>Footer (bottom) - Copyright © 2024</small>
                 </bx:layoutarea>
-                <bx:layoutarea position="west">
+                <bx:layoutarea position="left">
                     <strong>Sidebar (West)</strong><br>
                     • Menu Item 1<br>
                     • Menu Item 2<br>
                     • Menu Item 3
                 </bx:layoutarea>
-                <bx:layoutarea position="east">
+                <bx:layoutarea position="right">
                     <strong>Panel (East)</strong><br>
                     Recent Activity:<br>
                     - User logged in<br>
@@ -189,7 +189,7 @@
         <p>Layouts can be nested for complex interfaces:</p>
         <div class="result">
             <bx:layout type="border" id="nestedDemo" height="400px">
-                <bx:layoutarea position="north">
+                <bx:layoutarea position="top">
                     <h4>Application Header</h4>
                 </bx:layoutarea>
                 <bx:layoutarea position="center">
@@ -218,7 +218,7 @@
                         </bx:layoutarea>
                     </bx:layout>
                 </bx:layoutarea>
-                <bx:layoutarea position="south">
+                <bx:layoutarea position="bottom">
                     <small>Status: Ready | Connected to BoxLang Runtime</small>
                 </bx:layoutarea>
             </bx:layout>
@@ -247,7 +247,7 @@
     <script type="text/javascript">
         // Additional demonstration JavaScript
         console.log("Layout demos initialized");
-        
+
         // Listen for custom layout events
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for any custom layout behavior

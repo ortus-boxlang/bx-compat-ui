@@ -40,22 +40,22 @@ public class AjaxImportTest extends BaseIntegrationTest {
 
 		// Check CSS imports
 		assertThat( output )
-		    .contains( "<link rel=\"stylesheet\" type=\"text/css\" href=\"/bxmodules/bxCompatUI/public/index.bxm?target=css/boxlang-ajax-core.css\"" );
-		assertThat( output ).contains( "boxlang-layout.css" );
-		assertThat( output ).contains( "boxlang-div.css" );
-		assertThat( output ).contains( "boxlang-grid.css" );
-		assertThat( output ).contains( "boxlang-tooltip.css" );
-		assertThat( output ).contains( "boxlang-pod.css" );
+		    .contains( "<link rel=\"stylesheet\" type=\"text/css\" href=\"/bxmodules/bxCompatUI/public/index.bxm?target=css/ajax-core.css\"" );
+		assertThat( output ).contains( "layout.css" );
+		assertThat( output ).contains( "div.css" );
+		assertThat( output ).contains( "grid.css" );
+		assertThat( output ).contains( "tooltip.css" );
+		assertThat( output ).contains( "pod.css" );
 
 		// Check JavaScript imports
 		assertThat( output )
-		    .contains( "<script type=\"text/javascript\" src=\"/bxmodules/bxCompatUI/public/index.bxm?target=js/boxlang-ajax-core.js\"></script>" );
-		assertThat( output ).contains( "boxlang-layout.js" );
-		assertThat( output ).contains( "boxlang-div.js" );
-		assertThat( output ).contains( "boxlang-grid.js" );
-		assertThat( output ).contains( "boxlang-tooltip.js" );
-		assertThat( output ).contains( "boxlang-pod.js" );
-		assertThat( output ).contains( "boxlang-ajaxproxy.js" );
+		    .contains( "<script type=\"text/javascript\" src=\"/bxmodules/bxCompatUI/public/index.bxm?target=js/ajax-core.js\"></script>" );
+		assertThat( output ).contains( "layout.js" );
+		assertThat( output ).contains( "div.js" );
+		assertThat( output ).contains( "grid.js" );
+		assertThat( output ).contains( "tooltip.js" );
+		assertThat( output ).contains( "pod.js" );
+		assertThat( output ).contains( "ajaxproxy.js" );
 	}
 
 	@DisplayName( "It can import specific tags" )
@@ -73,18 +73,18 @@ public class AjaxImportTest extends BaseIntegrationTest {
 		String output = variables.getAsString( Key.of( "result" ) );
 
 		// Should contain core files
-		assertThat( output ).contains( "boxlang-ajax-core.css" );
-		assertThat( output ).contains( "boxlang-ajax-core.js" );
+		assertThat( output ).contains( "ajax-core.css" );
+		assertThat( output ).contains( "ajax-core.js" );
 
 		// Should contain specific tag files
-		assertThat( output ).contains( "boxlang-layout.css" );
-		assertThat( output ).contains( "boxlang-grid.css" );
-		assertThat( output ).contains( "boxlang-layout.js" );
-		assertThat( output ).contains( "boxlang-grid.js" );
+		assertThat( output ).contains( "layout.css" );
+		assertThat( output ).contains( "grid.css" );
+		assertThat( output ).contains( "layout.js" );
+		assertThat( output ).contains( "grid.js" );
 
 		// Should not contain other tag files
-		assertThat( output ).doesNotContain( "boxlang-div.css" );
-		assertThat( output ).doesNotContain( "boxlang-tooltip.css" );
+		assertThat( output ).doesNotContain( "div.css" );
+		assertThat( output ).doesNotContain( "tooltip.css" );
 	}
 
 	@DisplayName( "It can use custom CSS and script sources" )
@@ -100,10 +100,10 @@ public class AjaxImportTest extends BaseIntegrationTest {
 		);
 
 		String output = variables.getAsString( Key.of( "result" ) );
-		assertThat( output ).contains( "href=\"/custom/styles/boxlang-ajax-core.css\"" );
-		assertThat( output ).contains( "href=\"/custom/styles/boxlang-layout.css\"" );
-		assertThat( output ).contains( "src=\"/custom/scripts/boxlang-ajax-core.js\"" );
-		assertThat( output ).contains( "src=\"/custom/scripts/boxlang-layout.js\"" );
+		assertThat( output ).contains( "href=\"/custom/styles/ajax-core.css\"" );
+		assertThat( output ).contains( "href=\"/custom/styles/layout.css\"" );
+		assertThat( output ).contains( "src=\"/custom/scripts/ajax-core.js\"" );
+		assertThat( output ).contains( "src=\"/custom/scripts/layout.js\"" );
 	}
 
 	@DisplayName( "It initializes BoxLang AJAX namespace" )
@@ -237,8 +237,8 @@ public class AjaxImportTest extends BaseIntegrationTest {
 
 		String output = variables.getAsString( Key.of( "result" ) );
 		// Should fall back to default behavior and import common tags
-		assertThat( output ).contains( "boxlang-layout.css" );
-		assertThat( output ).contains( "boxlang-div.css" );
-		assertThat( output ).contains( "boxlang-grid.css" );
+		assertThat( output ).contains( "layout.css" );
+		assertThat( output ).contains( "div.css" );
+		assertThat( output ).contains( "grid.css" );
 	}
 }

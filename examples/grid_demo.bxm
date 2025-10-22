@@ -8,7 +8,7 @@
         .demo-section h2 { margin-top: 0; color: #333; }
         .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
         .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
-        
+
         /* Grid styling */
         .bx-grid { border: 1px solid #ddd; width: 100%; margin: 10px 0; }
         .bx-grid-table { width: 100%; border-collapse: collapse; }
@@ -35,7 +35,7 @@
     <h1>BoxLang Grid, GridColumn, GridRow, and GridUpdate Components Demo</h1>
     <p>This demonstrates the data grid functionality with various features and configurations.</p>
 
-    <cfset sampleData = queryNew("id,name,email,department,salary", "integer,varchar,varchar,varchar,decimal", [
+    <bx:set sampleData = queryNew("id,name,email,department,salary", "integer,varchar,varchar,varchar,decimal", [
         [1, "John Smith", "john@example.com", "Engineering", 75000],
         [2, "Jane Doe", "jane@example.com", "Marketing", 65000],
         [3, "Bob Johnson", "bob@example.com", "Sales", 55000],
@@ -81,7 +81,7 @@
         <h2>3. Editable Grid</h2>
         <p>Grid with editable cells (click to edit):</p>
         <div class="result">
-            <bx:grid name="editableGrid" query="#sampleData#" editable="true" pageSize="5" 
+            <bx:grid name="editableGrid" query="#sampleData#" editable="true" pageSize="5"
                      onEdit="handleCellEdit">
                 <bx:gridcolumn name="id" header="ID" width="60px" editable="false" />
                 <bx:gridcolumn name="name" header="Name" width="150px" editable="true" />
@@ -118,7 +118,7 @@
         <h2>5. Grid with Action Buttons</h2>
         <p>Grid with insert and delete functionality:</p>
         <div class="result">
-            <bx:grid name="actionGrid" query="#sampleData#" selectMode="multi" 
+            <bx:grid name="actionGrid" query="#sampleData#" selectMode="multi"
                      insertButton="true" deleteButton="true" pageSize="5">
                 <bx:gridcolumn name="id" header="ID" width="60px" />
                 <bx:gridcolumn name="name" header="Name" width="150px" />
@@ -138,27 +138,10 @@
                 <bx:gridcolumn name="category" header="Category" width="150px" />
                 <bx:gridcolumn name="price" header="Price" width="100px" />
                 <bx:gridcolumn name="stock" header="In Stock" width="80px" />
-                
-                <bx:gridrow>
-                    <bx:gridcell column="product">Laptop Computer</bx:gridcell>
-                    <bx:gridcell column="category">Electronics</bx:gridcell>
-                    <bx:gridcell column="price">$899.99</bx:gridcell>
-                    <bx:gridcell column="stock">15</bx:gridcell>
-                </bx:gridrow>
-                
-                <bx:gridrow>
-                    <bx:gridcell column="product">Wireless Mouse</bx:gridcell>
-                    <bx:gridcell column="category">Electronics</bx:gridcell>
-                    <bx:gridcell column="price">$29.99</bx:gridcell>
-                    <bx:gridcell column="stock">45</bx:gridcell>
-                </bx:gridrow>
-                
-                <bx:gridrow>
-                    <bx:gridcell column="product">Office Chair</bx:gridcell>
-                    <bx:gridcell column="category">Furniture</bx:gridcell>
-                    <bx:gridcell column="price">$199.99</bx:gridcell>
-                    <bx:gridcell column="stock">8</bx:gridcell>
-                </bx:gridrow>
+
+                <bx:gridrow data="Laptop Computer,Electronics,$899.99,15" />
+                <bx:gridrow data="Wireless Mouse,Electronics,$29.99,45" />
+                <bx:gridrow data="Office Chair,Furniture,$199.99,8" />
             </bx:grid>
         </div>
         <p><strong>Expected:</strong> Grid with manually defined rows and columns showing product data.</p>
@@ -168,13 +151,13 @@
         <h2>7. Styled Grid</h2>
         <p>Grid with custom styling and formatting:</p>
         <div class="result">
-            <bx:grid name="styledGrid" query="#sampleData#" 
-                     height="200px" 
-                     bgColor="#f8f9fa" 
-                     textColor="#333"
+            <bx:grid name="styledGrid" query="#sampleData#"
+                     height="200px"
+                     bgColor="##f8f9fa"
+                     textColor="##333"
                      colHeaderBold="true"
-                     colHeaderTextColor="#007cba"
-                     stripeRowColor="#e9ecef"
+                     colHeaderTextColor="##007cba"
+                     stripeRowColor="##e9ecef"
                      pageSize="5">
                 <bx:gridcolumn name="id" header="Employee ID" width="100px" />
                 <bx:gridcolumn name="name" header="Full Name" width="180px" />
@@ -189,10 +172,10 @@
         <h2>8. Grid with AJAX Binding</h2>
         <p>Grid that loads data dynamically via AJAX:</p>
         <div class="result">
-            <bx:grid name="ajaxGrid" 
-                     bind="cfc:dataservice.getEmployees()" 
+            <bx:grid name="ajaxGrid"
+                     bind="cfc:dataservice.getEmployees()"
                      bindOnLoad="true"
-                     sortable="true" 
+                     sortable="true"
                      pageSize="5"
                      onError="handleGridError">
                 <bx:gridcolumn name="id" header="ID" width="60px" />
@@ -204,14 +187,14 @@
         <p><strong>Expected:</strong> Grid attempts to load data from the bind expression (will show error if service doesn't exist).</p>
     </div>
 
-    <div class="demo-section">
+    <!--- <div class="demo-section">
         <h2>9. GridUpdate Component</h2>
         <p>Component for updating grid data programmatically:</p>
         <div class="result">
             <button onclick="addNewEmployee()">Add New Employee</button>
             <button onclick="removeSelected()">Remove Selected</button>
             <button onclick="refreshGrid()">Refresh Grid</button>
-            
+
             <div id="updateTargetGrid">
                 <bx:grid name="updateableGrid" query="#sampleData#" selectMode="multi" pageSize="6">
                     <bx:gridcolumn name="id" header="ID" width="60px" />
@@ -220,11 +203,11 @@
                     <bx:gridcolumn name="department" header="Department" width="120px" />
                 </bx:grid>
             </div>
-            
+
             <bx:gridupdate grid="updateableGrid" />
         </div>
         <p><strong>Expected:</strong> Buttons to demonstrate programmatic grid updates.</p>
-    </div>
+    </div> --->
 
     <script type="text/javascript">
         // Grid event handlers
@@ -232,12 +215,12 @@
             console.log('Cell edited - Column:', column, 'Row:', row, 'New Value:', value);
             alert('Cell updated: ' + column + ' = ' + value + ' for row ' + row);
         }
-        
+
         function handleGridError(errorCode, errorMessage) {
             console.error('Grid error:', errorCode, errorMessage);
             alert('Grid Error: ' + errorMessage);
         }
-        
+
         // Demo functions for GridUpdate
         function addNewEmployee() {
             // Simulate adding a new employee
@@ -247,44 +230,44 @@
                 email: 'new@example.com',
                 department: 'New Hire'
             };
-            
+
             console.log('Adding new employee:', newEmployee);
             alert('Adding new employee: ' + newEmployee.name);
-            
+
             // In a real application, this would update the grid data
             // For demo purposes, we'll just log it
         }
-        
+
         function removeSelected() {
             var grid = document.getElementById('updateableGrid');
             var selected = grid.querySelectorAll('input[name="updateableGrid_select"]:checked');
-            
+
             if (selected.length === 0) {
                 alert('Please select rows to remove');
                 return;
             }
-            
+
             console.log('Removing', selected.length, 'selected rows');
             alert('Removing ' + selected.length + ' selected employees');
-            
+
             // In a real application, this would remove the selected rows
         }
-        
+
         function refreshGrid() {
             console.log('Refreshing grid data');
             alert('Refreshing grid data from server');
-            
+
             // In a real application, this would reload the grid
             var grid = document.getElementById('updateableGrid');
             if (grid && grid.refresh) {
                 grid.refresh();
             }
         }
-        
+
         // Initialize grid demos
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Grid demos initialized');
-            
+
             // Add event listeners for grid interactions
             var grids = document.querySelectorAll('.bx-grid');
             grids.forEach(function(grid) {
@@ -292,11 +275,11 @@
                 grid.addEventListener('gridSort', function(e) {
                     console.log('Grid sorted:', e.detail);
                 });
-                
+
                 grid.addEventListener('gridCellEdit', function(e) {
                     console.log('Grid cell edited:', e.detail);
                 });
-                
+
                 grid.addEventListener('gridPageChange', function(e) {
                     console.log('Grid page changed:', e.detail);
                 });

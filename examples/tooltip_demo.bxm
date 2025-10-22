@@ -8,18 +8,18 @@
         .demo-section h2 { margin-top: 0; color: #333; }
         .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
         .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
-        
+
         /* Tooltip styling */
         .bx-tooltip-trigger { position: relative; cursor: help; }
-        .bx-tooltip { 
-            position: absolute; 
-            z-index: 9999; 
-            background: #333; 
-            color: white; 
-            padding: 8px 12px; 
-            border-radius: 4px; 
-            font-size: 12px; 
-            max-width: 300px; 
+        .bx-tooltip {
+            position: absolute;
+            z-index: 9999;
+            background: #333;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            max-width: 300px;
             word-wrap: break-word;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
@@ -32,41 +32,41 @@
             border: 5px solid transparent;
             border-top-color: #333;
         }
-        
+
         /* Demo elements */
         .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 15px 0; }
-        .tooltip-demo-item { 
-            padding: 15px; 
-            margin: 10px 0; 
-            border: 2px solid #ddd; 
-            border-radius: 6px; 
+        .tooltip-demo-item {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
             text-align: center;
             background: #f8f9fa;
             transition: all 0.2s ease;
         }
-        .tooltip-demo-item:hover { 
-            border-color: #007cba; 
-            background: #e3f2fd; 
+        .tooltip-demo-item:hover {
+            border-color: #007cba;
+            background: #e3f2fd;
         }
-        
+
         .highlight { background: yellow; padding: 2px 4px; border-radius: 2px; }
-        .button-style { 
-            padding: 8px 16px; 
-            background: #007cba; 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
+        .button-style {
+            padding: 8px 16px;
+            background: #007cba;
+            color: white;
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
             display: inline-block;
             text-decoration: none;
         }
         .button-style:hover { background: #0056b3; }
-        
+
         .warning { color: #856404; background: #fff3cd; padding: 4px 8px; border-radius: 4px; }
         .error { color: #721c24; background: #f8d7da; padding: 4px 8px; border-radius: 4px; }
         .success { color: #155724; background: #d4edda; padding: 4px 8px; border-radius: 4px; }
         .info { color: #004085; background: #cce7ff; padding: 4px 8px; border-radius: 4px; }
-        
+
         /* Interactive demo styling */
         .settings-panel { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 4px; margin: 10px 0; }
         .setting-item { margin: 8px 0; }
@@ -83,16 +83,16 @@
         <p>Simple tooltips with static text content:</p>
         <div class="result">
             <p>Hover over these elements to see basic tooltips:</p>
-            
+
             <bx:tooltip tooltip="This is a basic tooltip with helpful information.">
                 <span class="highlight">Hover over me</span>
             </bx:tooltip>
-            
-            <p>You can also add tooltips to 
+
+            <p>You can also add tooltips to
                 <bx:tooltip tooltip="Links can have tooltips too!">
                     <a href="#" onclick="return false;">clickable links</a>
                 </bx:tooltip>
-                and 
+                and
                 <bx:tooltip tooltip="Buttons are great candidates for tooltips.">
                     <button class="button-style">buttons</button>
                 </bx:tooltip>
@@ -113,21 +113,21 @@
                         <small>Quick to show</small>
                     </bx:tooltip>
                 </div>
-                
+
                 <div class="tooltip-demo-item">
                     <bx:tooltip tooltip="I take my time to appear (1500ms delay)" showDelay="1500">
                         <strong>Slow Tooltip</strong><br>
                         <small>Delayed appearance</small>
                     </bx:tooltip>
                 </div>
-                
+
                 <div class="tooltip-demo-item">
                     <bx:tooltip tooltip="I disappear quickly when you move away" hideDelay="50">
                         <strong>Quick Hide</strong><br>
                         <small>Fast to hide</small>
                     </bx:tooltip>
                 </div>
-                
+
                 <div class="tooltip-demo-item">
                     <bx:tooltip tooltip="I linger for a while after you move away" hideDelay="2000">
                         <strong>Slow Hide</strong><br>
@@ -150,7 +150,7 @@
                         <small>Disappears automatically</small>
                     </bx:tooltip>
                 </div>
-                
+
                 <div class="tooltip-demo-item">
                     <bx:tooltip tooltip="I auto-hide after 5 seconds, giving you more time to read" autoDismissDelay="5000" showDelay="200">
                         <strong>5-Second Auto-Hide</strong><br>
@@ -167,16 +167,16 @@
         <p>Tooltips can contain rich HTML content:</p>
         <div class="result">
             <p>These tooltips demonstrate HTML formatting capabilities:</p>
-            
+
             <bx:tooltip tooltip="&lt;strong&gt;Bold Text&lt;/strong&gt;&lt;br&gt;&lt;em&gt;Italic Text&lt;/em&gt;&lt;br&gt;&lt;u&gt;Underlined Text&lt;/u&gt;">
                 <span class="button-style">Rich HTML</span>
             </bx:tooltip>
-            
-            <bx:tooltip tooltip="&lt;h4 style='margin:0 0 5px 0; color: #ffd700;'&gt;🎯 Features&lt;/h4&gt;&lt;ul style='margin:0; padding-left:15px;'&gt;&lt;li&gt;Fast performance&lt;/li&gt;&lt;li&gt;Easy to use&lt;/li&gt;&lt;li&gt;Fully customizable&lt;/li&gt;&lt;/ul&gt;">
+
+            <bx:tooltip tooltip="&lt;h4 style='margin:0 0 5px 0; color: ##ffd700;'&gt;🎯 Features&lt;/h4&gt;&lt;ul style='margin:0; padding-left:15px;'&gt;&lt;li&gt;Fast performance&lt;/li&gt;&lt;li&gt;Easy to use&lt;/li&gt;&lt;li&gt;Fully customizable&lt;/li&gt;&lt;/ul&gt;">
                 <span class="info">Feature List</span>
             </bx:tooltip>
-            
-            <bx:tooltip tooltip="&lt;div style='text-align: center;'&gt;&lt;strong style='color: #ff6b6b;'&gt;⚠️ Warning&lt;/strong&gt;&lt;br&gt;This action cannot be undone!&lt;br&gt;&lt;small&gt;Proceed with caution&lt;/small&gt;&lt;/div&gt;">
+
+            <bx:tooltip tooltip="&lt;div style='text-align: center;'&gt;&lt;strong style='color: ##ff6b6b;'&gt;⚠️ Warning&lt;/strong&gt;&lt;br&gt;This action cannot be undone!&lt;br&gt;&lt;small&gt;Proceed with caution&lt;/small&gt;&lt;/div&gt;">
                 <span class="warning">Styled Warning</span>
             </bx:tooltip>
         </div>
@@ -188,15 +188,15 @@
         <p>Tooltips that load content from external sources:</p>
         <div class="result">
             <p>These tooltips attempt to load content dynamically:</p>
-            
+
             <bx:tooltip sourceForTooltip="/api/user/profile/123" showDelay="300">
                 <span class="info">User Profile (AJAX)</span>
             </bx:tooltip>
-            
+
             <bx:tooltip sourceForTooltip="/api/stats/dashboard" showDelay="300">
                 <span class="success">Dashboard Stats (AJAX)</span>
             </bx:tooltip>
-            
+
             <bx:tooltip sourceForTooltip="/api/help/context/button" showDelay="300">
                 <span class="button-style">Context Help (AJAX)</span>
             </bx:tooltip>
@@ -215,7 +215,7 @@
                         <small>Default behavior</small>
                     </div>
                 </bx:tooltip>
-                
+
                 <bx:tooltip tooltip="I avoid overlapping my trigger element and will reposition myself accordingly" preventOverlap="true">
                     <div class="tooltip-demo-item" style="margin: 0;">
                         <strong>Overlap Prevention</strong><br>
@@ -315,9 +315,9 @@
                 </div>
                 <button onclick="updateTooltipSettings()" class="button-style">Apply Settings</button>
             </div>
-            
+
             <div style="text-align: center; margin: 20px 0; padding: 40px; border: 2px dashed #007cba;">
-                <bx:tooltip id="configurableTooltip" 
+                <bx:tooltip id="configurableTooltip"
                            tooltip="This tooltip can be reconfigured dynamically using the settings above!"
                            showDelay="500"
                            hideDelay="300">
@@ -343,26 +343,26 @@
                     <span style="color: #007cba; cursor: help;">ℹ️</span>
                 </bx:tooltip>
             </p>
-            
+
             <h4>Icon Meanings:</h4>
             <p>
                 <bx:tooltip tooltip="Save your changes">
                     <span class="button-style">💾</span>
                 </bx:tooltip>
-                
+
                 <bx:tooltip tooltip="Delete this item permanently">
                     <span class="error" style="display: inline-block; padding: 8px;">🗑️</span>
                 </bx:tooltip>
-                
+
                 <bx:tooltip tooltip="Edit item details">
                     <span class="info" style="display: inline-block; padding: 8px;">✏️</span>
                 </bx:tooltip>
-                
+
                 <bx:tooltip tooltip="Share with others">
                     <span class="success" style="display: inline-block; padding: 8px;">📤</span>
                 </bx:tooltip>
             </p>
-            
+
             <h4>Abbreviations:</h4>
             <p>
                 The <bx:tooltip tooltip="Application Programming Interface - a set of protocols and tools for building software applications">API</bx:tooltip>
@@ -380,23 +380,23 @@
             var hideDelay = document.getElementById('hideDelayInput').value;
             var autoDismiss = document.getElementById('autoDismissInput').value;
             var preventOverlap = document.getElementById('preventOverlapSelect').value;
-            
+
             console.log('Updating tooltip settings:', {
                 showDelay: showDelay,
                 hideDelay: hideDelay,
                 autoDismiss: autoDismiss,
                 preventOverlap: preventOverlap
             });
-            
+
             // In a real implementation, we would update the tooltip attributes
             // For demo purposes, we'll just log the changes
             alert('Settings applied!\nShow Delay: ' + showDelay + 'ms\nHide Delay: ' + hideDelay + 'ms\nAuto-Dismiss: ' + (autoDismiss == 0 ? 'Disabled' : autoDismiss + 'ms') + '\nPrevent Overlap: ' + (preventOverlap === 'true' ? 'Yes' : 'No'));
         }
-        
+
         // Initialize tooltip demos
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Tooltip demos initialized');
-            
+
             // Add some interactive behavior for demonstration
             var tooltips = document.querySelectorAll('.bx-tooltip-trigger');
             tooltips.forEach(function(trigger, index) {
@@ -404,7 +404,7 @@
                     console.log('Tooltip ' + (index + 1) + ' triggered');
                 });
             });
-            
+
             // Simulate AJAX tooltip errors for demo
             setTimeout(function() {
                 var ajaxTooltips = document.querySelectorAll('[data-source]');
