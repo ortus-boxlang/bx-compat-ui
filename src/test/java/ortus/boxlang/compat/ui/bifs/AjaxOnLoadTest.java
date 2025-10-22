@@ -163,7 +163,7 @@ public class AjaxOnLoadTest extends BaseIntegrationTest {
 		} catch ( Exception e ) {
 			assertThat( e.getMessage() ).contains( "must be a valid JavaScript function name" );
 		}
-		
+
 		try {
 			runtime.executeSource(
 			    """

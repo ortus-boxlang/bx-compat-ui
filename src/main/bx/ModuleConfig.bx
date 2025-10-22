@@ -32,11 +32,22 @@ class {
 	 */
 	this.version = "@build.version@+@build.number@";
 
-	/**
+		/**
 	 * The BoxLang mapping for your module.  All BoxLang modules are registered with an internal
 	 * mapping prefix of : bxModules.{this.mapping}, /bxmodules/{this.mapping}. Ex: bxModules.test, /bxmodules/test
+	 * TODO: Once BoxLang 1.6.1 is releaed, remove this and use the public one. Due to the missing registration bug.
 	 */
-	this.mapping = "bxCompatUI";
+	this.mapping = {
+		name: "bxCompatUI",
+		external: true
+	}
+
+	/**
+	 * The public BoxLang mapping for your module.  This is the mapping that will be used by
+	 * developers to access your module features.  This mapping is registered without the
+	 * bxModules or /bxmodules prefix. Ex: test, /test
+	 */
+	this.publicMapping = "public";
 
 	/**
 	 * Who built the module
