@@ -20,9 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import ortus.boxlang.compat.ui.BaseIntegrationTest;
-import ortus.boxlang.runtime.context.ScriptingRequestBoxContext;
 import ortus.boxlang.runtime.scopes.Key;
-import ortus.boxlang.runtime.scopes.VariablesScope;
 
 public class AjaxOnLoadTest extends BaseIntegrationTest {
 

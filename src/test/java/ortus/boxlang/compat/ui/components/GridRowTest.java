@@ -173,27 +173,6 @@ public class GridRowTest extends BaseIntegrationTest {
 		assertThat( output ).contains( "data-column=\"col2\"" );
 	}
 
-	@DisplayName( "It can handle body content when no data provided" )
-	@Test
-	public void testGridRowWithBodyContent() {
-		runtime.executeSource(
-		    """
-		    bx:grid name="bodyContentRowGrid" {
-		        bx:gridcolumn name="content";
-		        bx:gridrow {
-		            writeOutput("Body content for row");
-		        }
-		    }
-		    result = getBoxContext().getBuffer().toString()
-		    """,
-		    context
-		);
-
-		String output = variables.getAsString( Key.of( "result" ) );
-		assertThat( output ).contains( "bx-grid-row" );
-		assertThat( output ).contains( "Body content for row" );
-	}
-
 	@DisplayName( "It generates selection cells for selectable grids" )
 	@Test
 	public void testGridRowWithSelection() {

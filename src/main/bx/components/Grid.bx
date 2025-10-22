@@ -707,13 +707,64 @@ class{
 				header.classList.add('bx-grid-sorted', 'bx-grid-sort-' + newSort);
 
 				// Fire sort event
-				#len( attributes.onSort ) ? attributes.onSort & '(column, newSort);' : ''#
+				#len( attributes.onSort ) ? attributes.onSort & '(column, newSort);' : 'sortRows( column, newSort );'#
 
 				// Fire custom event
 				var event = new CustomEvent('gridSort', {
 					detail: { column: column, direction: newSort }
 				});
 				grid.dispatchEvent(event);
+			}
+
+			function sortRows(column, direction) {
+				var tbody = grid.querySelector('.bx-grid-body');
+				var rows = Array.from(tbody.querySelectorAll('.bx-grid-row'));
+
+				// Find column index
+				var headers = grid.querySelectorAll('.bx-grid-column-header');
+				var columnIndex = -1;
+				var selectColumnOffset = grid.dataset.selectMode !== 'none' ? 1 : 0;
+
+				for (var i = 0; i < headers.length; i++) {
+					if (headers[i].dataset.column === column) {
+						columnIndex = i + selectColumnOffset;
+						break;
+					}
+				}
+
+				if (columnIndex === -1) return;
+
+				// Sort rows based on column values
+				rows.sort(function(a, b) {
+					var aCell = a.cells[columnIndex];
+					var bCell = b.cells[columnIndex];
+
+					if (!aCell || !bCell) return 0;
+
+					var aValue = aCell.textContent.trim();
+					var bValue = bCell.textContent.trim();
+
+					// Try numeric comparison first
+					var aNum = parseFloat(aValue);
+					var bNum = parseFloat(bValue);
+
+					var result;
+					if (!isNaN(aNum) && !isNaN(bNum)) {
+						// Numeric sort
+						result = aNum - bNum;
+					} else {
+						// Text sort (case-insensitive)
+						result = aValue.toLowerCase().localeCompare(bValue.toLowerCase());
+					}
+
+					// Apply sort direction
+					return direction === 'desc' ? -result : result;
+				});
+
+				// Re-append sorted rows to tbody
+				rows.forEach(function(row) {
+					tbody.appendChild(row);
+				});
 			}
 
 			function goToPage(page) {

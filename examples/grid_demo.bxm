@@ -30,6 +30,7 @@
         .bx-grid-sortable .bx-grid-column-header { cursor: pointer; }
         .bx-grid-sortable .bx-grid-column-header:hover { background: #e8e8e8; }
     </style>
+	<bx:ajaximport tags="grid"/>
 </head>
 <body>
     <h1>BoxLang Grid, GridColumn, GridRow, and GridUpdate Components Demo</h1>
