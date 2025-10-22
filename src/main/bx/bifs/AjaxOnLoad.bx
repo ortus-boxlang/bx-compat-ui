@@ -1,0 +1,62 @@
+/**
+ * BoxLang BIF: AjaxOnLoad
+ *
+ * Specifies a JavaScript function to run when a page loads in the browser.
+ */
+@BoxBIF( "AjaxOnLoad" )
+class {
+
+    /**
+     * Registers a JavaScript function to run when the page loads
+     *
+     * @functionName The name of the JavaScript function to execute on page load
+     */
+    function invoke() {
+        // Extract arguments with defaults - BIF gets positional args as numbered arguments
+        var functionName = arguments[ 1 ] ?: arguments.functionName ?: "";
+
+        // Validate required functionName parameter
+        if( len( functionName ) == 0 ){
+            throw(
+                type = "boxlang.compat.ui.InvalidArgumentException",
+                message = "The functionName parameter is required for AjaxOnLoad"
+            );
+        }
+
+        // Validate that function name is a valid JavaScript identifier
+        if( !functionName.reFindNoCase( "^[a-zA-Z_$][a-zA-Z0-9_$]*$" ) ){
+            throw(
+                type = "boxlang.compat.ui.InvalidArgumentException", 
+                message = "The functionName parameter must be a valid JavaScript function name"
+            );
+        }
+
+        // Generate the onload script and add it to the page
+        var script = "<script type=""text/javascript"">" & 
+                    "(function() {" &
+                    "if (document.readyState === 'loading') {" &
+                    "document.addEventListener('DOMContentLoaded', function() {" &
+                    "if (typeof " & functionName & " === 'function') {" &
+                    functionName & "();" &
+                    "} else {" &
+                    "console.error('Function " & functionName & " is not defined');" &
+                    "}" &
+                    "});" &
+                    "} else {" &
+                    "if (typeof " & functionName & " === 'function') {" &
+                    functionName & "();" &
+                    "} else {" &
+                    "console.error('Function " & functionName & " is not defined');" &
+                    "}" &
+                    "}" &
+                    "})();" &
+                    "</script>";
+
+        // Get the current context and write the script to the buffer
+        var context = getBoxContext();
+        context.writeToBuffer( script );
+
+        // Return empty string since this function doesn't return content
+        return "";
+    }
+}

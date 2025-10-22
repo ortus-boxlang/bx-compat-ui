@@ -1,0 +1,234 @@
+/**
+ * BoxLang Component Which Generates JavaScript Proxy for Server-Side Components
+ *
+ * This component implements the functionality of the ColdFusion cfajaxproxy tag,
+ * creating a JavaScript proxy for calling server-side methods via AJAX using the Fetch API.
+ */
+@BoxComponent( "AjaxProxy" )
+@AllowsBody( false )
+@RequiresBody( false )
+class{
+
+	/**
+	 * The AjaxProxy UI component
+	 *
+	 * <pre>
+	 * <bx:ajaxproxy cfc="mycomponent" jsclassname="MyProxy" />
+	 * <bx:ajaxproxy bind="cfc:mycomponent.getData()" onSuccess="handleSuccess" onError="handleError" />
+	 * </pre>
+	 *
+	 * @attribute.cfc - string, optional - The CFC for which to create a proxy (dot-delimited path)
+	 * @attribute.jsclassname - string, optional - Name for the JavaScript proxy class (defaults to CFC name)
+	 * @attribute.bind - string, optional - Bind expression for CFC method, JavaScript function, or URL
+	 * @attribute.onError - string, optional - JavaScript function to execute if bind fails
+	 * @attribute.onSuccess - string, optional - JavaScript function to execute if bind succeeds
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Set default values
+		param attributes.cfc = "";
+		param attributes.jsclassname = "";
+		param attributes.bind = "";
+		param attributes.onError = "";
+		param attributes.onSuccess = "";
+
+		// Validate that either cfc or bind is provided
+		if( len( attributes.cfc ) == 0 && len( attributes.bind ) == 0 ){
+			throw(
+				type		= "boxlang.compat.ui.MissingAttributeException",
+				message		= "Either cfc or bind attribute is required for the AjaxProxy component"
+			);
+		}
+
+		var script = "<script type=""text/javascript"">";
+
+		// If CFC is specified, create a proxy class
+		if( len( attributes.cfc ) > 0 ){
+			script &= generateCFCProxy( attributes );
+		}
+
+		// If bind is specified, execute the bind expression
+		if( len( attributes.bind ) > 0 ){
+			script &= generateBindCall( attributes );
+		}
+
+		script &= "</script>";
+
+		// Write the JavaScript to the output buffer
+		context.writeToBuffer( script );
+	}
+
+	/**
+	 * Generate JavaScript proxy class for a CFC
+	 */
+	private function generateCFCProxy( required attributes ){
+		var cfcPath = attributes.cfc;
+		var jsClassName = len( attributes.jsclassname ) ? attributes.jsclassname : listLast( cfcPath, "." );
+
+		var script = "
+		// BoxLang AJAX Proxy for CFC: #cfcPath#
+		class #jsClassName# {
+			constructor() {
+				this.cfcPath = '#cfcPath#';
+			}
+
+			// Generic method caller using Fetch API
+			async callMethod(methodName, args = {}) {
+				const url = '/index.cfm'; // Default BoxLang handler
+				const formData = new FormData();
+				formData.append('method', methodName);
+				formData.append('cfc', this.cfcPath);
+				
+				// Add method arguments
+				for (const [key, value] of Object.entries(args)) {
+					formData.append(key, value);
+				}
+
+				try {
+					const response = await fetch(url, {
+						method: 'POST',
+						body: formData,
+						headers: {
+							'X-Requested-With': 'XMLHttpRequest'
+						}
+					});
+
+					if (!response.ok) {
+						throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+					}
+
+					const contentType = response.headers.get('content-type');
+					if (contentType && contentType.includes('application/json')) {
+						return await response.json();
+					} else {
+						return await response.text();
+					}
+				} catch (error) {
+					console.error('AJAX Proxy Error:', error);
+					throw error;
+				}
+			}
+
+			// Convenience method for synchronous-looking calls
+			call(methodName, args = {}, callback = null) {
+				this.callMethod(methodName, args)
+					.then(result => {
+						if (callback && typeof callback === 'function') {
+							callback(result);
+						}
+					})
+					.catch(error => {
+						console.error('CFC Method Call Failed:', error);
+					});
+			}
+		}
+
+		// Create instance and make it globally available
+		window.#jsClassName# = new #jsClassName#();
+		";
+
+		return script;
+	}
+
+	/**
+	 * Generate JavaScript for bind expression
+	 */
+	private function generateBindCall( required attributes ){
+		var bindExpr = attributes.bind;
+		var onSuccess = attributes.onSuccess;
+		var onError = attributes.onError;
+
+		// Parse bind expression - simple implementation for cfc: expressions
+		if( bindExpr.startsWith( "cfc:" ) ){
+			// Extract CFC and method from bind expression
+			// Format: cfc:component.method(param1,param2)
+			var cfcCall = bindExpr.replace( "cfc:", "" );
+			var methodStart = cfcCall.find( "." );
+			var paramsStart = cfcCall.find( "(" );
+			
+			if( methodStart > 0 && paramsStart > 0 ){
+				var cfcName = cfcCall.substring( 0, methodStart - 1 );
+				var methodName = cfcCall.substring( methodStart, paramsStart - 1 );
+				var params = "";
+				if( paramsStart < cfcCall.len() - 1 ){
+					params = cfcCall.substring( paramsStart, cfcCall.len() - 1 );
+				}
+
+				var script = "
+				// Execute bind expression: #bindExpr#
+				(async function() {
+					try {
+						const formData = new FormData();
+						formData.append('method', '#methodName#');
+						formData.append('cfc', '#cfcName#');
+						";
+
+				// Parse parameters if any
+				if( len( params ) > 0 ){
+					var paramList = params.listToArray( "," );
+					for( var i = 1; i <= paramList.len(); i++ ){
+						var param = trim( paramList[i] );
+						script &= "formData.append('param#i#', '#param#');";
+					}
+				}
+
+				script &= "
+						const response = await fetch('/index.cfm', {
+							method: 'POST',
+							body: formData,
+							headers: {
+								'X-Requested-With': 'XMLHttpRequest'
+							}
+						});
+
+						if (!response.ok) {
+							throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+						}
+
+						const result = await response.text();
+						";
+
+				if( len( onSuccess ) > 0 ){
+					script &= "
+						if (typeof #onSuccess# === 'function') {
+							#onSuccess#(result);
+						}
+					";
+				}
+
+				script &= "
+					} catch (error) {
+						console.error('Bind execution failed:', error);
+						";
+
+				if( len( onError ) > 0 ){
+					script &= "
+						if (typeof #onError# === 'function') {
+							#onError#(error.message || 'Unknown error', error);
+						}
+					";
+				}
+
+				script &= "
+					}
+				})();
+				";
+
+				return script;
+			}
+		}
+
+		// For non-CFC bind expressions, create a generic handler
+		return "
+		// Generic bind handler for: #bindExpr#
+		console.warn('Bind expression not fully supported: #bindExpr#');
+		";
+	}
+}

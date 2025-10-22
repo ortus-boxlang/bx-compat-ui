@@ -1,0 +1,30 @@
+/**
+ * BoxLang BIF: AjaxLink
+ *
+ * Generates a URL that causes link results to display within the current AJAX container
+ * rather than replacing the current page content.
+ */
+@BoxBIF( "AjaxLink" )
+class {
+
+    /**
+     * Creates an AJAX link that loads content into the current container
+     *
+     * @url The URL to load when the link is clicked
+     */
+    function invoke() {
+        // Extract arguments with defaults - BIF gets positional args as numbered arguments
+        var url = arguments[ 1 ] ?: arguments.url ?: "";
+
+        // Validate required url parameter
+        if( len( url ) == 0 ){
+            throw(
+                type = "boxlang.compat.ui.InvalidArgumentException",
+                message = "The url parameter is required for AjaxLink"
+            );
+        }
+
+        // Return JavaScript that will handle the AJAX loading
+        return "javascript:void(BoxLangAjax && BoxLangAjax.utils ? BoxLangAjax.utils.handleAjaxLink('" & encodeForJavaScript( url ) & "', event) : console.error('BoxLang AJAX not initialized'))";
+    }
+}

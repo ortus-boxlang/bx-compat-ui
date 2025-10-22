@@ -1,0 +1,265 @@
+/**
+ * BoxLang Component Which Imports JavaScript and CSS Files for AJAX Features
+ *
+ * This component implements the functionality of the ColdFusion cfajaximport tag,
+ * importing JavaScript and CSS files required for BoxLang AJAX tags and features.
+ */
+@BoxComponent( "AjaxImport" )
+@AllowsBody( false )
+@RequiresBody( false )
+class{
+
+	/**
+	 * The AjaxImport UI component
+	 *
+	 * <pre>
+	 * <bx:ajaximport tags="div,layout,grid" />
+	 * <bx:ajaximport cssSrc="/custom/css" scriptSrc="/custom/js" />
+	 * </pre>
+	 *
+	 * @attribute.tags - string, optional - Comma-delimited list of BoxLang AJAX tags for which to import supporting files
+	 * @attribute.cssSrc - string, optional - URL of the directory containing CSS files for BoxLang AJAX features
+	 * @attribute.scriptSrc - string, optional - URL of the directory containing JavaScript files for BoxLang AJAX features
+	 * @attribute.params - string, optional - Parameters to pass, such as API keys (e.g., googlemapkey)
+	 *
+	 * @param context The context of the execution (IBoxContext)
+	 * @param attributes The attributes of the component that were passed in
+	 * @param body The body of the component that you can pass to `processBody(context, body, [buffer])` for execution and buffer retreival
+	 * @param executionState The execution state of the component. Each component get's one as an isolated state.
+	 *
+	 * @return A BodyResult instance or null for a default result return.
+	 */
+	function invoke( required context, Struct attributes, any body, Struct executionState ){
+
+		// Set default values
+		param attributes.tags = "";
+		param attributes.cssSrc = "/bxmodules/bxCompatUI/public/index.bxm?target=css";
+		param attributes.scriptSrc = "/bxmodules/bxCompatUI/public/index.bxm?target=js";
+		param attributes.params = "";
+
+		var output = "";
+
+		// Import CSS files
+		output &= generateCSSImports( attributes );
+
+		// Import JavaScript files
+		output &= generateJSImports( attributes );
+
+		// Generate initialization script
+		output &= generateInitializationScript( attributes );
+
+		// Write the output to the buffer
+		context.writeToBuffer( output );
+	}
+
+	/**
+	 * Generate CSS import statements
+	 */
+	private function generateCSSImports( required attributes ){
+		var cssOutput = "";
+		var cssSrc = attributes.cssSrc;
+		var tags = attributes.tags;
+
+		// Core BoxLang AJAX CSS
+		cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/boxlang-ajax-core.css"" />";
+
+		// Tag-specific CSS
+		if( len( tags ) > 0 ){
+			var tagList = tags.listToArray( "," );
+			for( var tag in tagList ){
+				var tagName = trim( tag );
+				cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/boxlang-#lcase(tagName)#.css"" />";
+			}
+		} else {
+			// Import all common AJAX CSS files
+			var commonTags = [ "layout", "div", "grid", "tooltip", "pod" ];
+			for( var tag in commonTags ){
+				cssOutput &= "<link rel=""stylesheet"" type=""text/css"" href=""#cssSrc#/boxlang-#tag#.css"" />";
+			}
+		}
+
+		return cssOutput;
+	}
+
+	/**
+	 * Generate JavaScript import statements
+	 */
+	private function generateJSImports( required attributes ){
+		var jsOutput = "";
+		var scriptSrc = attributes.scriptSrc;
+		var tags = attributes.tags;
+
+		// Core BoxLang AJAX JavaScript
+		jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/boxlang-ajax-core.js""></script>";
+
+		// Tag-specific JavaScript
+		if( len( tags ) > 0 ){
+			var tagList = tags.listToArray( "," );
+			for( var tag in tagList ){
+				var tagName = trim( tag );
+				jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/boxlang-#lcase(tagName)#.js""></script>";
+			}
+		} else {
+			// Import all common AJAX JavaScript files
+			var commonTags = [ "layout", "div", "grid", "tooltip", "pod", "ajaxproxy" ];
+			for( var tag in commonTags ){
+				jsOutput &= "<script type=""text/javascript"" src=""#scriptSrc#/boxlang-#tag#.js""></script>";
+			}
+		}
+
+		return jsOutput;
+	}
+
+	/**
+	 * Generate initialization script with configuration
+	 */
+	private function generateInitializationScript( required attributes ){
+		var script = "<script type=""text/javascript"">";
+
+		script &= "
+		// BoxLang AJAX Initialization
+		(function() {
+			// Create global BoxLang AJAX namespace if it doesn't exist
+			window.BoxLangAjax = window.BoxLangAjax || {
+				version: '1.0.0',
+				config: {
+					cssSrc: '#attributes.cssSrc#',
+					scriptSrc: '#attributes.scriptSrc#'
+				},
+				utils: {}
+			};
+
+			// Fetch API wrapper for consistent AJAX handling
+			BoxLangAjax.utils.fetchContent = async function(url, options = {}) {
+				const defaultOptions = {
+					method: 'GET',
+					headers: {
+						'X-Requested-With': 'XMLHttpRequest',
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				};
+
+				const fetchOptions = Object.assign({}, defaultOptions, options);
+
+				try {
+					const response = await fetch(url, fetchOptions);
+
+					if (!response.ok) {
+						throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+					}
+
+					const contentType = response.headers.get('content-type');
+					if (contentType && contentType.includes('application/json')) {
+						return await response.json();
+					} else {
+						return await response.text();
+					}
+				} catch (error) {
+					console.error('BoxLang AJAX Error:', error);
+					throw error;
+				}
+			};
+
+			// Container management for AJAX content loading
+			BoxLangAjax.utils.loadIntoContainer = function(containerId, url, options = {}) {
+				const container = document.getElementById(containerId);
+				if (!container) {
+					console.error('Container not found: ' + containerId);
+					return Promise.reject(new Error('Container not found: ' + containerId));
+				}
+
+				// Show loading indicator
+				const originalContent = container.innerHTML;
+				container.innerHTML = '<div class=""bx-loading"">Loading...</div>';
+
+				return BoxLangAjax.utils.fetchContent(url, options)
+					.then(function(content) {
+						container.innerHTML = content;
+						// Trigger custom event for loaded content
+						container.dispatchEvent(new CustomEvent('boxlang-content-loaded', {
+							detail: { url: url, container: containerId }
+						}));
+						return content;
+					})
+					.catch(function(error) {
+						container.innerHTML = '<div class=""bx-error"">Error loading content: ' + error.message + '</div>';
+						throw error;
+					});
+			};
+
+			// Handle AJAX links - finds the nearest AJAX container and loads content
+			BoxLangAjax.utils.handleAjaxLink = function(url, event) {
+				if (event) {
+					event.preventDefault();
+				}
+
+				// Find the nearest AJAX container (div with bx-* class or specific containers)
+				let currentElement = event ? event.target : null;
+				let container = null;
+
+				// Search up the DOM tree for a suitable container
+				while (currentElement && currentElement !== document.body) {
+					if (currentElement.classList && (
+						currentElement.classList.contains('bx-layout') ||
+						currentElement.classList.contains('bx-div') ||
+						currentElement.classList.contains('bx-pod') ||
+						currentElement.classList.contains('bx-layoutarea') ||
+						currentElement.id
+					)) {
+						container = currentElement;
+						break;
+					}
+					currentElement = currentElement.parentElement;
+				}
+
+				if (!container) {
+					// If no suitable container found, try to find the first available one
+					container = document.querySelector('.bx-layout, .bx-div, .bx-pod, [id]') || document.body;
+				}
+
+				// Load content into the container
+				if (container.id) {
+					return BoxLangAjax.utils.loadIntoContainer(container.id, url);
+				} else {
+					// If container has no ID, generate one
+					const containerId = 'bx-ajax-container-' + Date.now();
+					container.id = containerId;
+					return BoxLangAjax.utils.loadIntoContainer(containerId, url);
+				}
+			};
+
+			// Initialize on DOM ready
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', function() {
+					console.log('BoxLang AJAX initialized');
+				});
+			} else {
+				console.log('BoxLang AJAX initialized');
+			}
+		})();
+		";
+
+		// Add parameter-specific configuration
+		if( len( attributes.params ) > 0 ){
+			script &= "
+			// Additional parameters configuration
+			BoxLangAjax.config.params = {};
+			";
+
+			// Parse params (simple key=value parsing)
+			var paramList = attributes.params.listToArray( "," );
+			for( var param in paramList ){
+				var keyValue = param.listToArray( "=" );
+				if( keyValue.len() == 2 ){
+					var key = trim( keyValue[1] );
+					var value = trim( keyValue[2] );
+					script &= "BoxLangAjax.config.params['#key#'] = '#value#';";
+				}
+			}
+		}
+
+		script &= "</script>";
+
+		return script;
+	}
+}
