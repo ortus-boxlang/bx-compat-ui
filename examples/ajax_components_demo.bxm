@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BoxLang AJAX Components Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .demo-section { border: 1px solid #ccc; margin: 20px 0; padding: 15px; }
+        .demo-section h2 { margin-top: 0; color: #333; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
+        .code-example { background: #f8f9fa; padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; font-family: monospace; margin: 10px 0; white-space: pre-wrap; }
+        
+        /* AJAX styling */
+        .ajax-content { border: 1px solid #ddd; padding: 15px; margin: 10px 0; background: white; border-radius: 4px; }
+        .bx-loading { color: #666; font-style: italic; }
+        .bx-error { color: red; background: #ffebee; padding: 10px; border-radius: 4px; }
+        .bx-success { color: #2e7d32; background: #e8f5e8; padding: 10px; border-radius: 4px; }
+        
+        /* Grid update styling */
+        .grid-update-panel { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .button-group { margin: 10px 0; }
+        .button-group button { margin-right: 10px; margin-bottom: 5px; padding: 8px 16px; border: 1px solid #ddd; background: #f8f9fa; cursor: pointer; border-radius: 4px; }
+        .button-group button:hover { background: #e9ecef; }
+        .button-group button.primary { background: #007cba; color: white; border-color: #007cba; }
+        .button-group button.primary:hover { background: #0056b3; }
+        .button-group button.danger { background: #dc3545; color: white; border-color: #dc3545; }
+        .button-group button.danger:hover { background: #c82333; }
+        
+        /* Generated output styling */
+        .generated-output { background: #f8f9fa; border: 1px solid #e9ecef; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .script-output { background: #1e1e1e; color: #f8f8f2; padding: 10px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>BoxLang AJAX Components Demo</h1>
+    <p>This demonstrates the AjaxImport, AjaxProxy, and GridUpdate components that provide AJAX functionality and grid manipulation capabilities.</p>
+
+    <div class="demo-section">
+        <h2>1. AjaxImport Component</h2>
+        <p>The AjaxImport component imports the necessary CSS and JavaScript files for AJAX functionality in UI components.</p>
+        
+        <div class="code-example">
+&lt;!-- Basic import for all UI components --&gt;
+&lt;bx:ajaximport /&gt;
+
+&lt;!-- Import specific component dependencies --&gt;
+&lt;bx:ajaximport tags="layout,div,grid" /&gt;
+
+&lt;!-- Import with custom CSS/JS paths --&gt;
+&lt;bx:ajaximport cssPath="/assets/css/" jsPath="/assets/js/" /&gt;</div>
+        
+        <div class="result">
+            <h4>1. Basic AjaxImport (All Components):</h4>
+            <bx:ajaximport />
+            <p class="bx-success">✅ Generated CSS and JavaScript imports for all BoxLang UI components</p>
+            
+            <h4>2. Selective Component Import:</h4>
+            <bx:ajaximport tags="layout,div,grid" />
+            <p class="bx-success">✅ Generated imports for Layout, Div, and Grid components only</p>
+            
+            <h4>3. Custom Paths Import:</h4>
+            <bx:ajaximport tags="pod,tooltip" cssPath="/custom/styles/" jsPath="/custom/scripts/" />
+            <p class="bx-success">✅ Generated imports with custom CSS and JavaScript paths</p>
+            
+            <h4>Generated Output Preview:</h4>
+            <div class="generated-output">
+                <strong>CSS Imports:</strong>
+                <div class="code-example">&lt;link rel="stylesheet" type="text/css" href="/boxlang/ui/css/layout.css" /&gt;
+&lt;link rel="stylesheet" type="text/css" href="/boxlang/ui/css/grid.css" /&gt;
+&lt;link rel="stylesheet" type="text/css" href="/boxlang/ui/css/div.css" /&gt;
+&lt;link rel="stylesheet" type="text/css" href="/boxlang/ui/css/pod.css" /&gt;
+&lt;link rel="stylesheet" type="text/css" href="/boxlang/ui/css/tooltip.css" /&gt;</div>
+                
+                <strong>JavaScript Imports:</strong>
+                <div class="code-example">&lt;script type="text/javascript" src="/boxlang/ui/js/boxlang-ajax.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/boxlang/ui/js/layout.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/boxlang/ui/js/grid.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="/boxlang/ui/js/div.js"&gt;&lt;/script&gt;</div>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> HTML head section contains appropriate CSS and JavaScript import statements.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. AjaxProxy Component - CFC Proxy</h2>
+        <p>The AjaxProxy component creates JavaScript proxy objects for server-side CFC (Component) methods.</p>
+        
+        <div class="code-example">
+&lt;!-- Create JavaScript proxy for a CFC --&gt;
+&lt;bx:ajaxproxy cfc="services.UserService" jsclassname="UserProxy" /&gt;
+
+&lt;!-- Use the proxy in JavaScript --&gt;
+&lt;script&gt;
+var userService = new UserProxy();
+userService.getUser(123, handleUserResult, handleError);
+&lt;/script&gt;</div>
+        
+        <div class="result">
+            <h4>1. User Service Proxy:</h4>
+            <bx:ajaxproxy cfc="services.UserService" jsclassname="UserProxy" />
+            
+            <h4>2. Data Service Proxy:</h4>  
+            <bx:ajaxproxy cfc="data.ReportService" jsclassname="ReportProxy" />
+            
+            <h4>3. Utility Service Proxy:</h4>
+            <bx:ajaxproxy cfc="utils.ValidationService" jsclassname="ValidationProxy" />
+            
+            <div class="generated-output">
+                <strong>Generated JavaScript Proxy Classes:</strong>
+                <div class="script-output">// UserProxy Class
+function UserProxy() {
+    this.cfcPath = 'services.UserService';
+    this.callMethod = function(method, args, successCallback, errorCallback) {
+        // AJAX call implementation
+        BoxLangAjax.callCFC(this.cfcPath, method, args, successCallback, errorCallback);
+    };
+    
+    // Proxy methods (would be generated based on CFC introspection)
+    this.getUser = function(userId, successCallback, errorCallback) {
+        this.callMethod('getUser', {userId: userId}, successCallback, errorCallback);
+    };
+    
+    this.getAllUsers = function(successCallback, errorCallback) {
+        this.callMethod('getAllUsers', {}, successCallback, errorCallback);
+    };
+    
+    this.saveUser = function(userData, successCallback, errorCallback) {
+        this.callMethod('saveUser', {userData: userData}, successCallback, errorCallback);
+    };
+}</div>
+            </div>
+            
+            <div class="ajax-content">
+                <h5>🧪 Test CFC Proxy:</h5>
+                <div class="button-group">
+                    <button onclick="testUserProxy()" class="primary">Test User Service</button>
+                    <button onclick="testReportProxy()" class="primary">Test Report Service</button>
+                    <button onclick="testValidationProxy()" class="primary">Test Validation Service</button>
+                </div>
+                <div id="proxyTestOutput" class="ajax-content">
+                    Click a button above to test the generated proxy classes.
+                </div>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> JavaScript classes generated that provide client-side access to server-side CFC methods.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. AjaxProxy Component - Bind Expressions</h2>
+        <p>AjaxProxy can also execute bind expressions for loading content dynamically.</p>
+        
+        <div class="code-example">
+&lt;!-- Execute bind expression on page load --&gt;
+&lt;bx:ajaxproxy bind="cfc:data.DashboardService.getStats()" 
+              onSuccess="handleStatsLoad" 
+              onError="handleStatsError" /&gt;
+
+&lt;!-- Conditional bind execution --&gt;
+&lt;bx:ajaxproxy bind="url:/api/notifications/recent" 
+              bindOnLoad="false" 
+              onSuccess="displayNotifications" /&gt;</div>
+        
+        <div class="result">
+            <h4>1. Dashboard Statistics Bind:</h4>
+            <bx:ajaxproxy bind="cfc:data.DashboardService.getStats()" onSuccess="handleStatsLoad" onError="handleStatsError" />
+            
+            <h4>2. User Preferences Bind:</h4>
+            <bx:ajaxproxy bind="cfc:user.PreferenceService.getUserPrefs()" onSuccess="handlePrefsLoad" onError="handlePrefsError" />
+            
+            <h4>3. Notification Center Bind (Manual Trigger):</h4>
+            <bx:ajaxproxy bind="url:/api/notifications/recent" bindOnLoad="false" onSuccess="displayNotifications" onError="handleNotificationError" />
+            
+            <div class="ajax-content">
+                <h5>📊 Bind Expression Results:</h5>
+                <div id="statsContainer" class="generated-output">
+                    <em>Loading dashboard statistics...</em>
+                </div>
+                
+                <div id="prefsContainer" class="generated-output">
+                    <em>Loading user preferences...</em>
+                </div>
+                
+                <button onclick="triggerNotificationBind()" class="primary">Load Notifications</button>
+                <div id="notificationsContainer" class="generated-output" style="display: none;">
+                    <em>Notifications will appear here...</em>
+                </div>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> Bind expressions execute automatically or manually and trigger success/error callbacks.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>4. GridUpdate Component</h2>
+        <p>The GridUpdate component provides programmatic control over grid data and operations.</p>
+        
+        <div class="code-example">
+&lt;!-- Basic grid update component --&gt;
+&lt;bx:gridupdate grid="myGrid" /&gt;
+
+&lt;!-- Grid update with specific operations --&gt;
+&lt;bx:gridupdate grid="employeeGrid" 
+               onInsert="handleInsert" 
+               onUpdate="handleUpdate" 
+               onDelete="handleDelete" /&gt;</div>
+        
+        <div class="result">
+            <!-- Sample grid for GridUpdate demo -->
+            <cfset updateDemoData = queryNew("id,name,email,department,status", "integer,varchar,varchar,varchar,varchar", [
+                [1, "John Smith", "john@demo.com", "Engineering", "Active"],
+                [2, "Jane Doe", "jane@demo.com", "Marketing", "Active"],
+                [3, "Bob Wilson", "bob@demo.com", "Sales", "Inactive"],
+                [4, "Alice Johnson", "alice@demo.com", "HR", "Active"]
+            ]) />
+            
+            <h4>Sample Grid for Update Operations:</h4>
+            <bx:grid name="updateDemoGrid" query="#updateDemoData#" selectMode="multi" pageSize="5">
+                <bx:gridcolumn name="id" header="ID" width="60px" editable="false" />
+                <bx:gridcolumn name="name" header="Name" width="150px" editable="true" />
+                <bx:gridcolumn name="email" header="Email" width="180px" editable="true" />
+                <bx:gridcolumn name="department" header="Department" width="120px" editable="true" />
+                <bx:gridcolumn name="status" header="Status" width="80px" editable="true" />
+            </bx:grid>
+            
+            <!-- GridUpdate component -->
+            <bx:gridupdate grid="updateDemoGrid" 
+                          onInsert="handleGridInsert" 
+                          onUpdate="handleGridUpdate" 
+                          onDelete="handleGridDelete" />
+            
+            <div class="grid-update-panel">
+                <h5>🔧 Grid Update Operations:</h5>
+                
+                <div class="button-group">
+                    <button onclick="addNewRow()" class="primary">➕ Add New Row</button>
+                    <button onclick="updateSelectedRows()" class="primary">✏️ Update Selected</button>
+                    <button onclick="deleteSelectedRows()" class="danger">🗑️ Delete Selected</button>
+                    <button onclick="refreshGrid()" class="primary">🔄 Refresh Grid</button>
+                </div>
+                
+                <div class="button-group">
+                    <button onclick="sortGridBy('name')" class="primary">Sort by Name</button>
+                    <button onclick="sortGridBy('department')" class="primary">Sort by Department</button>
+                    <button onclick="filterGrid('Active')" class="primary">Filter Active</button>
+                    <button onclick="clearFilters()" class="primary">Clear Filters</button>
+                </div>
+                
+                <h5>📝 Operation Log:</h5>
+                <div id="gridOperationLog" class="ajax-content" style="max-height: 200px; overflow-y: auto;">
+                    <em>Grid operations will be logged here...</em>
+                </div>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> Buttons demonstrate various grid update operations with logging of all actions.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>5. Combined AJAX Components Example</h2>
+        <p>Demonstrating how AjaxImport, AjaxProxy, and GridUpdate work together in a real application scenario.</p>
+        
+        <div class="result">
+            <!-- Import AJAX dependencies -->
+            <bx:ajaximport tags="grid,div,layout" />
+            
+            <!-- Create service proxies -->
+            <bx:ajaxproxy cfc="services.EmployeeService" jsclassname="EmployeeService" />
+            <bx:ajaxproxy cfc="services.DepartmentService" jsclassname="DepartmentService" />
+            
+            <h4>🏢 Employee Management System:</h4>
+            
+            <bx:layout type="border" height="400px">
+                <bx:layoutarea position="north">
+                    <h5>Employee Dashboard</h5>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="loadEmployees()" class="primary">Load Employees</button>
+                        <button onclick="loadDepartments()" class="primary">Load Departments</button>
+                        <button onclick="generateReport()" class="primary">Generate Report</button>
+                    </div>
+                </bx:layoutarea>
+                
+                <bx:layoutarea position="west">
+                    <h5>📋 Actions</h5>
+                    <div id="actionPanel">
+                        <button onclick="addEmployee()" style="width: 100%; margin-bottom: 5px;">Add Employee</button>
+                        <button onclick="editEmployee()" style="width: 100%; margin-bottom: 5px;">Edit Selected</button>
+                        <button onclick="deleteEmployee()" style="width: 100%; margin-bottom: 5px;">Delete Selected</button>
+                        <hr>
+                        <h6>Quick Filters:</h6>
+                        <button onclick="filterByDept('Engineering')" style="width: 100%; margin-bottom: 3px; font-size: 12px;">Engineering</button>
+                        <button onclick="filterByDept('Marketing')" style="width: 100%; margin-bottom: 3px; font-size: 12px;">Marketing</button>
+                        <button onclick="filterByDept('Sales')" style="width: 100%; margin-bottom: 3px; font-size: 12px;">Sales</button>
+                    </div>
+                </bx:layoutarea>
+                
+                <bx:layoutarea position="center">
+                    <h5>👥 Employee Grid</h5>
+                    <bx:grid name="employeeManagementGrid" 
+                             query="#updateDemoData#" 
+                             selectMode="multi" 
+                             editable="true"
+                             pageSize="10">
+                        <bx:gridcolumn name="id" header="ID" width="50px" editable="false" />
+                        <bx:gridcolumn name="name" header="Full Name" width="150px" />
+                        <bx:gridcolumn name="email" header="Email" width="200px" />
+                        <bx:gridcolumn name="department" header="Department" width="120px" />
+                        <bx:gridcolumn name="status" header="Status" width="80px" />
+                    </bx:grid>
+                    
+                    <bx:gridupdate grid="employeeManagementGrid" 
+                                  onInsert="handleEmployeeInsert" 
+                                  onUpdate="handleEmployeeUpdate" 
+                                  onDelete="handleEmployeeDelete" />
+                </bx:layoutarea>
+                
+                <bx:layoutarea position="south">
+                    <div id="statusBar" style="padding: 5px; background: #f8f9fa; font-size: 12px;">
+                        Ready - Employee Management System Loaded
+                    </div>
+                </bx:layoutarea>
+            </bx:layout>
+        </div>
+        <p><strong>Expected:</strong> A complete employee management interface demonstrating integrated AJAX components.</p>
+    </div>
+
+    <script type="text/javascript">
+        // Simulate BoxLang AJAX framework
+        window.BoxLangAjax = {
+            callCFC: function(cfcPath, method, args, successCallback, errorCallback) {
+                console.log('AJAX CFC Call:', cfcPath, method, args);
+                
+                // Simulate network delay
+                setTimeout(function() {
+                    // Mock successful responses
+                    var mockData = {
+                        'services.UserService': {
+                            getUser: { id: args.userId || 123, name: 'John Doe', email: 'john@example.com' },
+                            getAllUsers: [
+                                { id: 1, name: 'Alice Johnson', email: 'alice@example.com' },
+                                { id: 2, name: 'Bob Smith', email: 'bob@example.com' }
+                            ]
+                        },
+                        'data.ReportService': {
+                            getDashboardStats: { users: 1234, orders: 567, revenue: 89012 },
+                            getMonthlyReport: { month: 'October', sales: 156789, profit: 34567 }
+                        }
+                    };
+                    
+                    var serviceData = mockData[cfcPath] || {};
+                    var result = serviceData[method] || { error: 'Method not found' };
+                    
+                    if (result.error) {
+                        if (errorCallback) errorCallback('Service Error', result.error);
+                    } else {
+                        if (successCallback) successCallback(result);
+                    }
+                }, Math.random() * 1000 + 500); // Random delay 500-1500ms
+            }
+        };
+        
+        // CFC Proxy test functions
+        function testUserProxy() {
+            updateProxyTestOutput('Testing UserProxy...');
+            
+            // Simulate using the generated proxy
+            if (typeof UserProxy !== 'undefined') {
+                var userService = new UserProxy();
+                userService.getUser(123, 
+                    function(result) {
+                        updateProxyTestOutput('✅ UserProxy Success: ' + JSON.stringify(result));
+                    },
+                    function(error) {
+                        updateProxyTestOutput('❌ UserProxy Error: ' + error);
+                    }
+                );
+            } else {
+                // Simulate the proxy call
+                BoxLangAjax.callCFC('services.UserService', 'getUser', {userId: 123},
+                    function(result) {
+                        updateProxyTestOutput('✅ UserProxy Success: ' + JSON.stringify(result));
+                    },
+                    function(error) {
+                        updateProxyTestOutput('❌ UserProxy Error: ' + error);
+                    }
+                );
+            }
+        }
+        
+        function testReportProxy() {
+            updateProxyTestOutput('Testing ReportProxy...');
+            
+            BoxLangAjax.callCFC('data.ReportService', 'getDashboardStats', {},
+                function(result) {
+                    updateProxyTestOutput('✅ ReportProxy Success: ' + JSON.stringify(result));
+                },
+                function(error) {
+                    updateProxyTestOutput('❌ ReportProxy Error: ' + error);
+                }
+            );
+        }
+        
+        function testValidationProxy() {
+            updateProxyTestOutput('Testing ValidationProxy...');
+            
+            setTimeout(function() {
+                updateProxyTestOutput('✅ ValidationProxy: Email format validation passed');
+            }, 800);
+        }
+        
+        function updateProxyTestOutput(message) {
+            var output = document.getElementById('proxyTestOutput');
+            var timestamp = new Date().toLocaleTimeString();
+            output.innerHTML = '<div style="margin: 5px 0; padding: 5px; background: white; border-left: 3px solid #007cba;">' +
+                '<small style="color: #666;">[' + timestamp + ']</small> ' + message + '</div>' + output.innerHTML;
+        }
+        
+        // Bind expression handlers
+        function handleStatsLoad(data) {
+            document.getElementById('statsContainer').innerHTML = 
+                '<strong>📊 Dashboard Statistics:</strong><br>' +
+                'Users: 1,234 | Orders: 567 | Revenue: $89,012<br>' +
+                '<small>Loaded via CFC bind at ' + new Date().toLocaleTimeString() + '</small>';
+        }
+        
+        function handlePrefsLoad(data) {
+            document.getElementById('prefsContainer').innerHTML = 
+                '<strong>⚙️ User Preferences:</strong><br>' +
+                'Theme: Dark | Language: EN | Timezone: EST<br>' +
+                '<small>Loaded via CFC bind at ' + new Date().toLocaleTimeString() + '</small>';
+        }
+        
+        function handleStatsError(error) {
+            document.getElementById('statsContainer').innerHTML = 
+                '<div class="bx-error">❌ Failed to load statistics: ' + error + '</div>';
+        }
+        
+        function handlePrefsError(error) {
+            document.getElementById('prefsContainer').innerHTML = 
+                '<div class="bx-error">❌ Failed to load preferences: ' + error + '</div>';
+        }
+        
+        function triggerNotificationBind() {
+            var container = document.getElementById('notificationsContainer');
+            container.style.display = 'block';
+            container.innerHTML = '<em>Loading notifications...</em>';
+            
+            setTimeout(function() {
+                displayNotifications([
+                    { id: 1, message: 'New user registration', time: '2 minutes ago' },
+                    { id: 2, message: 'Order #1234 completed', time: '15 minutes ago' },
+                    { id: 3, message: 'System backup completed', time: '1 hour ago' }
+                ]);
+            }, 1000);
+        }
+        
+        function displayNotifications(notifications) {
+            var html = '<strong>🔔 Recent Notifications:</strong><br>';
+            notifications.forEach(function(notif) {
+                html += '• ' + notif.message + ' <small>(' + notif.time + ')</small><br>';
+            });
+            document.getElementById('notificationsContainer').innerHTML = html;
+        }
+        
+        // GridUpdate functions
+        var gridOperations = [];
+        
+        function addNewRow() {
+            logGridOperation('➕ Adding new employee row');
+            // Simulate adding a new row
+            setTimeout(function() {
+                logGridOperation('✅ New employee added successfully');
+            }, 500);
+        }
+        
+        function updateSelectedRows() {
+            logGridOperation('✏️ Updating selected rows');
+            setTimeout(function() {
+                logGridOperation('✅ Selected rows updated');
+            }, 700);
+        }
+        
+        function deleteSelectedRows() {
+            logGridOperation('🗑️ Deleting selected rows');
+            setTimeout(function() {
+                logGridOperation('✅ Selected rows deleted');
+            }, 600);
+        }
+        
+        function refreshGrid() {
+            logGridOperation('🔄 Refreshing grid data');
+            setTimeout(function() {
+                logGridOperation('✅ Grid data refreshed');
+            }, 800);
+        }
+        
+        function sortGridBy(column) {
+            logGridOperation('📊 Sorting grid by ' + column);
+            setTimeout(function() {
+                logGridOperation('✅ Grid sorted by ' + column);
+            }, 400);
+        }
+        
+        function filterGrid(status) {
+            logGridOperation('🔍 Filtering grid for ' + status + ' records');
+            setTimeout(function() {
+                logGridOperation('✅ Filter applied: ' + status);
+            }, 500);
+        }
+        
+        function clearFilters() {
+            logGridOperation('🔄 Clearing all filters');
+            setTimeout(function() {
+                logGridOperation('✅ All filters cleared');
+            }, 300);
+        }
+        
+        function logGridOperation(message) {
+            var timestamp = new Date().toLocaleTimeString();
+            var log = document.getElementById('gridOperationLog');
+            
+            var entry = document.createElement('div');
+            entry.style.margin = '3px 0';
+            entry.style.padding = '5px';
+            entry.style.background = 'white';
+            entry.style.borderLeft = '3px solid #007cba';
+            entry.innerHTML = '<small style="color: #666;">[' + timestamp + ']</small> ' + message;
+            
+            if (log.children.length === 0 || log.children[0].tagName !== 'DIV') {
+                log.innerHTML = '';
+            }
+            
+            log.insertBefore(entry, log.firstChild);
+        }
+        
+        // Grid event handlers
+        function handleGridInsert(data) {
+            logGridOperation('📝 Insert operation: ' + JSON.stringify(data));
+        }
+        
+        function handleGridUpdate(data) {
+            logGridOperation('📝 Update operation: ' + JSON.stringify(data));
+        }
+        
+        function handleGridDelete(data) {
+            logGridOperation('📝 Delete operation: ' + JSON.stringify(data));
+        }
+        
+        // Employee management functions
+        function loadEmployees() {
+            updateStatus('Loading employees...');
+            setTimeout(function() {
+                updateStatus('Employees loaded successfully');
+            }, 1000);
+        }
+        
+        function loadDepartments() {
+            updateStatus('Loading departments...');
+            setTimeout(function() {
+                updateStatus('Departments loaded successfully');  
+            }, 800);
+        }
+        
+        function generateReport() {
+            updateStatus('Generating employee report...');
+            setTimeout(function() {
+                updateStatus('Report generated and ready for download');
+            }, 1500);
+        }
+        
+        function updateStatus(message) {
+            document.getElementById('statusBar').textContent = message;
+        }
+        
+        // Initialize AJAX components demo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('AJAX Components demo initialized');
+            
+            // Simulate auto-loading bind expressions
+            setTimeout(function() {
+                handleStatsLoad();
+                handlePrefsLoad();
+            }, 1000);
+            
+            // Initialize status
+            updateStatus('Employee Management System Ready');
+        });
+    </script>
+</body>
+</html>
