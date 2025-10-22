@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BoxLang Pod Component Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .demo-section { border: 1px solid #ccc; margin: 20px 0; padding: 15px; }
+        .demo-section h2 { margin-top: 0; color: #333; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
+        
+        /* Pod styling */
+        .bx-pod { border: 1px solid #ccc; margin: 10px 0; background: white; border-radius: 4px; overflow: hidden; }
+        .bx-pod-header { background: linear-gradient(to bottom, #f8f9fa, #e9ecef); padding: 10px 15px; border-bottom: 1px solid #ddd; font-weight: bold; color: #333; }
+        .bx-pod-body { padding: 15px; }
+        .bx-source-loading { color: #666; font-style: italic; text-align: center; padding: 20px; }
+        .bx-source-error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 4px; }
+        .bx-source-loaded { /* Loaded content styling */ }
+        
+        /* Demo grid for pods */
+        .pod-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0; }
+        .pod-row { display: flex; gap: 15px; margin: 10px 0; }
+        .pod-row .bx-pod { flex: 1; }
+        
+        /* Custom pod styles for demos */
+        .dashboard-pod { background: #f8f9fa; }
+        .dashboard-pod .bx-pod-header { background: linear-gradient(to right, #007bff, #0056b3); color: white; }
+        
+        .alert-pod { background: #fff3cd; border-color: #ffeaa7; }
+        .alert-pod .bx-pod-header { background: #ffc107; color: #212529; }
+        
+        .success-pod { background: #d4edda; border-color: #c3e6cb; }
+        .success-pod .bx-pod-header { background: #28a745; color: white; }
+    </style>
+</head>
+<body>
+    <h1>BoxLang Pod Component Demo</h1>
+    <p>The Pod component provides a container with optional title bar and body content, perfect for creating dashboards and content panels.</p>
+
+    <div class="demo-section">
+        <h2>1. Basic Pod</h2>
+        <p>Simple pod with title and static content:</p>
+        <div class="result">
+            <bx:pod title="Welcome Message" width="400px">
+                <h4>Hello, BoxLang Developer!</h4>
+                <p>This is a basic pod containing static content. Pods are great for organizing information into distinct sections.</p>
+                <ul>
+                    <li>Easy to use</li>
+                    <li>Flexible styling</li>
+                    <li>Perfect for dashboards</li>
+                </ul>
+            </bx:pod>
+        </div>
+        <p><strong>Expected:</strong> A bordered container with a header showing "Welcome Message" and the content below.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. Pod without Title</h2>
+        <p>Pod containing only body content:</p>
+        <div class="result">
+            <bx:pod width="350px" height="150px">
+                <p><strong>No Title Pod</strong></p>
+                <p>This pod doesn't have a title bar, just content. This is useful when you want a simple bordered container.</p>
+                <p>The height is fixed at 150px for this example.</p>
+            </bx:pod>
+        </div>
+        <p><strong>Expected:</strong> A container with content but no header/title bar.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. Pods with Different Overflow Settings</h2>
+        <p>Demonstrating overflow behavior:</p>
+        <div class="result">
+            <div class="pod-row">
+                <bx:pod title="Auto Overflow (Default)" height="120px" overflow="auto">
+                    <p>This pod has overflow set to "auto".</p>
+                    <p>When content is too tall for the container, scrollbars will appear automatically.</p>
+                    <p>This is a longer paragraph to demonstrate the scrolling behavior when there's more content than space.</p>
+                    <p>You should see a vertical scrollbar appear in this pod.</p>
+                </bx:pod>
+                
+                <bx:pod title="Hidden Overflow" height="120px" overflow="hidden">
+                    <p>This pod has overflow set to "hidden".</p>
+                    <p>Content that doesn't fit will be clipped and hidden from view.</p>
+                    <p>This text might be cut off because the pod height is limited and overflow is hidden.</p>
+                    <p>No scrollbars will appear.</p>
+                </bx:pod>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> Left pod shows scrollbar, right pod clips content without scrollbars.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>4. Pod with AJAX Source</h2>
+        <p>Pod that loads content from an external URL:</p>
+        <div class="result">
+            <bx:pod title="Dynamic Content" 
+                    source="/api/dashboard/stats" 
+                    width="400px" 
+                    height="200px"
+                    onBindError="handlePodError">
+                <!-- Initial content shown while loading -->
+                <div class="bx-source-loading">
+                    <p>🔄 Loading dashboard statistics...</p>
+                    <p>Please wait while we fetch the latest data.</p>
+                </div>
+            </bx:pod>
+        </div>
+        <p><strong>Expected:</strong> Shows loading message, then attempts to load from source URL (will show error if URL doesn't exist).</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>5. Custom Styled Pods</h2>
+        <p>Pods with custom styling using style attributes:</p>
+        <div class="result">
+            <div class="pod-row">
+                <bx:pod title="Info Pod" 
+                        width="200px"
+                        headerStyle="background: #17a2b8; color: white; text-align: center;"
+                        bodyStyle="background: #e7f7ff; color: #0c5460;">
+                    <p>📊 Statistics</p>
+                    <p><strong>Users:</strong> 1,234</p>
+                    <p><strong>Orders:</strong> 567</p>
+                    <p><strong>Revenue:</strong> $89,012</p>
+                </bx:pod>
+                
+                <bx:pod title="Alert Pod" 
+                        width="200px"
+                        headerStyle="background: #dc3545; color: white; text-align: center;"
+                        bodyStyle="background: #f8d7da; color: #721c24; text-align: center;">
+                    <p>⚠️ Warning</p>
+                    <p>System maintenance scheduled for tonight at 11 PM.</p>
+                    <p>Expected downtime: 2 hours</p>
+                </bx:pod>
+                
+                <bx:pod title="Success Pod" 
+                        width="200px"
+                        headerStyle="background: #28a745; color: white; text-align: center;"
+                        bodyStyle="background: #d4edda; color: #155724; text-align: center;">
+                    <p>✅ Success</p>
+                    <p>Backup completed successfully!</p>
+                    <p>All files saved to cloud storage.</p>
+                </bx:pod>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> Three pods with different color schemes representing info, warning, and success states.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>6. Dashboard Layout with Pods</h2>
+        <p>Creating a dashboard-style layout using multiple pods:</p>
+        <div class="result">
+            <div class="pod-grid">
+                <bx:pod title="📈 Sales Overview" class="dashboard-pod">
+                    <table style="width: 100%; font-size: 14px;">
+                        <tr><td>Today:</td><td style="text-align: right;"><strong>$5,234</strong></td></tr>
+                        <tr><td>This Week:</td><td style="text-align: right;"><strong>$28,945</strong></td></tr>
+                        <tr><td>This Month:</td><td style="text-align: right;"><strong>$156,789</strong></td></tr>
+                        <tr><td>YTD:</td><td style="text-align: right;"><strong>$1,234,567</strong></td></tr>
+                    </table>
+                </bx:pod>
+                
+                <bx:pod title="👥 User Activity" class="dashboard-pod">
+                    <div style="font-size: 14px;">
+                        <p><span style="color: #28a745;">●</span> 145 users online</p>
+                        <p><span style="color: #ffc107;">●</span> 23 pending registrations</p>
+                        <p><span style="color: #dc3545;">●</span> 3 support tickets</p>
+                        <hr>
+                        <p><small>Last updated: <span id="lastUpdate">Just now</span></small></p>
+                    </div>
+                </bx:pod>
+                
+                <bx:pod title="📋 Recent Orders" class="dashboard-pod" height="200px" overflow="auto">
+                    <div style="font-size: 13px;">
+                        <div style="border-bottom: 1px solid #eee; padding: 5px 0;">
+                            <strong>#12345</strong> - John Smith - $156.99
+                            <br><small style="color: #666;">2 minutes ago</small>
+                        </div>
+                        <div style="border-bottom: 1px solid #eee; padding: 5px 0;">
+                            <strong>#12344</strong> - Jane Doe - $89.50
+                            <br><small style="color: #666;">15 minutes ago</small>
+                        </div>
+                        <div style="border-bottom: 1px solid #eee; padding: 5px 0;">
+                            <strong>#12343</strong> - Bob Wilson - $234.75
+                            <br><small style="color: #666;">32 minutes ago</small>
+                        </div>
+                        <div style="border-bottom: 1px solid #eee; padding: 5px 0;">
+                            <strong>#12342</strong> - Alice Johnson - $67.25
+                            <br><small style="color: #666;">1 hour ago</small>
+                        </div>
+                        <div style="border-bottom: 1px solid #eee; padding: 5px 0;">
+                            <strong>#12341</strong> - Charlie Brown - $145.00
+                            <br><small style="color: #666;">1 hour ago</small>
+                        </div>
+                    </div>
+                </bx:pod>
+                
+                <bx:pod title="🔧 System Status" class="dashboard-pod">
+                    <div style="font-size: 14px;">
+                        <p><span style="color: #28a745;">✓</span> Web Server: Online</p>
+                        <p><span style="color: #28a745;">✓</span> Database: Online</p>
+                        <p><span style="color: #28a745;">✓</span> Cache: Online</p>
+                        <p><span style="color: #ffc107;">⚠</span> Mail Server: Slow</p>
+                        <hr>
+                        <p><small>Uptime: 99.8% this month</small></p>
+                    </div>
+                </bx:pod>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> A 2x2 grid layout showing a complete dashboard with various information panels.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>7. Named Pod with JavaScript Interaction</h2>
+        <p>Pod with a name attribute for programmatic access:</p>
+        <div class="result">
+            <bx:pod title="Interactive Content" 
+                    name="interactivePod" 
+                    width="400px" 
+                    id="myInteractivePod">
+                <div id="podContent">
+                    <p>This pod can be updated dynamically using JavaScript.</p>
+                    <p><strong>Clicks:</strong> <span id="clickCount">0</span></p>
+                    <button onclick="updatePodContent()">Update Content</button>
+                    <button onclick="togglePodVisibility()">Toggle Visibility</button>
+                </div>
+            </bx:pod>
+        </div>
+        <p><strong>Expected:</strong> Pod with buttons that demonstrate JavaScript interaction.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>8. Responsive Pods</h2>
+        <p>Pods that adapt to container size:</p>
+        <div class="result">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <bx:pod title="Flexible Pod 1" style="flex: 1; min-width: 200px;">
+                    <p>This pod grows and shrinks with the container.</p>
+                    <p>Resize your browser to see the responsive behavior.</p>
+                </bx:pod>
+                <bx:pod title="Flexible Pod 2" style="flex: 1; min-width: 200px;">
+                    <p>Another flexible pod that adapts to available space.</p>
+                    <p>Both pods maintain equal width when possible.</p>
+                </bx:pod>
+                <bx:pod title="Fixed Pod" width="150px">
+                    <p>This pod maintains a fixed width of 150px regardless of container size.</p>
+                </bx:pod>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> Two flexible pods and one fixed-width pod that demonstrate responsive behavior.</p>
+    </div>
+
+    <script type="text/javascript">
+        var clickCount = 0;
+        
+        function updatePodContent() {
+            clickCount++;
+            document.getElementById('clickCount').textContent = clickCount;
+            
+            var content = document.getElementById('podContent');
+            var currentTime = new Date().toLocaleTimeString();
+            
+            // Add a timestamp message
+            var timeMsg = document.createElement('p');
+            timeMsg.innerHTML = '<small style="color: #666;">Updated at: ' + currentTime + '</small>';
+            timeMsg.style.borderTop = '1px solid #eee';
+            timeMsg.style.paddingTop = '5px';
+            timeMsg.style.marginTop = '10px';
+            
+            // Remove any existing timestamp
+            var existing = content.querySelector('small');
+            if (existing && existing.parentElement) {
+                existing.parentElement.remove();
+            }
+            
+            content.appendChild(timeMsg);
+        }
+        
+        function togglePodVisibility() {
+            var pod = document.getElementById('myInteractivePod');
+            if (pod.style.display === 'none') {
+                pod.style.display = 'block';
+            } else {
+                pod.style.display = 'none';
+                // Show it again after 2 seconds for demo purposes
+                setTimeout(function() {
+                    pod.style.display = 'block';
+                }, 2000);
+            }
+        }
+        
+        function handlePodError(errorMessage, error) {
+            console.error('Pod loading error:', errorMessage, error);
+            alert('Pod Error: ' + errorMessage);
+        }
+        
+        // Update the "last updated" timestamp periodically
+        function updateLastUpdateTime() {
+            var element = document.getElementById('lastUpdate');
+            if (element) {
+                var now = new Date();
+                element.textContent = now.toLocaleTimeString();
+            }
+        }
+        
+        // Initialize pod demos
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Pod demos initialized');
+            
+            // Update timestamp every 30 seconds
+            setInterval(updateLastUpdateTime, 30000);
+            
+            // Listen for pod events
+            document.addEventListener('bindSuccess', function(e) {
+                console.log('Pod content loaded successfully:', e.target);
+            });
+            
+            document.addEventListener('bindError', function(e) {
+                console.log('Pod content loading failed:', e.detail);
+            });
+        });
+    </script>
+</body>
+</html>

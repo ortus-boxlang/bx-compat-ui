@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BoxLang UI BIFs (Built-in Functions) Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .demo-section { border: 1px solid #ccc; margin: 20px 0; padding: 15px; }
+        .demo-section h2 { margin-top: 0; color: #333; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
+        .code-example { background: #f8f9fa; padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; font-family: monospace; margin: 10px 0; }
+        
+        /* AJAX content styling */
+        .ajax-content { border: 1px solid #ddd; padding: 15px; margin: 10px 0; background: white; border-radius: 4px; }
+        .bx-loading { color: #666; font-style: italic; }
+        .bx-error { color: red; }
+        
+        /* Grid styling for query conversion demo */
+        .query-grid { border-collapse: collapse; width: 100%; margin: 10px 0; }
+        .query-grid th, .query-grid td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .query-grid th { background: #f5f5f5; }
+        
+        /* Interactive demo styling */
+        .interactive-panel { background: white; border: 1px solid #ddd; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .button-group { margin: 10px 0; }
+        .button-group button { margin-right: 10px; margin-bottom: 5px; padding: 8px 16px; border: 1px solid #ddd; background: #f8f9fa; cursor: pointer; border-radius: 4px; }
+        .button-group button:hover { background: #e9ecef; }
+        .button-group button.primary { background: #007cba; color: white; border-color: #007cba; }
+        .button-group button.primary:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>BoxLang UI BIFs (Built-in Functions) Demo</h1>
+    <p>This demonstrates the Built-in Functions (BIFs) provided by the BoxLang UI module for AJAX functionality and grid data processing.</p>
+
+    <div class="demo-section">
+        <h2>1. AjaxLink BIF</h2>
+        <p>The <code>AjaxLink()</code> function generates URLs that cause content to load via AJAX rather than replacing the entire page.</p>
+        
+        <div class="code-example">
+&lt;cfset myAjaxURL = ajaxLink("content/sample-page.cfm") /&gt;
+&lt;a href="#myAjaxURL#"&gt;Load Content via AJAX&lt;/a&gt;
+        </div>
+        
+        <div class="result">
+            <h4>Basic AJAX Links:</h4>
+            
+            <cfset ajaxURL1 = ajaxLink("api/content/home") />
+            <p>Generated URL: <code><cfoutput>#ajaxURL1#</cfoutput></code></p>
+            <a href="<cfoutput>#ajaxURL1#</cfoutput>">Load Home Content</a><br><br>
+            
+            <cfset ajaxURL2 = ajaxLink("api/content/about") />
+            <p>Generated URL: <code><cfoutput>#ajaxURL2#</cfoutput></code></p>
+            <a href="<cfoutput>#ajaxURL2#</cfoutput>">Load About Content</a><br><br>
+            
+            <cfset ajaxURL3 = ajaxLink("api/data/users") />
+            <p>Generated URL: <code><cfoutput>#ajaxURL3#</cfoutput></code></p>
+            <a href="<cfoutput>#ajaxURL3#</cfoutput>">Load User Data</a><br><br>
+            
+            <h4>AJAX Content Container:</h4>
+            <div id="ajaxContainer" class="ajax-content">
+                <p><em>Click any AJAX link above to load content here.</em></p>
+                <p>The AjaxLink BIF generates JavaScript URLs that prevent full page reloads.</p>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> Links generate JavaScript URLs starting with "javascript:void(" that would handle AJAX loading.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. AjaxOnLoad BIF</h2>
+        <p>The <code>AjaxOnLoad()</code> function registers JavaScript functions to execute when the page finishes loading.</p>
+        
+        <div class="code-example">
+&lt;script&gt;
+function initializeApp() {
+    console.log("App initialized via AjaxOnLoad!");
+}
+&lt;/script&gt;
+&lt;cfset ajaxOnLoad("initializeApp") /&gt;
+        </div>
+        
+        <div class="result">
+            <script type="text/javascript">
+                function welcomeMessage() {
+                    console.log("Welcome message initialized via AjaxOnLoad!");
+                    var element = document.getElementById('welcomeTarget');
+                    if (element) {
+                        element.innerHTML = '<div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 4px;">' +
+                            '✅ <strong>Success!</strong> This content was loaded by AjaxOnLoad BIF.<br>' +
+                            'Function executed at: ' + new Date().toLocaleTimeString() +
+                            '</div>';
+                    }
+                }
+                
+                function setupDashboard() {
+                    console.log("Dashboard setup via AjaxOnLoad!");
+                    var dashboards = document.querySelectorAll('.dashboard-widget');
+                    dashboards.forEach(function(widget, index) {
+                        setTimeout(function() {
+                            widget.innerHTML = '<p>📊 Widget ' + (index + 1) + ' loaded!</p>';
+                            widget.style.background = '#e3f2fd';
+                        }, (index + 1) * 500);
+                    });
+                }
+                
+                function validateForms() {
+                    console.log("Form validation setup via AjaxOnLoad!");
+                    document.getElementById('formStatus').innerHTML = 
+                        '<span style="color: #28a745;">✓ Form validation initialized</span>';
+                }
+            </script>
+            
+            <!-- Register functions to run on page load -->
+            <cfset ajaxOnLoad("welcomeMessage") />
+            <cfset ajaxOnLoad("setupDashboard") />
+            <cfset ajaxOnLoad("validateForms") />
+            
+            <h4>Functions Registered with AjaxOnLoad:</h4>
+            <ul>
+                <li><code>welcomeMessage()</code> - Shows welcome content</li>
+                <li><code>setupDashboard()</code> - Initializes dashboard widgets</li>  
+                <li><code>validateForms()</code> - Sets up form validation</li>
+            </ul>
+            
+            <div id="welcomeTarget" class="ajax-content">
+                <p>🔄 Waiting for AjaxOnLoad to execute welcomeMessage()...</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 15px 0;">
+                <div class="dashboard-widget ajax-content" style="text-align: center; padding: 20px;">
+                    <p>📊 Widget Loading...</p>
+                </div>
+                <div class="dashboard-widget ajax-content" style="text-align: center; padding: 20px;">
+                    <p>📈 Widget Loading...</p>
+                </div>
+                <div class="dashboard-widget ajax-content" style="text-align: center; padding: 20px;">
+                    <p>📋 Widget Loading...</p>
+                </div>
+            </div>
+            
+            <p><strong>Form Status:</strong> <span id="formStatus" style="color: #666;">Checking...</span></p>
+        </div>
+        <p><strong>Expected:</strong> Content updates automatically when page loads, demonstrating the AjaxOnLoad BIF execution.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. QueryConvertForGrid BIF</h2>
+        <p>The <code>QueryConvertForGrid()</code> function converts query objects into formats suitable for grid components.</p>
+        
+        <div class="code-example">
+&lt;cfset myQuery = queryNew("id,name,email,status", "integer,varchar,varchar,varchar") /&gt;
+&lt;cfset queryAddRow(myQuery, [
+    [1, "John Doe", "john@example.com", "Active"],
+    [2, "Jane Smith", "jane@example.com", "Inactive"]
+]) /&gt;
+&lt;cfset gridData = queryConvertForGrid(myQuery, page=1, pageSize=10, sort="name", sortDir="ASC") /&gt;
+        </div>
+        
+        <div class="result">
+            <cfset sampleQuery = queryNew("id,name,email,department,salary,status", "integer,varchar,varchar,varchar,decimal,varchar", [
+                [1, "Alice Johnson", "alice@company.com", "Engineering", 85000, "Active"],
+                [2, "Bob Smith", "bob@company.com", "Marketing", 65000, "Active"],
+                [3, "Carol Davis", "carol@company.com", "Sales", 58000, "Inactive"],
+                [4, "David Wilson", "david@company.com", "Engineering", 92000, "Active"],
+                [5, "Eva Brown", "eva@company.com", "HR", 67000, "Active"],
+                [6, "Frank Miller", "frank@company.com", "Sales", 61000, "Active"],
+                [7, "Grace Lee", "grace@company.com", "Engineering", 88000, "Inactive"],
+                [8, "Henry Taylor", "henry@company.com", "Marketing", 69000, "Active"]
+            ]) />
+            
+            <h4>Original Query Data:</h4>
+            <table class="query-grid">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Salary</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <cfloop query="sampleQuery">
+                        <cfif sampleQuery.currentRow <= 5>
+                            <tr>
+                                <td><cfoutput>#id#</cfoutput></td>
+                                <td><cfoutput>#name#</cfoutput></td>
+                                <td><cfoutput>#email#</cfoutput></td>
+                                <td><cfoutput>#department#</cfoutput></td>
+                                <td><cfoutput>$#numberFormat(salary, "999,999")#</cfoutput></td>
+                                <td><cfoutput>#status#</cfoutput></td>
+                            </tr>
+                        </cfif>
+                    </cfloop>
+                </tbody>
+            </table>
+            <p><small>Showing first 5 rows of #sampleQuery.recordCount# total records</small></p>
+            
+            <h4>QueryConvertForGrid Examples:</h4>
+            
+            <div class="interactive-panel">
+                <h5>Page 1, Size 3, Sort by Name ASC:</h5>
+                <cfset gridData1 = queryConvertForGrid(sampleQuery, page=1, pageSize=3, sort="name", sortDir="ASC") />
+                <pre><cfoutput>#serializeJSON(gridData1)#</cfoutput></pre>
+            </div>
+            
+            <div class="interactive-panel">
+                <h5>Page 2, Size 3, Sort by Salary DESC:</h5>
+                <cfset gridData2 = queryConvertForGrid(sampleQuery, page=2, pageSize=3, sort="salary", sortDir="DESC") />
+                <pre><cfoutput>#serializeJSON(gridData2)#</cfoutput></pre>
+            </div>
+            
+            <div class="interactive-panel">
+                <h5>Filter Active Users Only:</h5>
+                <cfset activeQuery = queryExecute("SELECT * FROM sampleQuery WHERE status = 'Active'", {}, {dbtype="query"}) />
+                <cfset gridData3 = queryConvertForGrid(activeQuery, page=1, pageSize=5) />
+                <pre><cfoutput>#serializeJSON(gridData3)#</cfoutput></pre>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> JSON formatted data structures suitable for grid components, with pagination and sorting applied.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>4. Interactive BIF Testing</h2>
+        <p>Test the BIFs with different parameters:</p>
+        
+        <div class="result">
+            <div class="interactive-panel">
+                <h4>🔗 AjaxLink Generator</h4>
+                <p>
+                    <label>URL: </label>
+                    <input type="text" id="urlInput" value="api/data/sample" style="width: 200px;">
+                    <button onclick="generateAjaxLink()" class="primary">Generate Link</button>
+                </p>
+                <p id="generatedLink">Click "Generate Link" to see the result</p>
+                <div id="linkTest" class="ajax-content" style="display: none;">
+                    <p>Test the generated link:</p>
+                    <a id="testLink" href="#">Test Link</a>
+                </div>
+            </div>
+            
+            <div class="interactive-panel">
+                <h4>⚡ AjaxOnLoad Tester</h4>
+                <p>
+                    <label>Function Name: </label>
+                    <input type="text" id="functionInput" value="testFunction" style="width: 150px;">
+                    <button onclick="testAjaxOnLoad()" class="primary">Register Function</button>
+                </p>
+                <div id="functionOutput" class="ajax-content">
+                    <p>Register a function to see it executed on the next page event.</p>
+                </div>
+                
+                <script>
+                    var testFunctionCounter = 0;
+                    function testFunction() {
+                        testFunctionCounter++;
+                        document.getElementById('functionOutput').innerHTML = 
+                            '<div style="background: #d4edda; padding: 10px; border-radius: 4px; color: #155724;">' +
+                            '✅ testFunction() executed successfully! (Call #' + testFunctionCounter + ')' +
+                            '</div>';
+                    }
+                    
+                    function customTestFunction() {
+                        document.getElementById('functionOutput').innerHTML = 
+                            '<div style="background: #cce7ff; padding: 10px; border-radius: 4px; color: #004085;">' +
+                            '🎯 customTestFunction() was called at ' + new Date().toLocaleTimeString() +
+                            '</div>';
+                    }
+                </script>
+            </div>
+            
+            <div class="interactive-panel">
+                <h4>📊 QueryConvertForGrid Tester</h4>
+                <div class="button-group">
+                    <button onclick="testGridConvert('name', 'ASC', 1, 3)">Sort by Name ↑</button>
+                    <button onclick="testGridConvert('salary', 'DESC', 1, 3)">Sort by Salary ↓</button>
+                    <button onclick="testGridConvert('department', 'ASC', 2, 2)">Page 2, Size 2</button>
+                    <button onclick="testGridConvert('status', 'ASC', 1, 10)">All Active</button>
+                </div>
+                <div id="gridConvertOutput" class="ajax-content">
+                    <p>Click a button above to test different QueryConvertForGrid scenarios.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>5. Real-World Usage Scenarios</h2>
+        <p>Practical examples of how these BIFs work together:</p>
+        
+        <div class="result">
+            <h4>Dashboard with Dynamic Loading:</h4>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="ajax-content">
+                    <h5>📈 Sales Report</h5>
+                    <cfset salesURL = ajaxLink("reports/sales/daily") />
+                    <p><a href="<cfoutput>#salesURL#</cfoutput>">Load Daily Sales</a></p>
+                    <cfset weeklyURL = ajaxLink("reports/sales/weekly") />
+                    <p><a href="<cfoutput>#weeklyURL#</cfoutput>">Load Weekly Sales</a></p>
+                </div>
+                
+                <div class="ajax-content">
+                    <h5>👥 User Management</h5>
+                    <cfset userURL = ajaxLink("admin/users/list") />
+                    <p><a href="<cfoutput>#userURL#</cfoutput>">Load User List</a></p>
+                    <cfset activeURL = ajaxLink("admin/users/active") />
+                    <p><a href="<cfoutput>#activeURL#</cfoutput>">Load Active Users</a></p>
+                </div>
+            </div>
+            
+            <h4>Initialization Sequence:</h4>
+            <script>
+                function initializeDashboard() {
+                    console.log("Dashboard initialization started");
+                    document.getElementById('initStatus').innerHTML = '1. Dashboard framework loaded ✓';
+                    
+                    setTimeout(function() {
+                        document.getElementById('initStatus').innerHTML += '<br>2. User permissions checked ✓';
+                        setTimeout(function() {
+                            document.getElementById('initStatus').innerHTML += '<br>3. Data connections established ✓';
+                            setTimeout(function() {
+                                document.getElementById('initStatus').innerHTML += '<br>4. Dashboard ready! ✓';
+                            }, 300);
+                        }, 300);
+                    }, 300);
+                }
+                
+                function loadInitialData() {
+                    document.getElementById('dataStatus').innerHTML = 
+                        '<span style="color: #28a745;">Initial data loaded via AjaxOnLoad</span>';
+                }
+            </script>
+            
+            <cfset ajaxOnLoad("initializeDashboard") />
+            <cfset ajaxOnLoad("loadInitialData") />
+            
+            <div class="ajax-content">
+                <h5>🚀 Initialization Status:</h5>
+                <p id="initStatus">Initializing...</p>
+                <p><strong>Data Status:</strong> <span id="dataStatus">Loading...</span></p>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> Demonstrates how AjaxLink and AjaxOnLoad work together for dynamic application initialization.</p>
+    </div>
+
+    <script type="text/javascript">
+        function generateAjaxLink() {
+            var url = document.getElementById('urlInput').value;
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+            
+            // Simulate the AjaxLink BIF
+            var ajaxURL = "javascript:void(BoxLangAjax && BoxLangAjax.utils ? BoxLangAjax.utils.handleAjaxLink('" + url + "', event) : console.error('BoxLang AJAX not initialized'))";
+            
+            document.getElementById('generatedLink').innerHTML = 
+                '<strong>Generated AjaxLink:</strong><br><code>' + ajaxURL + '</code>';
+            
+            // Show test link
+            document.getElementById('linkTest').style.display = 'block';
+            document.getElementById('testLink').href = ajaxURL;
+            document.getElementById('testLink').textContent = 'Test: ' + url;
+        }
+        
+        function testAjaxOnLoad() {
+            var funcName = document.getElementById('functionInput').value;
+            if (!funcName) {
+                alert('Please enter a function name');
+                return;
+            }
+            
+            // Simulate registering a function with AjaxOnLoad
+            console.log('Registering function with AjaxOnLoad:', funcName);
+            
+            // Execute the function if it exists
+            if (typeof window[funcName] === 'function') {
+                window[funcName]();
+                document.getElementById('functionOutput').innerHTML = 
+                    '<div style="background: #d4edda; padding: 10px; border-radius: 4px; color: #155724;">' +
+                    '✅ Function "' + funcName + '()" executed successfully!' +
+                    '</div>';
+            } else {
+                document.getElementById('functionOutput').innerHTML = 
+                    '<div style="background: #f8d7da; padding: 10px; border-radius: 4px; color: #721c24;">' +
+                    '❌ Function "' + funcName + '()" not found. Available: testFunction, customTestFunction' +
+                    '</div>';
+            }
+        }
+        
+        function testGridConvert(sort, sortDir, page, pageSize) {
+            // Simulate QueryConvertForGrid BIF
+            var result = {
+                TOTALROWCOUNT: 8,
+                ROWCOUNT: pageSize,
+                STARTROW: ((page - 1) * pageSize) + 1,
+                COLUMNS: ["ID", "NAME", "EMAIL", "DEPARTMENT", "SALARY", "STATUS"],
+                DATA: []
+            };
+            
+            // Mock data (simplified)
+            var mockData = [
+                [1, "Alice Johnson", "alice@company.com", "Engineering", 85000, "Active"],
+                [2, "Bob Smith", "bob@company.com", "Marketing", 65000, "Active"],
+                [3, "Carol Davis", "carol@company.com", "Sales", 58000, "Inactive"],
+                [4, "David Wilson", "david@company.com", "Engineering", 92000, "Active"]
+            ];
+            
+            result.DATA = mockData.slice(0, pageSize);
+            
+            document.getElementById('gridConvertOutput').innerHTML = 
+                '<strong>QueryConvertForGrid Result:</strong><br>' +
+                '<div style="background: #f8f9fa; padding: 10px; border: 1px solid #e9ecef; border-radius: 4px; font-family: monospace; white-space: pre-wrap;">' +
+                JSON.stringify(result, null, 2) +
+                '</div>' +
+                '<p><small>Sort: ' + sort + ' ' + sortDir + ', Page: ' + page + ', Size: ' + pageSize + '</small></p>';
+        }
+        
+        // Initialize BIF demos
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('BIF demos initialized');
+            
+            // Simulate BoxLang AJAX utilities for link handling
+            window.BoxLangAjax = {
+                utils: {
+                    handleAjaxLink: function(url, event) {
+                        if (event && event.preventDefault) {
+                            event.preventDefault();
+                        }
+                        
+                        console.log('AJAX link clicked:', url);
+                        
+                        // Update the AJAX container with simulated content
+                        var container = document.getElementById('ajaxContainer');
+                        if (container) {
+                            container.innerHTML = 
+                                '<div style="background: #e3f2fd; padding: 15px; border-radius: 4px; border-left: 4px solid #2196f3;">' +
+                                '<h5>📡 AJAX Content Loaded</h5>' +
+                                '<p><strong>URL:</strong> ' + url + '</p>' +
+                                '<p><strong>Loaded at:</strong> ' + new Date().toLocaleTimeString() + '</p>' +
+                                '<p>This content would normally be loaded from the server.</p>' +
+                                '</div>';
+                        }
+                        
+                        return false;
+                    }
+                }
+            };
+        });
+    </script>
+</body>
+</html>

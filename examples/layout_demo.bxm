@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BoxLang Layout and LayoutArea Components Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .demo-section { border: 1px solid #ccc; margin: 20px 0; padding: 15px; }
+        .demo-section h2 { margin-top: 0; color: #333; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
+        
+        /* Basic styling for layouts */
+        .bx-layout { border: 1px solid #ddd; margin: 10px 0; }
+        .bx-layout-tab .bx-tab-headers { background: #f5f5f5; border-bottom: 1px solid #ddd; }
+        .bx-layout-tab .bx-tab-header { padding: 8px 16px; border: 1px solid #ddd; background: #fff; cursor: pointer; display: inline-block; margin-right: 2px; }
+        .bx-layout-tab .bx-tab-header.active { background: #007cba; color: white; }
+        .bx-layout-tab .bx-tab-panel { padding: 15px; display: none; }
+        .bx-layout-tab .bx-tab-panel.active { display: block; }
+        
+        .bx-layout-accordion .bx-accordion-header { background: #f5f5f5; padding: 10px; border: 1px solid #ddd; cursor: pointer; margin-bottom: 1px; }
+        .bx-layout-accordion .bx-accordion-header:hover { background: #e0e0e0; }
+        .bx-layout-accordion .bx-accordion-content { padding: 15px; border: 1px solid #ddd; border-top: none; }
+        .bx-layout-accordion .bx-accordion-panel.collapsed .bx-accordion-content { display: none; }
+        
+        .bx-layout-border { position: relative; min-height: 300px; }
+        .bx-border-north { position: absolute; top: 0; left: 0; right: 0; height: 60px; background: #e8f4fd; border-bottom: 1px solid #ccc; padding: 10px; }
+        .bx-border-south { position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: #e8f4fd; border-top: 1px solid #ccc; padding: 10px; }
+        .bx-border-west { position: absolute; top: 70px; left: 0; bottom: 50px; width: 150px; background: #f0f8ff; border-right: 1px solid #ccc; padding: 10px; }
+        .bx-border-east { position: absolute; top: 70px; right: 0; bottom: 50px; width: 150px; background: #f0f8ff; border-left: 1px solid #ccc; padding: 10px; }
+        .bx-border-center { position: absolute; top: 70px; left: 170px; right: 170px; bottom: 50px; padding: 10px; }
+        
+        .bx-layout-hbox, .bx-layout-vbox { display: flex; }
+        .bx-layout-hbox { flex-direction: row; }
+        .bx-layout-vbox { flex-direction: column; }
+        .bx-box-item { padding: 10px; border: 1px solid #ddd; margin: 2px; flex: 1; }
+    </style>
+</head>
+<body>
+    <h1>BoxLang Layout and LayoutArea Components Demo</h1>
+    <p>This demonstrates the various layout types and how content areas work within them.</p>
+
+    <div class="demo-section">
+        <h2>1. Tab Layout</h2>
+        <p>Creates tabbed interface with clickable headers and content panels:</p>
+        <div class="result">
+            <bx:layout type="tab" id="tabDemo" height="200px">
+                <bx:layoutarea title="Home">
+                    <h3>Welcome Home!</h3>
+                    <p>This is the home tab content. You can put any HTML or BoxLang content here.</p>
+                    <ul>
+                        <li>Feature 1</li>
+                        <li>Feature 2</li>
+                        <li>Feature 3</li>
+                    </ul>
+                </bx:layoutarea>
+                <bx:layoutarea title="About">
+                    <h3>About Us</h3>
+                    <p>This tab contains information about the application.</p>
+                    <p><strong>Version:</strong> 1.0.0</p>
+                    <p><strong>Author:</strong> BoxLang Team</p>
+                </bx:layoutarea>
+                <bx:layoutarea title="Contact">
+                    <h3>Contact Information</h3>
+                    <p>Get in touch with us:</p>
+                    <p>📧 Email: info@boxlang.io<br>
+                       📞 Phone: (555) 123-4567</p>
+                </bx:layoutarea>
+            </bx:layout>
+        </div>
+        <p><strong>Expected:</strong> Interactive tabs that switch content when clicked.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. Accordion Layout</h2>
+        <p>Creates collapsible panels that expand/collapse when clicked:</p>
+        <div class="result">
+            <bx:layout type="accordion" id="accordionDemo">
+                <bx:layoutarea title="Getting Started" initcollapsed="false">
+                    <h4>Quick Start Guide</h4>
+                    <ol>
+                        <li>Install BoxLang</li>
+                        <li>Create your first .bx file</li>
+                        <li>Run your application</li>
+                    </ol>
+                    <p>It's that simple to get started with BoxLang!</p>
+                </bx:layoutarea>
+                <bx:layoutarea title="Advanced Features" initcollapsed="true">
+                    <h4>Power User Features</h4>
+                    <p>BoxLang offers advanced capabilities:</p>
+                    <ul>
+                        <li>Component-based architecture</li>
+                        <li>Built-in function library (BIFs)</li>
+                        <li>Module system</li>
+                        <li>Modern Java integration</li>
+                    </ul>
+                </bx:layoutarea>
+                <bx:layoutarea title="Support & Community" initcollapsed="true">
+                    <h4>Get Help</h4>
+                    <p>Join our community:</p>
+                    <p>🌐 Website: <a href="#">boxlang.io</a><br>
+                       💬 Discord: <a href="#">BoxLang Community</a><br>
+                       📚 Docs: <a href="#">docs.boxlang.io</a></p>
+                </bx:layoutarea>
+            </bx:layout>
+        </div>
+        <p><strong>Expected:</strong> Collapsible panels with the first one expanded by default.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. Border Layout</h2>
+        <p>Creates regions positioned around the container:</p>
+        <div class="result">
+            <bx:layout type="border" id="borderDemo" height="300px">
+                <bx:layoutarea position="north">
+                    <strong>Header (North)</strong> - Application title and navigation
+                </bx:layoutarea>
+                <bx:layoutarea position="south">
+                    <small>Footer (South) - Copyright © 2024</small>
+                </bx:layoutarea>
+                <bx:layoutarea position="west">
+                    <strong>Sidebar (West)</strong><br>
+                    • Menu Item 1<br>
+                    • Menu Item 2<br>
+                    • Menu Item 3
+                </bx:layoutarea>
+                <bx:layoutarea position="east">
+                    <strong>Panel (East)</strong><br>
+                    Recent Activity:<br>
+                    - User logged in<br>
+                    - File uploaded<br>
+                    - Task completed
+                </bx:layoutarea>
+                <bx:layoutarea position="center">
+                    <strong>Main Content (Center)</strong><br>
+                    <p>This is the main content area where your primary application content would be displayed.</p>
+                    <p>The center area automatically fills the remaining space after other regions are positioned.</p>
+                </bx:layoutarea>
+            </bx:layout>
+        </div>
+        <p><strong>Expected:</strong> Five positioned regions forming a traditional application layout.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>4. Horizontal Box Layout (HBox)</h2>
+        <p>Arranges content areas horizontally:</p>
+        <div class="result">
+            <bx:layout type="hbox" id="hboxDemo" height="150px">
+                <bx:layoutarea>
+                    <strong>Panel 1</strong><br>
+                    This is the first panel in the horizontal layout.
+                </bx:layoutarea>
+                <bx:layoutarea>
+                    <strong>Panel 2</strong><br>
+                    Second panel with different content.
+                </bx:layoutarea>
+                <bx:layoutarea>
+                    <strong>Panel 3</strong><br>
+                    Third panel completing the row.
+                </bx:layoutarea>
+            </bx:layout>
+        </div>
+        <p><strong>Expected:</strong> Three panels arranged side-by-side with equal width.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>5. Vertical Box Layout (VBox)</h2>
+        <p>Arranges content areas vertically:</p>
+        <div class="result">
+            <bx:layout type="vbox" id="vboxDemo" width="300px">
+                <bx:layoutarea>
+                    <strong>Top Section</strong><br>
+                    This appears at the top of the vertical stack.
+                </bx:layoutarea>
+                <bx:layoutarea>
+                    <strong>Middle Section</strong><br>
+                    This is in the middle of the layout.
+                </bx:layoutarea>
+                <bx:layoutarea>
+                    <strong>Bottom Section</strong><br>
+                    This appears at the bottom of the stack.
+                </bx:layoutarea>
+            </bx:layout>
+        </div>
+        <p><strong>Expected:</strong> Three panels stacked vertically with equal height distribution.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>6. Advanced: Nested Layouts</h2>
+        <p>Layouts can be nested for complex interfaces:</p>
+        <div class="result">
+            <bx:layout type="border" id="nestedDemo" height="400px">
+                <bx:layoutarea position="north">
+                    <h4>Application Header</h4>
+                </bx:layoutarea>
+                <bx:layoutarea position="center">
+                    <bx:layout type="tab" id="innerTabs">
+                        <bx:layoutarea title="Dashboard">
+                            <bx:layout type="hbox">
+                                <bx:layoutarea>
+                                    <h5>Statistics</h5>
+                                    <p>Users: 1,234<br>
+                                       Sales: $45,678<br>
+                                       Orders: 89</p>
+                                </bx:layoutarea>
+                                <bx:layoutarea>
+                                    <h5>Recent Activity</h5>
+                                    <ul>
+                                        <li>New user registered</li>
+                                        <li>Order #1234 completed</li>
+                                        <li>Payment processed</li>
+                                    </ul>
+                                </bx:layoutarea>
+                            </bx:layout>
+                        </bx:layoutarea>
+                        <bx:layoutarea title="Reports">
+                            <p>Report content would go here...</p>
+                            <p>This demonstrates how layouts can be nested to create sophisticated interfaces.</p>
+                        </bx:layoutarea>
+                    </bx:layout>
+                </bx:layoutarea>
+                <bx:layoutarea position="south">
+                    <small>Status: Ready | Connected to BoxLang Runtime</small>
+                </bx:layoutarea>
+            </bx:layout>
+        </div>
+        <p><strong>Expected:</strong> A border layout containing tabbed content with horizontal panels in the first tab.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>7. Layout with AJAX Source</h2>
+        <p>LayoutAreas can load content from external sources:</p>
+        <div class="result">
+            <bx:layout type="tab" id="ajaxTabsDemo">
+                <bx:layoutarea title="Static Content">
+                    <h4>Static Content</h4>
+                    <p>This content is defined directly in the template.</p>
+                </bx:layoutarea>
+                <bx:layoutarea title="Dynamic Content" source="/api/content/dynamic">
+                    <!-- This content will be loaded via AJAX -->
+                    <div class="bx-source-loading">Loading dynamic content...</div>
+                </bx:layoutarea>
+            </bx:layout>
+        </div>
+        <p><strong>Expected:</strong> First tab shows static content, second tab attempts to load content from the source URL.</p>
+    </div>
+
+    <script type="text/javascript">
+        // Additional demonstration JavaScript
+        console.log("Layout demos initialized");
+        
+        // Listen for custom layout events
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for any custom layout behavior
+            var layouts = document.querySelectorAll('.bx-layout');
+            layouts.forEach(function(layout) {
+                layout.addEventListener('click', function(e) {
+                    console.log('Layout interaction:', e.target);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

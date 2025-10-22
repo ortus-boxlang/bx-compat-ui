@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BoxLang Div Component Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .demo-section { border: 1px solid #ccc; margin: 20px 0; padding: 15px; }
+        .demo-section h2 { margin-top: 0; color: #333; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; border-left: 4px solid #007cba; }
+        .container { border: 2px dashed #007cba; padding: 20px; min-height: 100px; }
+        
+        /* Div styling */
+        .bx-div { border: 1px solid #ddd; padding: 10px; margin: 5px 0; background: white; border-radius: 4px; }
+        .bx-div-bind { background: #f8f9fa; }
+        .bx-bind-loading { color: #666; font-style: italic; text-align: center; padding: 20px; background: #fff3cd; border-radius: 4px; }
+        .bx-bind-loaded { background: #d4edda; border-color: #c3e6cb; }
+        .bx-bind-error { background: #f8d7da; color: #721c24; border-color: #f5c6cb; padding: 15px; border-radius: 4px; }
+        
+        /* Demo styling */
+        .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 10px 0; }
+        .status-div { padding: 10px; border-radius: 4px; margin: 5px 0; }
+        .status-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .status-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-info { background: #cce7ff; color: #004085; border: 1px solid #b3d9ff; }
+    </style>
+</head>
+<body>
+    <h1>BoxLang Div Component Demo</h1>
+    <p>The Div component provides dynamic HTML div elements that can be updated asynchronously via AJAX binding expressions.</p>
+
+    <div class="demo-section">
+        <h2>1. Basic Static Div</h2>
+        <p>Simple div with static content (no binding):</p>
+        <div class="result">
+            <bx:div id="basicDiv" class="demo-content">
+                <h4>Static Content</h4>
+                <p>This is a basic div component containing static HTML content.</p>
+                <p>It behaves just like a regular HTML div but with BoxLang component benefits.</p>
+                <ul>
+                    <li>Clean syntax</li>
+                    <li>Consistent styling</li>
+                    <li>Easy to extend</li>
+                </ul>
+            </bx:div>
+        </div>
+        <p><strong>Expected:</strong> A styled div container with the static content shown above.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>2. Different HTML Tag Types</h2>
+        <p>Div component can generate different HTML tag types:</p>
+        <div class="result">
+            <bx:div tagName="div" class="status-info">
+                <strong>DIV Element:</strong> This is rendered as a &lt;div&gt; tag (default).
+            </bx:div>
+            
+            <bx:div tagName="section" class="status-success">
+                <strong>SECTION Element:</strong> This is rendered as a &lt;section&gt; tag.
+            </bx:div>
+            
+            <bx:div tagName="article" class="status-warning">
+                <strong>ARTICLE Element:</strong> This is rendered as an &lt;article&gt; tag.
+            </bx:div>
+            
+            <bx:div tagName="aside" class="status-error">
+                <strong>ASIDE Element:</strong> This is rendered as an &lt;aside&gt; tag.
+            </bx:div>
+        </div>
+        <p><strong>Expected:</strong> Four different semantic HTML elements with different styling.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>3. Div with AJAX Binding (CFC)</h2>
+        <p>Div that loads content from a CFC method:</p>
+        <div class="result">
+            <bx:div bind="cfc:dataservice.getWelcomeMessage()" 
+                    bindOnLoad="true" 
+                    id="cfcDiv"
+                    onBindError="handleBindError">
+            </bx:div>
+        </div>
+        <p><strong>Expected:</strong> Shows loading message, then attempts to load from CFC (will show error if CFC doesn't exist).</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>4. Div with URL Binding</h2>
+        <p>Div that loads content from a direct URL:</p>
+        <div class="result">
+            <bx:div bind="url:/api/status/server" 
+                    bindOnLoad="true" 
+                    id="urlDiv"
+                    class="server-status"
+                    onBindError="handleBindError">
+            </bx:div>
+        </div>
+        <p><strong>Expected:</strong> Attempts to load content from the specified URL endpoint.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>5. Conditional Binding</h2>
+        <p>Div that loads content conditionally (bindOnLoad="false"):</p>
+        <div class="result">
+            <button onclick="loadConditionalContent()">Load Content</button>
+            <button onclick="clearConditionalContent()">Clear Content</button>
+            
+            <bx:div bind="cfc:reports.getDashboardData()" 
+                    bindOnLoad="false" 
+                    id="conditionalDiv"
+                    class="conditional-content"
+                    onBindError="handleBindError">
+                <p style="color: #666; font-style: italic;">Click "Load Content" to fetch data dynamically.</p>
+            </bx:div>
+        </div>
+        <p><strong>Expected:</strong> Content loads only when the button is clicked, not on page load.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>6. Multiple Divs with Different Bindings</h2>
+        <p>Several divs showing different binding patterns:</p>
+        <div class="result">
+            <div class="demo-grid">
+                <bx:div bind="cfc:analytics.getUserStats()" 
+                        bindOnLoad="true" 
+                        class="status-div"
+                        onBindError="handleBindError">
+                </bx:div>
+                
+                <bx:div bind="url:/api/weather/current" 
+                        bindOnLoad="true" 
+                        class="status-div"
+                        onBindError="handleBindError">
+                </bx:div>
+                
+                <bx:div bind="cfc:inventory.getLowStockItems()" 
+                        bindOnLoad="true" 
+                        class="status-div"
+                        onBindError="handleBindError">
+                </bx:div>
+                
+                <bx:div bind="url:/api/notifications/recent" 
+                        bindOnLoad="true" 
+                        class="status-div"
+                        onBindError="handleBindError">
+                </bx:div>
+            </div>
+        </div>
+        <p><strong>Expected:</strong> Four divs in a grid layout, each attempting to load different content sources.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>7. Div with Custom Styling</h2>
+        <p>Styled divs with custom CSS:</p>
+        <div class="result">
+            <bx:div style="background: linear-gradient(45deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center;"
+                    class="gradient-div">
+                <h4 style="margin-top: 0;">Styled Div Component</h4>
+                <p>This div has custom gradient background and styling.</p>
+                <p>You can apply any CSS styling to div components.</p>
+            </bx:div>
+            
+            <bx:div style="border: 3px dashed #007cba; background: #f0f8ff; padding: 15px; margin: 15px 0;"
+                    class="dashed-border">
+                <p><strong>Dashed Border Div</strong></p>
+                <p>This div demonstrates custom border styling and background colors.</p>
+            </bx:div>
+        </div>
+        <p><strong>Expected:</strong> Two divs with custom gradient and dashed border styling.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>8. Interactive Div with Manual Updates</h2>
+        <p>Div that can be updated programmatically:</p>
+        <div class="result">
+            <div style="margin-bottom: 10px;">
+                <button onclick="updateDivContent()">Update Content</button>
+                <button onclick="triggerManualBind()">Trigger Bind</button>
+                <button onclick="simulateError()">Simulate Error</button>
+                <button onclick="resetDiv()">Reset</button>
+            </div>
+            
+            <bx:div bind="cfc:content.getRandomQuote()" 
+                    bindOnLoad="false" 
+                    id="interactiveDiv"
+                    class="interactive-content"
+                    style="min-height: 100px; border: 2px solid #007cba; padding: 15px;"
+                    onBindError="handleBindError">
+                <div class="status-info">
+                    <h4>Interactive Div</h4>
+                    <p>This div can be updated using JavaScript controls.</p>
+                    <p><strong>Status:</strong> <span id="divStatus">Ready</span></p>
+                    <p><strong>Last Updated:</strong> <span id="lastUpdate">Never</span></p>
+                </div>
+            </bx:div>
+        </div>
+        <p><strong>Expected:</strong> Buttons that demonstrate different ways to interact with and update the div content.</p>
+    </div>
+
+    <div class="demo-section">
+        <h2>9. Span Component Alternative</h2>
+        <p>Using div component to create span elements:</p>
+        <div class="result">
+            <p>This paragraph contains 
+                <bx:div tagName="span" style="background: yellow; padding: 2px 4px;">highlighted text using a span component</bx:div>
+                and 
+                <bx:div tagName="span" style="color: red; font-weight: bold;">important red text</bx:div>
+                within the sentence.
+            </p>
+            
+            <p>Inline elements: 
+                <bx:div tagName="span" class="status-success" style="display: inline-block; padding: 4px 8px; margin: 2px; border-radius: 4px;">Success</bx:div>
+                <bx:div tagName="span" class="status-warning" style="display: inline-block; padding: 4px 8px; margin: 2px; border-radius: 4px;">Warning</bx:div>
+                <bx:div tagName="span" class="status-error" style="display: inline-block; padding: 4px 8px; margin: 2px; border-radius: 4px;">Error</bx:div>
+            </p>
+        </div>
+        <p><strong>Expected:</strong> Inline styled elements created using div component with span tagName.</p>
+    </div>
+
+    <script type="text/javascript">
+        var updateCounter = 0;
+        
+        function handleBindError(errorMessage, error) {
+            console.error('Div bind error:', errorMessage, error);
+            
+            // Find the div that caused the error and show a friendly message
+            var errorDiv = error && error.target ? error.target : null;
+            if (errorDiv) {
+                errorDiv.innerHTML = '<div class="bx-bind-error">' +
+                    '<h5>⚠️ Content Loading Failed</h5>' +
+                    '<p><strong>Error:</strong> ' + errorMessage + '</p>' +
+                    '<p><small>This is expected in the demo environment where the bound services don\'t exist.</small></p>' +
+                    '</div>';
+                errorDiv.classList.add('bx-bind-error');
+            }
+        }
+        
+        function loadConditionalContent() {
+            var div = document.getElementById('conditionalDiv');
+            if (div && div.executeBind) {
+                div.executeBind();
+                updateStatus('Loading conditional content...');
+            } else {
+                // Simulate content loading for demo
+                div.innerHTML = '<div class="status-success">' +
+                    '<h4>✅ Dashboard Data Loaded</h4>' +
+                    '<p>Users online: 247</p>' +
+                    '<p>Active sessions: 156</p>' +
+                    '<p>Server load: 23%</p>' +
+                    '<p><small>Loaded at: ' + new Date().toLocaleTimeString() + '</small></p>' +
+                    '</div>';
+                updateStatus('Conditional content loaded');
+            }
+        }
+        
+        function clearConditionalContent() {
+            var div = document.getElementById('conditionalDiv');
+            div.innerHTML = '<p style="color: #666; font-style: italic;">Click "Load Content" to fetch data dynamically.</p>';
+            div.className = 'conditional-content';
+            updateStatus('Content cleared');
+        }
+        
+        function updateDivContent() {
+            updateCounter++;
+            var div = document.getElementById('interactiveDiv');
+            var timestamp = new Date().toLocaleTimeString();
+            
+            var messages = [
+                'Content has been updated successfully!',
+                'New data received from server.',
+                'Dashboard refreshed with latest information.',
+                'System status updated.',
+                'User preferences synchronized.'
+            ];
+            
+            var randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            
+            div.innerHTML = '<div class="status-success">' +
+                '<h4>🔄 Content Updated</h4>' +
+                '<p>' + randomMessage + '</p>' +
+                '<p><strong>Update #:</strong> ' + updateCounter + '</p>' +
+                '<p><strong>Timestamp:</strong> ' + timestamp + '</p>' +
+                '</div>';
+            
+            updateStatus('Manual update complete');
+            document.getElementById('lastUpdate').textContent = timestamp;
+        }
+        
+        function triggerManualBind() {
+            var div = document.getElementById('interactiveDiv');
+            if (div && div.executeBind) {
+                div.executeBind();
+            } else {
+                // Simulate bind execution
+                div.innerHTML = '<div class="bx-bind-loading">Executing bind expression...</div>';
+                setTimeout(function() {
+                    div.innerHTML = '<div class="status-info">' +
+                        '<h4>📡 Bind Executed</h4>' +
+                        '<p>Quote: "The best way to predict the future is to create it." - Peter Drucker</p>' +
+                        '<p><small>Retrieved from cfc:content.getRandomQuote()</small></p>' +
+                        '</div>';
+                    updateStatus('Bind execution complete');
+                }, 1500);
+            }
+            updateStatus('Executing bind...');
+        }
+        
+        function simulateError() {
+            var div = document.getElementById('interactiveDiv');
+            div.innerHTML = '<div class="bx-bind-error">' +
+                '<h4>❌ Simulated Error</h4>' +
+                '<p><strong>Error Code:</strong> 500</p>' +
+                '<p><strong>Message:</strong> Service temporarily unavailable</p>' +
+                '<p><small>This is a simulated error for demonstration purposes.</small></p>' +
+                '</div>';
+            updateStatus('Error simulated');
+        }
+        
+        function resetDiv() {
+            var div = document.getElementById('interactiveDiv');
+            div.innerHTML = '<div class="status-info">' +
+                '<h4>Interactive Div</h4>' +
+                '<p>This div can be updated using JavaScript controls.</p>' +
+                '<p><strong>Status:</strong> <span id="divStatus">Ready</span></p>' +
+                '<p><strong>Last Updated:</strong> <span id="lastUpdate">Never</span></p>' +
+                '</div>';
+            updateStatus('Reset complete');
+            document.getElementById('lastUpdate').textContent = 'Never';
+        }
+        
+        function updateStatus(message) {
+            var statusElement = document.getElementById('divStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+                
+                // Clear status after 3 seconds
+                setTimeout(function() {
+                    if (statusElement.textContent === message) {
+                        statusElement.textContent = 'Ready';
+                    }
+                }, 3000);
+            }
+        }
+        
+        // Initialize div demos
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Div demos initialized');
+            
+            // Set up event listeners for bind events
+            document.addEventListener('bindSuccess', function(e) {
+                console.log('Div bind success:', e.target);
+                updateStatus('Content loaded successfully');
+            });
+            
+            document.addEventListener('bindError', function(e) {
+                console.log('Div bind error:', e.detail);
+                updateStatus('Binding failed');
+            });
+            
+            // Initialize error handlers for all bind divs
+            setTimeout(function() {
+                var bindDivs = document.querySelectorAll('.bx-div-bind');
+                bindDivs.forEach(function(div) {
+                    if (div.classList.contains('bx-bind-loading')) {
+                        // Simulate loading timeout and show demo content
+                        setTimeout(function() {
+                            handleBindError('Service not available in demo environment', { target: div });
+                        }, 2000);
+                    }
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
