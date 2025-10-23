@@ -33,8 +33,8 @@ class{
 
 		// Set default values
 		param attributes.tags = "";
-		param attributes.cssSrc = "/bxmodules/bxCompatUI/public/index.bxm?target=css";
-		param attributes.scriptSrc = "/bxmodules/bxCompatUI/public/index.bxm?target=js";
+		param attributes.cssSrc = "/bxmodules/bxUICompat/public/index.bxm?target=css";
+		param attributes.scriptSrc = "/bxmodules/bxUICompat/public/index.bxm?target=js";
 		param attributes.params = "";
 
 		var output = "";

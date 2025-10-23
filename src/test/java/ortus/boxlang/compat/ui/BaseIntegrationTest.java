@@ -39,7 +39,7 @@ public abstract class BaseIntegrationTest {
 	protected static ModuleService			moduleService;
 	protected static ModuleRecord			moduleRecord;
 	protected static Key					result		= new Key( "result" );
-	protected static Key					moduleName	= new Key( "bx-compat-ui" );
+	protected static Key					moduleName	= new Key( "bx-ui-compat" );
 	protected ScriptingRequestBoxContext	context;
 	protected IScope						variables;
 

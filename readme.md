@@ -57,10 +57,11 @@ This module provides powerful UI layout, grid, and AJAX capabilities to the [Box
 ### Install via CommandBox
 
 ```bash
-box install bx-compat-ui
+box install bx-ui-compat
 ```
 
 The module will automatically register and be available in your BoxLang applications with the following components:
+
 - `bx:layout`, `bx:layoutarea` - Layout management
 - `bx:grid`, `bx:gridcolumn`, `bx:gridrow`, `bx:gridupdate` - Data grids
 - `bx:ajaxproxy`, `bx:ajaximport` - AJAX functionality
@@ -71,7 +72,7 @@ The module will automatically register and be available in your BoxLang applicat
 If you are using a URL rewriting mechanism (like `.htaccess` for Apache or URL rewrite rules in Nginx), ensure that requests to static assets (JavaScript and CSS files) are properly routed. The module serves assets from the following paths:
 
 ```
-/bxModules/bxCompatUI/public/
+/bxModules/bxUICompat/public/
 ```
 
 Make sure these paths passthrough with no rewrites.
@@ -250,8 +251,8 @@ Imports JavaScript and CSS files required for BoxLang AJAX tags and features
 | Attribute | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `tags` | string | "" | Comma-delimited list of BoxLang AJAX tags for which to import supporting files |
-| `cssSrc` | string | "/bx-compat-ui/css" | URL of the directory containing CSS files |
-| `scriptSrc` | string | "/bx-compat-ui/js" | URL of the directory containing JavaScript files |
+| `cssSrc` | string | "/bx-ui-compat/css" | URL of the directory containing CSS files |
+| `scriptSrc` | string | "/bx-ui-compat/js" | URL of the directory containing JavaScript files |
 | `params` | string | "" | Parameters to pass, such as API keys |
 
 ### UI Components
@@ -933,7 +934,7 @@ Layouts automatically adapt to different screen sizes:
 
 **Solutions:**
 
-- ✅ Ensure the module is installed: `box install bx-compat-ui`
+- ✅ Ensure the module is installed: `box install bx-ui-compat`
 - ✅ Verify BoxLang web support is enabled
 - ✅ Check that component tags use the correct `bx:` prefix
 - ✅ Ensure required attributes are provided (e.g., `type` for layouts, `name` for grids)
@@ -1012,7 +1013,7 @@ We ❤️ contributions! This project is open source and welcomes your help to m
 
 If you discover a bug, please:
 
-1. **Check existing issues** at [GitHub Issues](https://github.com/ortus-boxlang/bx-compat-ui/issues)
+1. **Check existing issues** at [GitHub Issues](https://github.com/ortus-boxlang/bx-ui-compat/issues)
 2. **Create a new issue** with:
    - Clear title and description
    - Steps to reproduce
@@ -1024,7 +1025,7 @@ If you discover a bug, please:
 
 We'd love to hear your ideas! Please:
 
-1. Open a [Feature Request](https://github.com/ortus-boxlang/bx-compat-ui/issues/new)
+1. Open a [Feature Request](https://github.com/ortus-boxlang/bx-ui-compat/issues/new)
 2. Describe the feature and its use case
 3. Explain how it would benefit users
 
@@ -1037,8 +1038,8 @@ Excellent! Here's how to get started:
 1. **Fork and Clone:**
 
    ```bash
-   git clone https://github.com/YOUR-USERNAME/bx-compat-ui.git
-   cd bx-compat-ui
+   git clone https://github.com/YOUR-USERNAME/bx-ui-compat.git
+   cd bx-ui-compat
    ```
 
 2. **Set up Development Environment:**
@@ -1126,8 +1127,8 @@ See [LICENSE](LICENSE) file for full details.
 
 - **BoxLang Website**: [https://boxlang.io](https://boxlang.io)
 - **Ortus Solutions**: [https://www.ortussolutions.com](https://www.ortussolutions.com)
-- **GitHub Repository**: [https://github.com/ortus-boxlang/bx-compat-ui](https://github.com/ortus-boxlang/bx-compat-ui)
-- **Issue Tracker**: [https://github.com/ortus-boxlang/bx-compat-ui/issues](https://github.com/ortus-boxlang/bx-compat-ui/issues)
+- **GitHub Repository**: [https://github.com/ortus-boxlang/bx-ui-compat](https://github.com/ortus-boxlang/bx-ui-compat)
+- **Issue Tracker**: [https://github.com/ortus-boxlang/bx-ui-compat/issues](https://github.com/ortus-boxlang/bx-ui-compat/issues)
 
 ### 🎓 Learning Resources
 
@@ -1160,5 +1161,4 @@ You can support BoxLang and all Ortus Solutions open source projects:
 	<a href="https://www.boxlang.io">www.boxlang.io</a> |
 	<a href="https://www.ortussolutions.com">www.ortussolutions.com</a>
 </blockquote>
-
 

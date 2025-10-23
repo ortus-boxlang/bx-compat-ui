@@ -13,12 +13,11 @@ This is a BoxLang module for Excel spreadsheet manipulation built on Apache POI.
 
 ### Module Structure
 
-- `src/main/bx/ModuleConfig.bx` - BoxLang module descriptor defining registration, settings, and lifecycle
-- `src/main/java/ortus/boxlang/compat/ui/` - Root directory for Compiled Java classes
-- `src/main/bx/` - Root directory for Boxlang components and BIFs
-  - `bifs/` - Individual BIF function implementations (`@BoxBIF` annotated)
-  - `components/` - Component tag implementations (`@BoxComponent` annotated)
-
+-   `src/main/bx/ModuleConfig.bx` - BoxLang module descriptor defining registration, settings, and lifecycle
+-   `src/main/java/ortus/boxlang/compat/ui/` - Root directory for Compiled Java classes
+-   `src/main/bx/` - Root directory for Boxlang components and BIFs
+    -   `bifs/` - Individual BIF function implementations (`@BoxBIF` annotated)
+    -   `components/` - Component tag implementations (`@BoxComponent` annotated)
 
 ## Development Workflows
 
@@ -34,11 +33,11 @@ This is a BoxLang module for Excel spreadsheet manipulation built on Apache POI.
 
 ### Testing Patterns
 
-- Extend `BaseIntegrationTest` for all module tests
-- Use `@BeforeAll` to load module into BoxRuntime instance
-- Test data in `src/test/resources/tmp/` (auto-cleaned)
-- Execute BoxLang code via `runtime.executeSource(code, context)`
-- Assertions use Google Truth: `assertThat(result).isNotNull()`
+-   Extend `BaseIntegrationTest` for all module tests
+-   Use `@BeforeAll` to load module into BoxRuntime instance
+-   Test data in `src/test/resources/tmp/` (auto-cleaned)
+-   Execute BoxLang code via `runtime.executeSource(code, context)`
+-   Assertions use Google Truth: `assertThat(result).isNotNull()`
 
 **Test Structure Example:**
 
@@ -56,25 +55,25 @@ public class MyTest extends BaseIntegrationTest {
 
 ### Module Loading
 
-Module uses the module name `bx-compat-ui` for registration. The `BaseIntegrationTest.loadModule()` handles module lifecycle during testing.
+Module uses the module name `bx-ui-compat` for registration. The `BaseIntegrationTest.loadModule()` handles module lifecycle during testing.
 
 ## BoxLang Type Helpers and Casters
 
-### IStruct/ArgumentsScope getAs* Methods
+### IStruct/ArgumentsScope getAs\* Methods
 
 BoxLang's `IStruct` interface and `ArgumentsScope` (which extends `IStruct`) provide typed accessor methods for safe value extraction:
 
 **Use `getAs*()` methods when you KNOW the type at compile time (strongly typed):**
 
-- `getAsString(Key)` - Returns the value as a String, null if not present
-- `getAsBoolean(Key)` - Returns the value as a Boolean, null if not present
-- `getAsInteger(Key)` - Returns the value as an Integer, null if not present
-- `getAsLong(Key)` - Returns the value as a Long, null if not present
-- `getAsDouble(Key)` - Returns the value as a Double, null if not present
-- `getAsStruct(Key)` - Returns the value as an IStruct, null if not present
-- `getAsArray(Key)` - Returns the value as an Array, null if not present
-- `getAsNumber(Key)` - Returns the value as a Number (smallest type possible)
-- `getAsKey(Key)` - Returns the value as a Key
+-   `getAsString(Key)` - Returns the value as a String, null if not present
+-   `getAsBoolean(Key)` - Returns the value as a Boolean, null if not present
+-   `getAsInteger(Key)` - Returns the value as an Integer, null if not present
+-   `getAsLong(Key)` - Returns the value as a Long, null if not present
+-   `getAsDouble(Key)` - Returns the value as a Double, null if not present
+-   `getAsStruct(Key)` - Returns the value as an IStruct, null if not present
+-   `getAsArray(Key)` - Returns the value as an Array, null if not present
+-   `getAsNumber(Key)` - Returns the value as a Number (smallest type possible)
+-   `getAsKey(Key)` - Returns the value as a Key
 
 Example usage (when type is known from argument/attribute declarations):
 
@@ -99,15 +98,15 @@ When the type is NOT known at compile time or from user input that needs validat
 
 **Common Casters:**
 
-- `StringCaster.cast(value)` - Casts any value to String (for unknown types)
-- `BooleanCaster.cast(value)` - Casts any value to Boolean (with validation)
-- `IntegerCaster.cast(value)` - Casts any value to Integer
-- `LongCaster.cast(value)` - Casts any value to Long
-- `DoubleCaster.cast(value)` - Casts any value to Double
-- `NumberCaster.cast(value)` - Casts to smallest appropriate number type
-- `StructCaster.cast(value)` - Casts any value to Struct
-- `ArrayCaster.cast(value)` - Casts any value to Array
-- `DateTimeCaster.cast(value)` - Casts to DateTime objects
+-   `StringCaster.cast(value)` - Casts any value to String (for unknown types)
+-   `BooleanCaster.cast(value)` - Casts any value to Boolean (with validation)
+-   `IntegerCaster.cast(value)` - Casts any value to Integer
+-   `LongCaster.cast(value)` - Casts any value to Long
+-   `DoubleCaster.cast(value)` - Casts any value to Double
+-   `NumberCaster.cast(value)` - Casts to smallest appropriate number type
+-   `StructCaster.cast(value)` - Casts any value to Struct
+-   `ArrayCaster.cast(value)` - Casts any value to Array
+-   `DateTimeCaster.cast(value)` - Casts to DateTime objects
 
 Example usage (when type is unknown or user-provided):
 
@@ -129,48 +128,47 @@ if (attempt.wasSuccessful()) {
 
 **Pattern: Use Strong Typing in Module Code**
 
-- Always declare argument types in BIF constructors using `Argument.STRING`, `Argument.BOOLEAN`, etc.
-- Use `arguments.getAs*()` in BIF `_invoke()` methods - type is guaranteed by framework
-- Only use casters when dealing with user input from untyped contexts
-- In `SpreadsheetUtil` helper methods, prefer documented strong types where possible
+-   Always declare argument types in BIF constructors using `Argument.STRING`, `Argument.BOOLEAN`, etc.
+-   Use `arguments.getAs*()` in BIF `_invoke()` methods - type is guaranteed by framework
+-   Only use casters when dealing with user input from untyped contexts
+-   In `SpreadsheetUtil` helper methods, prefer documented strong types where possible
 
 ## Project-Specific Conventions
 
 ### File Format Handling
 
-- Default `xmlFormat = true` creates `.xlsx` files
-- `xmlFormat = false` creates legacy `.xls` files
-- Apache POI abstractions handle format differences transparently
+-   Default `xmlFormat = true` creates `.xlsx` files
+-   `xmlFormat = false` creates legacy `.xls` files
+-   Apache POI abstractions handle format differences transparently
 
 ### Key Management
 
-- All BoxLang `Key` objects centralized in `KeyDictionary`
-- Use `Key.of("string")` for new keys, prefer constants for reused keys
-- BoxLang context access via `context.getScopeNearby(VariablesScope.name)`
+-   All BoxLang `Key` objects centralized in `KeyDictionary`
+-   Use `Key.of("string")` for new keys, prefer constants for reused keys
+-   BoxLang context access via `context.getScopeNearby(VariablesScope.name)`
 
 ### Error Handling
 
-- Use `BoxRuntimeException` for all module-specific errors
-- Include descriptive messages for API misuse
-- Validate required parameters early in BIF/component methods
+-   Use `BoxRuntimeException` for all module-specific errors
+-   Include descriptive messages for API misuse
+-   Validate required parameters early in BIF/component methods
 
 ## Integration Points
 
 ### BoxLang Runtime Integration
 
-- Module registers automatically via `ModuleService`
-- BIFs auto-discovered in `bifs/` package
-- Components auto-discovered with `@BoxComponent` annotation
-- Interceptors registered via `ModuleConfig.configure()`
+-   Module registers automatically via `ModuleService`
+-   BIFs auto-discovered in `bifs/` package
+-   Components auto-discovered with `@BoxComponent` annotation
+-   Interceptors registered via `ModuleConfig.configure()`
 
 ### Data Interchange
 
-- Export to BoxLang Arrays/Structs via `toArray()`, `toQuery()`
-- Import from BoxLang data structures via constructor overloads
-- JSON export/import through BoxLang's native serialization
+-   Export to BoxLang Arrays/Structs via `toArray()`, `toQuery()`
+-   Import from BoxLang data structures via constructor overloads
+-   JSON export/import through BoxLang's native serialization
 
 ## Common Gotchas
 
-- Test module loading requires physical path resolution in `BaseIntegrationTest`
-- File paths need expansion via `FileSystemUtil.expandPath(context, path)`
-
+-   Test module loading requires physical path resolution in `BaseIntegrationTest`
+-   File paths need expansion via `FileSystemUtil.expandPath(context, path)`

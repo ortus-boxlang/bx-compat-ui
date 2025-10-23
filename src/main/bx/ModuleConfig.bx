@@ -38,7 +38,7 @@ class {
 	 * TODO: Once BoxLang 1.6.1 is releaed, remove this and use the public one. Due to the missing registration bug.
 	 */
 	this.mapping = {
-		name: "bxCompatUI",
+		name: "bxUICompat",
 		external: true
 	}
 
@@ -62,7 +62,7 @@ class {
 	/**
 	 * The module web URL
 	 */
-	this.webURL = "https://github.com/ortus-boxlang/bx-compat-ui";
+	this.webURL = "https://github.com/ortus-boxlang/bx-ui-compat";
 
 	/**
 	 * This boolean flag tells the module service to skip the module registration/activation process.
