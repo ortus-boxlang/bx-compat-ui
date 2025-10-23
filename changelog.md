@@ -9,9 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2025-10-22
-
 - First iteration of this module
 
 [unreleased]: https://github.com/ortus-boxlang/bx-compat-ui/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/ortus-boxlang/bx-compat-ui/compare/569d6b5036ac5069d693b8d22432d24745837346...v1.0.0
