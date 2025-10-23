@@ -40,7 +40,7 @@ public class AjaxImportTest extends BaseIntegrationTest {
 
 		// Check CSS imports
 		assertThat( output )
-		    .contains( "<link rel=\"stylesheet\" type=\"text/css\" href=\"/bxmodules/bxCompatUI/public/index.bxm?target=css/ajax-core.css\"" );
+		    .contains( "<link rel=\"stylesheet\" type=\"text/css\" href=\"/bxmodules/bxUICompat/public/index.bxm?target=css/ajax-core.css\"" );
 		assertThat( output ).contains( "layout.css" );
 		assertThat( output ).contains( "div.css" );
 		assertThat( output ).contains( "grid.css" );
@@ -49,7 +49,7 @@ public class AjaxImportTest extends BaseIntegrationTest {
 
 		// Check JavaScript imports
 		assertThat( output )
-		    .contains( "<script type=\"text/javascript\" src=\"/bxmodules/bxCompatUI/public/index.bxm?target=js/ajax-core.js\"></script>" );
+		    .contains( "<script type=\"text/javascript\" src=\"/bxmodules/bxUICompat/public/index.bxm?target=js/ajax-core.js\"></script>" );
 		assertThat( output ).contains( "layout.js" );
 		assertThat( output ).contains( "div.js" );
 		assertThat( output ).contains( "grid.js" );
@@ -121,8 +121,8 @@ public class AjaxImportTest extends BaseIntegrationTest {
 		String output = variables.getAsString( Key.of( "result" ) );
 		assertThat( output ).contains( "window.BoxLangAjax = window.BoxLangAjax ||" );
 		assertThat( output ).contains( "version: '1.0.0'" );
-		assertThat( output ).contains( "cssSrc: '/bxmodules/bxCompatUI/public/index.bxm?target=css'" );
-		assertThat( output ).contains( "scriptSrc: '/bxmodules/bxCompatUI/public/index.bxm?target=js'" );
+		assertThat( output ).contains( "cssSrc: '/bxmodules/bxUICompat/public/index.bxm?target=css'" );
+		assertThat( output ).contains( "scriptSrc: '/bxmodules/bxUICompat/public/index.bxm?target=js'" );
 		assertThat( output ).contains( "utils: {}" );
 	}
 

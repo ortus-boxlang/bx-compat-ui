@@ -249,7 +249,7 @@ class{
 				#len( config.password ) ? 'payload.password = "' & config.password & '";' : ''#
 
 				// Send to BoxLang backend for database processing
-				fetch('/bx-compat-ui/gridupdate', {
+				fetch('/bx-ui-compat/gridupdate', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

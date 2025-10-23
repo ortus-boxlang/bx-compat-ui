@@ -1,16 +1,16 @@
 {
 	"name": "BoxLang UI Compatibility Module",
 	"version": "@build.version@+@build.number@",
-	"location": "https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-compat-ui/@build.version@/bx-compat-ui-@build.version@.zip",
+	"location": "https://downloads.ortussolutions.com/ortussolutions/boxlang-modules/bx-ui-compat/@build.version@/bx-ui-compat-@build.version@.zip",
 	"author": "Ortus Solutions",
-	"homepage": "https://github.com/ortus-boxlang/bx-compat-ui",
-	"documentation": "https://github.com/ortus-boxlang/bx-compat-ui",
+	"homepage": "https://github.com/ortus-boxlang/bx-ui-compat",
+	"documentation": "https://github.com/ortus-boxlang/bx-ui-compat",
 	"repository": {
 		"type": "git",
-		"URL": "https://github.com/ortus-boxlang/bx-compat-ui"
+		"URL": "https://github.com/ortus-boxlang/bx-ui-compat"
 	},
 	"bugs": "https://ortussolutions.atlassian.net/browse/BLMODULES",
-	"slug": "bx-compat-ui",
+	"slug": "bx-ui-compat",
 	"shortDescription": "Module template for BoxLang modules",
 	"type": "boxlang-modules",
 	"keywords": ["boxlang"],

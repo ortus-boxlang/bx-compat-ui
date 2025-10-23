@@ -203,7 +203,7 @@ public class GridUpdateTest extends BaseIntegrationTest {
 		);
 
 		String output = variables.getAsString( Key.of( "result" ) );
-		assertThat( output ).contains( "/bx-compat-ui/gridupdate" );
+		assertThat( output ).contains( "/bx-ui-compat/gridupdate" );
 		assertThat( output ).contains( "fetch(" );
 		assertThat( output ).contains( "application/json" );
 		assertThat( output ).contains( "JSON.stringify" );
